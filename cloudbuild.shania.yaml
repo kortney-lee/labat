@@ -1,0 +1,116 @@
+# Cloud Build — Shania: WIHY Engagement Agent (wihy-shania)
+# Responds to lead-service requests to post WIHY-toned comments on platforms.
+# Called by auth.wihy.ai/services/lead-service after scoring qualified leads.
+#
+# FIRST-TIME SECRET SETUP (run once per secret):
+#
+#   # Core secrets (already exist in Secret Manager):
+#   # internal-admin-token, openai-api-key, wihy-ml-client-secret
+#
+#   # Twitter/X posting account (post comments, auto-reply to threads):
+#   echo -n "YOUR_TWITTER_API_KEY"             | gcloud secrets create twitter-api-key             --data-file=- --project=wihy-ai
+#   echo -n "YOUR_TWITTER_API_SECRET"          | gcloud secrets create twitter-api-secret          --data-file=- --project=wihy-ai
+#   echo -n "YOUR_TWITTER_ACCESS_TOKEN"        | gcloud secrets create twitter-access-token        --data-file=- --project=wihy-ai
+#   echo -n "YOUR_TWITTER_ACCESS_TOKEN_SECRET" | gcloud secrets create twitter-access-token-secret --data-file=- --project=wihy-ai
+#   echo -n "wihyhealthbot"                    | gcloud secrets create twitter-bot-username        --data-file=- --project=wihy-ai
+#
+#   # Instagram (Meta Graph API long-lived token, instagram_manage_comments scope):
+#   echo -n "YOUR_IG_LONG_LIVED_TOKEN" | gcloud secrets create instagram-access-token --data-file=- --project=wihy-ai
+#
+#   # Facebook (Page access token, pages_manage_engagement scope):
+#   echo -n "YOUR_FB_PAGE_TOKEN"       | gcloud secrets create facebook-access-token  --data-file=- --project=wihy-ai
+#
+#   # TikTok (tt.user.comment scope access token):
+#   echo -n "YOUR_TIKTOK_TOKEN"        | gcloud secrets create tiktok-access-token    --data-file=- --project=wihy-ai
+#
+#   # LinkedIn (posting + scheduling — access token from Developer Portal):
+#   echo -n "YOUR_LINKEDIN_ACCESS_TOKEN"  | gcloud secrets create linkedin-access-token --data-file=- --project=wihy-ai
+#
+# After creating any of the optional secrets above, uncomment them in the
+# --set-secrets block below and redeploy.
+#
+# Usage:           gcloud builds submit --config cloudbuild.shania.yaml
+# Service URL:     https://wihy-shania-n4l2vldq3q-uc.a.run.app
+# Monitor status:  GET /api/engagement/monitor  (X-Admin-Token required)
+# Thread monitor:  polls Twitter every 5 min for replies, auto-replies up to depth 2
+#
+# Lead-service example call:
+#   POST /api/engagement/engage
+#   X-Admin-Token: <INTERNAL_ADMIN_TOKEN>
+#   { "platform": "twitter", "action": "comment", "target_id": "1234567890123456789",
+#     "post_content": "I've been struggling with my diet...",
+#     "topic": "healthy eating meal prep", "lead_id": "uuid",
+#     "conversation_tweet_id": "1234567890123456789" }
+
+steps:
+  # Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--no-cache'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/wihy-shania:latest'
+      - '-f'
+      - 'Dockerfile'
+      - '.'
+    timeout: 1200s
+
+  # Push to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/wihy-shania:latest'
+
+  # Deploy to Cloud Run as wihy-shania
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'wihy-shania'
+      - '--image'
+      - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/wihy-shania:latest'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--timeout'
+      - '120'
+      - '--memory'
+      - '512Mi'
+      - '--cpu'
+      - '1'
+      - '--concurrency'
+      - '20'
+      - '--set-env-vars'
+      - 'APP_MODULE=src.apps.shania_app:app,ENV=production,LOG_LEVEL=INFO,WIHY_ML_CLIENT_ID=wihy_ml_mk1waylw,META_GRAPH_API_VERSION=v21.0,INSTAGRAM_GRAPH_VERSION=v19.0,LINKEDIN_ORG_ID=111401973,BRAND_ENFORCEMENT_MODE=warn'
+      - '--set-secrets'
+      - >-
+        INTERNAL_ADMIN_TOKEN=internal-admin-token:latest,
+        OPENAI_API_KEY=openai-api-key:latest,
+        WIHY_OPENAI_API_KEY=openai-api-key:latest,
+        WIHY_ML_CLIENT_SECRET=wihy-ml-client-secret:latest,
+        INSTAGRAM_ACCESS_TOKEN=instagram-access-token:latest,
+        LINKEDIN_ACCESS_TOKEN=linkedin-access-token:latest,
+        SHANIA_APP_ID=wihy-shania-app-id:latest,
+        SHANIA_APP_SECRET=wihy-shania-app-secret:latest,
+        SHANIA_LONG_LIVED_USER_TOKEN=wihy-shania-long-user-token:latest,
+        SHANIA_PAGE_ACCESS_TOKEN=wihy-shania-page-access-token:latest,
+        META_WEBHOOK_VERIFY_TOKEN=wihy-agent-meta-webhook-verify-token:latest,
+        META_PAGE_ID_WIHY=meta-page-id-wihy:latest,
+        META_PAGE_ID_VOWELS=meta-page-id-vowels:latest,
+        META_PAGE_ID_COMMUNITYGROCERIES=meta-page-id-communitygroceries:latest,
+        META_PAGE_ID_CHILDRENNUTRITION=meta-page-id-childrennutrition:latest,
+        META_PAGE_ID_PARENTINGWITHCHRIST=meta-page-id-parentingwithchrist:latest,
+        META_PAGE_ID_OTAKULOUNGE=meta-page-id-otakulounge:latest
+      - '--min-instances'
+      - '1'
+      - '--max-instances'
+      - '5'
+      - '--allow-unauthenticated'
+      - '--service-account'
+      - 'wihy-ml-backend@wihy-ai.iam.gserviceaccount.com'
+    timeout: 600s
+
+images:
+  - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/wihy-shania:latest'

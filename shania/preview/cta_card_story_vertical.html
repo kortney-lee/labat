@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@700;800;900&display=swap');
+
+    :root {
+      --bg: #e0f2fe;
+      --bg-dark: #0c1d2e;
+      --primary: #fa5f06;
+      --success: #4cbb17;
+      --white: #ffffff;
+      --card: #ffffff;
+      --text-dark: #111827;
+      --text-muted: #6b7280;
+      --text-light: #f9fafb;
+      --danger: #ef4444;
+      --font-headline: 'Montserrat', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --sp-xs: 8px;
+      --sp-sm: 16px;
+      --sp-md: 24px;
+      --sp-lg: 40px;
+      --sp-xl: 64px;
+      --sp-xxl: 96px;
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+    }
+  
+:root{--canvas-w:1080px;--canvas-h:1920px;}</style>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: var(--canvas-w);
+    height: var(--canvas-h);
+    font-family: var(--font-body);
+    overflow: hidden;
+  }
+
+  .card {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 72px;
+    position: relative;
+    text-align: center;
+    background: linear-gradient(160deg, var(--bg1) 0%, var(--bg2) 100%);
+  }
+
+  /* Inner frame border using accent */
+  .frame {
+    position: absolute;
+    top: 32px; left: 32px; right: 32px; bottom: 32px;
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    pointer-events: none;
+    opacity: 0.12;
+  }
+
+  /* Top-right glow */
+  .glow {
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 360px; height: 360px;
+    background: radial-gradient(circle, var(--glow) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* Decorative accent diamond */
+  .deco-diamond {
+    position: absolute;
+    top: 72px; right: 72px;
+    width: 60px; height: 60px;
+    border: 2px solid var(--accent);
+    transform: rotate(45deg);
+    opacity: 0.1;
+    pointer-events: none;
+  }
+
+  /* Bottom-left floating dots */
+  .deco-dots {
+    position: absolute;
+    bottom: 80px; left: 52px;
+    width: 48px; height: 48px;
+    background-image: radial-gradient(circle, var(--accent) 1.5px, transparent 1.5px);
+    background-size: 12px 12px;
+    opacity: 0.1;
+    pointer-events: none;
+  }
+
+  .headline {
+    font-family: var(--font-headline);
+    font-weight: 900;
+    font-size: 54px;
+    color: #f8fafc;
+    line-height: 1.1;
+    max-width: 90%;
+    margin-bottom: 20px;
+    letter-spacing: -1px;
+  }
+
+  .subtext {
+    font-size: 22px;
+    font-weight: 400;
+    color: rgba(248,250,252,0.5);
+    max-width: 80%;
+    line-height: 1.5;
+    margin-bottom: 48px;
+  }
+
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    font-family: var(--font-headline);
+    font-weight: 800;
+    font-size: 20px;
+    padding: 20px 56px;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+  }
+
+  .product-name {
+    margin-top: 24px;
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(248,250,252,0.35);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .logo {
+    position: absolute;
+    bottom: 32px;
+    height: 64px;
+    width: auto;
+    object-fit: contain;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="frame"></div>
+    <div class="glow"></div>
+    <div class="deco-diamond"></div>
+    <div class="deco-dots"></div>
+
+    <h1 class="headline">Stop Guessing. Start Knowing.</h1>
+
+    <p class="subtext">Scan any product. Get the truth in seconds. No ads, no sponsorships — just science.</p>
+
+    <div class="cta-btn">Download WIHY Free</div>
+
+    <div class="product-name">WIHY</div>
+
+    <img class="logo" src="https://storage.googleapis.com/wihy-web-assets/images/Logo_wihy.png" />
+  </div>
+</body>
+</html>

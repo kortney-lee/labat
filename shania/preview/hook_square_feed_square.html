@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@700;800;900&display=swap');
+
+    :root {
+      --bg: #e0f2fe;
+      --bg-dark: #0c1d2e;
+      --primary: #fa5f06;
+      --success: #4cbb17;
+      --white: #ffffff;
+      --card: #ffffff;
+      --text-dark: #111827;
+      --text-muted: #6b7280;
+      --text-light: #f9fafb;
+      --danger: #ef4444;
+      --font-headline: 'Montserrat', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --sp-xs: 8px;
+      --sp-sm: 16px;
+      --sp-md: 24px;
+      --sp-lg: 40px;
+      --sp-xl: 64px;
+      --sp-xxl: 96px;
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+    }
+  
+:root{--canvas-w:1080px;--canvas-h:1080px;}</style>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: var(--canvas-w);
+    height: var(--canvas-h);
+    font-family: var(--font-body);
+    overflow: hidden;
+  }
+
+  .card {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 72px;
+    position: relative;
+    background: linear-gradient(155deg, var(--bg1) 0%, var(--bg2) 100%);
+  }
+
+  /* Accent top bar */
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--accent) 0%, transparent 80%);
+  }
+
+  /* Corner glow */
+  .glow {
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, var(--glow) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* Geometric circle */
+  .deco-circle {
+    position: absolute;
+    bottom: 120px; right: 64px;
+    width: 180px; height: 180px;
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+    opacity: 0.1;
+    pointer-events: none;
+  }
+
+  /* Dotted grid */
+  .deco-dots {
+    position: absolute;
+    top: 80px; right: 72px;
+    width: 80px; height: 80px;
+    background-image: radial-gradient(circle, var(--accent) 1.5px, transparent 1.5px);
+    background-size: 16px 16px;
+    opacity: 0.15;
+    pointer-events: none;
+  }
+
+  .headline {
+    font-family: var(--font-headline);
+    font-weight: 900;
+    font-size: 62px;
+    color: #f8fafc;
+    line-height: 1.08;
+    letter-spacing: -1.5px;
+    max-width: 85%;
+    margin-bottom: 20px;
+  }
+
+  .divider {
+    width: 56px;
+    height: 4px;
+    background: var(--accent);
+    margin-bottom: 20px;
+    border-radius: 2px;
+  }
+
+  .subtext {
+    font-size: 22px;
+    font-weight: 400;
+    color: rgba(248,250,252,0.55);
+    max-width: 80%;
+    line-height: 1.5;
+    margin-bottom: 36px;
+  }
+
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 15px;
+    padding: 14px 36px;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .footer {
+    position: absolute;
+    bottom: 36px;
+    left: 72px;
+    right: 72px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logo {
+    height: 64px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  .product-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(248,250,252,0.35);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="glow"></div>
+    <div class="deco-circle"></div>
+    <div class="deco-dots"></div>
+
+    <h1 class="headline">What If Everything You Were Told About Nutrition Was Wrong?</h1>
+    <div class="divider"></div>
+    <p class="subtext">The food industry spends $14 billion a year telling you what to eat. We spent 10 years researching what they don&#x27;t want you to know.</p>
+    <div class="cta-btn">Get the Book</div>
+
+    <div class="footer">
+      <img class="logo" src="https://storage.googleapis.com/wihy-web-assets/images/Logo_wihy.png" />
+      <span class="product-name">VOWELS</span>
+    </div>
+  </div>
+</body>
+</html>

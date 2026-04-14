@@ -1,0 +1,71 @@
+# Cloud Build — ALEX: Children Nutrition brand instance (SEO, content, authority)
+# Usage: gcloud builds submit --project=wihy-ai --config=cloudbuild.alex-cn.yaml .
+
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--no-cache'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/wihy-alex-cn:latest'
+      - '-f'
+      - 'Dockerfile'
+      - '.'
+    timeout: 1200s
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/wihy-alex-cn:latest'
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'wihy-alex-cn'
+      - '--image'
+      - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/wihy-alex-cn:latest'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--timeout'
+      - '3600'
+      - '--memory'
+      - '1Gi'
+      - '--cpu'
+      - '1'
+      - '--concurrency'
+      - '40'
+      - '--set-env-vars'
+      - 'APP_MODULE=src.apps.alex_app:app,ENV=production,LOG_LEVEL=INFO,SERVICES_URL=https://services.wihy.ai,WIHY_ML_CLIENT_ID=wihy_ml_mk1waylw,WIHY_VECTOR_STORE_ID=vs_69b0bd9387dc8191b9bc4d8d8f9c4cb1,AUTH_SERVICE_URL=https://auth.wihy.ai,LABAT_URL=https://wihy-labat-cn-n4l2vldq3q-uc.a.run.app,SHANIA_GRAPHICS_URL=https://wihy-shania-graphics-12913076533.us-central1.run.app,AD_POSTING_ENABLED=false,ALEX_BRAND_SCOPE=childrennutrition,LABAT_AD_BRANDS=childrennutrition,BRAND_ENFORCEMENT_MODE=warn'
+      - '--set-secrets'
+      - >-
+        INTERNAL_ADMIN_TOKEN=internal-admin-token:latest,
+        WIHY_ML_CLIENT_SECRET=wihy-ml-client-secret:latest,
+        OPENAI_API_KEY=openai-api-key:latest,
+        WIHY_OPENAI_API_KEY=openai-api-key:latest,
+        META_PAGE_ID_WIHY=meta-page-id-wihy:latest,
+        META_PAGE_ID_VOWELS=meta-page-id-vowels:latest,
+        META_PAGE_ID_COMMUNITYGROCERIES=meta-page-id-communitygroceries:latest,
+        META_PAGE_ID_CHILDRENNUTRITION=meta-page-id-childrennutrition:latest,
+        META_PAGE_ID_PARENTINGWITHCHRIST=meta-page-id-parentingwithchrist:latest,
+        META_PAGE_ID_OTAKULOUNGE=meta-page-id-otakulounge:latest
+      - '--min-instances'
+      - '0'
+      - '--max-instances'
+      - '5'
+      - '--allow-unauthenticated'
+      - '--service-account'
+      - 'wihy-ml-backend@wihy-ai.iam.gserviceaccount.com'
+    timeout: 600s
+
+images:
+  - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/wihy-alex-cn:latest'
+
+timeout: 1800s
+
+options:
+  machineType: 'E2_HIGHCPU_8'
+  logging: CLOUD_LOGGING_ONLY

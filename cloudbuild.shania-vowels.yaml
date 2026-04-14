@@ -1,0 +1,75 @@
+# Cloud Build — Shania: Vowels brand instance (engagement + posting)
+# Scoped to vowels brand only via SHANIA_BRAND_SCOPE.
+# Usage: gcloud builds submit --project=wihy-ai --config=cloudbuild.shania-vowels.yaml .
+
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--no-cache'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/wihy-shania-vowels:latest'
+      - '-f'
+      - 'Dockerfile'
+      - '.'
+    timeout: 1200s
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/wihy-shania-vowels:latest'
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'wihy-shania-vowels'
+      - '--image'
+      - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/wihy-shania-vowels:latest'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--timeout'
+      - '120'
+      - '--memory'
+      - '512Mi'
+      - '--cpu'
+      - '1'
+      - '--concurrency'
+      - '20'
+      - '--set-env-vars'
+      - 'APP_MODULE=src.apps.shania_app:app,ENV=production,LOG_LEVEL=INFO,WIHY_ML_CLIENT_ID=wihy_ml_mk1waylw,META_GRAPH_API_VERSION=v21.0,INSTAGRAM_GRAPH_VERSION=v19.0,LINKEDIN_ORG_ID=111401973,SHANIA_BRAND_SCOPE=vowels,BRAND_ENFORCEMENT_MODE=warn'
+      - '--set-secrets'
+      - >-
+        INTERNAL_ADMIN_TOKEN=internal-admin-token:latest,
+        OPENAI_API_KEY=openai-api-key:latest,
+        WIHY_OPENAI_API_KEY=openai-api-key:latest,
+        WIHY_ML_CLIENT_SECRET=wihy-ml-client-secret:latest,
+        INSTAGRAM_ACCESS_TOKEN=instagram-access-token:latest,
+        LINKEDIN_ACCESS_TOKEN=linkedin-access-token:latest,
+        SHANIA_APP_ID=wihy-shania-app-id:latest,
+        SHANIA_APP_SECRET=wihy-shania-app-secret:latest,
+        SHANIA_LONG_LIVED_USER_TOKEN=wihy-shania-long-user-token:latest,
+        SHANIA_PAGE_ACCESS_TOKEN=wihy-shania-page-access-token:latest,
+        META_WEBHOOK_VERIFY_TOKEN=wihy-agent-meta-webhook-verify-token:latest,
+        META_PAGE_ID_WIHY=meta-page-id-wihy:latest,
+        META_PAGE_ID_VOWELS=meta-page-id-vowels:latest,
+        META_PAGE_ID_COMMUNITYGROCERIES=meta-page-id-communitygroceries:latest,
+        META_PAGE_ID_CHILDRENNUTRITION=meta-page-id-childrennutrition:latest,
+        META_PAGE_ID_PARENTINGWITHCHRIST=meta-page-id-parentingwithchrist:latest,
+        META_PAGE_ID_OTAKULOUNGE=meta-page-id-otakulounge:latest
+      - '--min-instances'
+      - '0'
+      - '--max-instances'
+      - '5'
+      - '--allow-unauthenticated'
+      - '--service-account'
+      - 'wihy-ml-backend@wihy-ai.iam.gserviceaccount.com'
+    timeout: 600s
+
+images:
+  - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/wihy-shania-vowels:latest'
+
+timeout: 1800s

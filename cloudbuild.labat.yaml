@@ -1,0 +1,111 @@
+# Cloud Build — WIHY LABAT Service (wihy-labat)
+# Lead Automation, Business Ads & Targeting — Meta/Facebook integration.
+# Same codebase; APP_MODULE selects the slim LABAT entry point.
+#
+# FIRST-TIME SECRET SETUP (run once per secret):
+#
+#   # Core secrets (already exist in Secret Manager):
+#   # internal-admin-token, openai-api-key, wihy-ml-client-secret
+#
+#   # Meta / Facebook app credentials (prefixed with app name for multi-app support):
+#   # DONE: wihy-agent-meta-app-id, wihy-agent-meta-app-secret
+#   echo -n "YOUR_META_PAGE_ACCESS_TOKEN" | gcloud secrets create wihy-agent-meta-page-access-token --data-file=- --project=wihy-ai
+#   echo -n "YOUR_META_SYSTEM_USER_TOKEN" | gcloud secrets create wihy-agent-meta-system-user-token --data-file=- --project=wihy-ai
+#   echo -n "YOUR_WEBHOOK_VERIFY_TOKEN"   | gcloud secrets create wihy-agent-meta-webhook-verify-token --data-file=- --project=wihy-ai
+#   echo -n "YOUR_META_PIXEL_ID"          | gcloud secrets create wihy-agent-meta-pixel-id --data-file=- --project=wihy-ai
+#
+#   # LinkedIn (LABAT analytics + Shania posting — access token from Developer Portal):
+#   echo -n "YOUR_LINKEDIN_ACCESS_TOKEN"  | gcloud secrets create linkedin-access-token --data-file=- --project=wihy-ai
+#
+# Usage:           gcloud builds submit --config cloudbuild.labat.yaml
+# Service URL:     https://wihy-labat-<hash>.us-central1.run.app
+# Docs:            GET /docs
+# Health:          GET /health
+#
+# Webhook URL for Meta Developer Console:
+#   https://ml.wihy.ai/api/labat/webhooks
+
+steps:
+  # Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--no-cache'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/wihy-labat:latest'
+      - '-f'
+      - 'Dockerfile'
+      - '.'
+    timeout: 1200s
+
+  # Push to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/wihy-labat:latest'
+
+  # Deploy to Cloud Run as wihy-labat
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'wihy-labat'
+      - '--image'
+      - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/wihy-labat:latest'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--timeout'
+      - '120'
+      - '--memory'
+      - '512Mi'
+      - '--cpu'
+      - '1'
+      - '--concurrency'
+      - '40'
+      - '--set-env-vars'
+      - 'APP_MODULE=src.apps.labat_app:app,ENV=production,LOG_LEVEL=INFO,WIHY_ML_CLIENT_ID=wihy_ml_mk1waylw,SERVICES_URL=https://services.wihy.ai,META_AD_ACCOUNT_ID=act_218581359635343,META_BUSINESS_ID=4867231843349033,LINKEDIN_ORG_ID=111401973,BRAND_ENFORCEMENT_MODE=warn'
+      - '--set-secrets'
+      - >-
+        INTERNAL_ADMIN_TOKEN=internal-admin-token:latest,
+        GEMINI_API_KEY=GOOGLE_API_KEY:latest,
+        OPENAI_API_KEY=openai-api-key:latest,
+        WIHY_ML_CLIENT_SECRET=wihy-ml-client-secret:latest,
+        OAUTH_FRONTEND_CLIENT_SECRET=OAUTH_FRONTEND_CLIENT_SECRET:latest,
+        LINKEDIN_ACCESS_TOKEN=linkedin-access-token:latest,
+        SHANIA_APP_ID=wihy-shania-app-id:latest,
+        SHANIA_APP_SECRET=wihy-shania-app-secret:latest,
+        SHANIA_PAGE_ACCESS_TOKEN=wihy-shania-page-access-token:latest,
+        SHANIA_LONG_LIVED_USER_TOKEN=wihy-shania-long-user-token:latest,
+        META_APP_ID=wihy-agent-meta-app-id:latest,
+        META_APP_SECRET=wihy-agent-meta-app-secret:latest,
+        META_PAGE_ACCESS_TOKEN=wihy-agent-meta-page-access-token:latest,
+        META_SYSTEM_USER_TOKEN=wihy-agent-meta-system-user-token:latest,
+        META_WEBHOOK_VERIFY_TOKEN=wihy-agent-meta-webhook-verify-token:latest,
+        META_PIXEL_ID=wihy-agent-meta-pixel-id:latest,
+        SENDGRID_API_KEY=sendgrid-api-key:latest,
+        META_PAGE_ID_WIHY=meta-page-id-wihy:latest,
+        META_PAGE_ID_VOWELS=meta-page-id-vowels:latest,
+        META_PAGE_ID_COMMUNITYGROCERIES=meta-page-id-communitygroceries:latest,
+        META_PAGE_ID_CHILDRENNUTRITION=meta-page-id-childrennutrition:latest,
+        META_PAGE_ID_PARENTINGWITHCHRIST=meta-page-id-parentingwithchrist:latest,
+        META_PAGE_ID_OTAKULOUNGE=meta-page-id-otakulounge:latest
+      - '--min-instances'
+      - '0'
+      - '--max-instances'
+      - '5'
+      - '--allow-unauthenticated'
+      - '--service-account'
+      - 'wihy-ml-backend@wihy-ai.iam.gserviceaccount.com'
+    timeout: 600s
+
+images:
+  - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/wihy-labat:latest'
+
+timeout: 1800s
+
+options:
+  machineType: 'E2_HIGHCPU_8'
+  logging: CLOUD_LOGGING_ONLY

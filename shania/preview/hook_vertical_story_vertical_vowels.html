@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@700;800;900&display=swap');
+      :root {
+        --font-headline: 'Montserrat', sans-serif;
+        --font-body: 'Inter', sans-serif;
+        --canvas-w: 1080px;
+        --canvas-h: 1920px;
+        --bg1: #f5f3ff;
+        --bg2: #eff6ff;
+        --accent: #3b82f6;
+        --accent2: #a78bfa;
+        --text-primary: #1e293b;
+        --text-secondary: #6b7280;
+        --tag-bg: rgba(59,130,246,0.08);
+        --glow: rgba(0,0,0,0);
+        --btn-bg: #3b82f6;
+        --btn-text: #ffffff;
+      }
+    </style>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: var(--canvas-w);
+    height: var(--canvas-h);
+    font-family: var(--font-body);
+    overflow: hidden;
+  }
+
+  .card {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 72px 48px 64px;
+    position: relative;
+    background: linear-gradient(180deg, var(--bg2) 0%, var(--bg1) 55%, var(--bg1) 100%);
+  }
+
+  /* Left accent bar */
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 5px;
+    background: linear-gradient(180deg, var(--accent) 0%, transparent 70%);
+  }
+
+  /* Top-right glow */
+  .glow {
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, var(--glow) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* Bottom-left decorative ring */
+  .deco-ring {
+    position: absolute;
+    bottom: 180px; left: -40px;
+    width: 200px; height: 200px;
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+    opacity: 0.08;
+    pointer-events: none;
+  }
+
+  /* Diagonal line */
+  .deco-line {
+    position: absolute;
+    top: 40%; right: 48px;
+    width: 2px; height: 120px;
+    background: var(--accent);
+    opacity: 0.12;
+    transform: rotate(25deg);
+    pointer-events: none;
+  }
+
+  .top {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+
+  .logo {
+    height: 72px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  .center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px 0;
+  }
+
+  .headline {
+    font-family: var(--font-headline);
+    font-weight: 900;
+    font-size: 68px;
+    color: #f8fafc;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    max-width: 95%;
+    margin-bottom: 28px;
+  }
+
+  .divider {
+    width: 48px;
+    height: 4px;
+    background: var(--accent);
+    margin-bottom: 24px;
+    border-radius: 2px;
+  }
+
+  .subtext {
+    font-size: 26px;
+    font-weight: 400;
+    color: rgba(248,250,252,0.55);
+    line-height: 1.5;
+    max-width: 90%;
+  }
+
+  .bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding-bottom: 16px;
+  }
+
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 18px;
+    padding: 18px 52px;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .product-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(248,250,252,0.35);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="glow"></div>
+    <div class="deco-ring"></div>
+    <div class="deco-line"></div>
+
+    <div class="top">
+      <img class="logo" src="https://storage.googleapis.com/wihy-web-assets/images/brands/vowels_logo.png" />
+    </div>
+
+    <div class="center">
+      <h1 class="headline">Your Grocery Store Has 40,000 Products. Only 12% Are Actually Healthy.</h1>
+      <div class="divider"></div>
+      <p class="subtext">We analyzed every single one so you don&#x27;t have to.</p>
+    </div>
+
+    <div class="bottom">
+      <div class="cta-btn">See the Data</div>
+      <span class="product-name">WIHY</span>
+    </div>
+  </div>
+</body>
+</html>

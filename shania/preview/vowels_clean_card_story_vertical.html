@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@700;800;900&display=swap');
+      :root {
+        --font-headline: 'Montserrat', sans-serif;
+        --font-body: 'Inter', sans-serif;
+        --canvas-w: 1080px;
+        --canvas-h: 1920px;
+        --bg1: #fefce8;
+        --bg2: #faf5ff;
+        --accent: #7c3aed;
+        --accent2: #2563eb;
+        --text-primary: #1e1b4b;
+        --text-secondary: #78716c;
+        --tag-bg: rgba(124,58,237,0.08);
+        --glow: rgba(0,0,0,0);
+        --btn-bg: #7c3aed;
+        --btn-text: #ffffff;
+      }
+    </style>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: var(--canvas-w);
+    height: var(--canvas-h);
+    font-family: var(--font-body);
+    overflow: hidden;
+  }
+
+  .card {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    background: var(--bg1);
+    padding: 64px;
+  }
+
+  /* Thin top accent bar */
+  .accent-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    background: var(--accent);
+  }
+
+  /* Subtle vertical line */
+  .v-line {
+    position: absolute;
+    top: 40px; right: 56px;
+    width: 2px; height: 120px;
+    background: var(--accent);
+    opacity: 0.12;
+    pointer-events: none;
+  }
+
+  .headline {
+    font-family: var(--font-headline);
+    font-weight: 800;
+    font-size: 52px;
+    color: var(--text-primary);
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+    max-width: 85%;
+    margin-bottom: 16px;
+  }
+
+  .rule {
+    width: 44px;
+    height: 3px;
+    background: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .subtext {
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    max-width: 85%;
+    margin-bottom: 28px;
+  }
+
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 13px;
+    padding: 12px 28px;
+    border-radius: 6px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .footer {
+    position: absolute;
+    bottom: 28px;
+    right: 64px;
+  }
+
+  .logo {
+    height: 80px;
+    width: auto;
+    object-fit: contain;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="accent-bar"></div>
+    <div class="v-line"></div>
+
+    <h1 class="headline">1 in 3 Children Is Now Overweight</h1>
+    <div class="rule"></div>
+    <p class="subtext">CDC data shows diet-related illness is the #1 preventable cause of childhood morbidity.</p>
+    <div class="cta-btn">Learn More</div>
+
+    <div class="footer">
+      <img class="logo" src="https://storage.googleapis.com/wihy-web-assets/images/brands/vowels_logo.png" />
+    </div>
+  </div>
+</body>
+</html>

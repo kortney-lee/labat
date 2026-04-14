@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+{{{brandStyles}}}
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: var(--canvas-w);
+    height: var(--canvas-h);
+    font-family: var(--font-body);
+    overflow: hidden;
+    --panel-bg: rgba(255,255,255,0.66);
+    --head-size: 58px;
+    --kicker-size: 11px;
+  }
+
+  body[data-theme='bold'] {
+    --head-size: 62px;
+  }
+
+  body[data-theme='dark'] {
+    --panel-bg: rgba(15,23,42,0.45);
+  }
+
+  body[data-direction='editorial'] {
+    --kicker-size: 12px;
+  }
+
+  body[data-direction='data_lab'] {
+    --panel-bg: rgba(255,255,255,0.54);
+  }
+
+  .card {
+    width: 100%;
+    height: 100%;
+    padding: 54px;
+    position: relative;
+    background:
+      radial-gradient(circle at 18% 8%, rgba(255,255,255,0.6) 0%, transparent 34%),
+      linear-gradient(150deg, var(--bg1) 0%, var(--bg2) 100%);
+  }
+
+  .mesh {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(30,64,175,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,58,237,0.06) 1px, transparent 1px);
+    background-size: 22px 22px;
+    opacity: 0.55;
+    pointer-events: none;
+  }
+
+  .layout {
+    position: absolute;
+    inset: 54px;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 22px 56px rgba(15,23,42,0.2);
+    border: 1px solid rgba(255,255,255,0.5);
+  }
+
+  .left {
+    background: var(--panel-bg);
+    backdrop-filter: blur(4px);
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .kicker {
+    font-family: var(--font-headline);
+    font-size: var(--kicker-size);
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    color: var(--accent);
+  }
+
+  .headline {
+    margin-top: 12px;
+    font-family: var(--font-headline);
+    font-size: var(--head-size);
+    font-weight: 900;
+    line-height: 1.02;
+    letter-spacing: -1.1px;
+    color: var(--text-primary);
+    text-wrap: balance;
+  }
+
+  .subtext {
+    margin-top: 16px;
+    font-size: 20px;
+    color: var(--text-secondary);
+    line-height: 1.45;
+    text-wrap: pretty;
+  }
+
+  .logo {
+    height: 58px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  .right {
+    background: linear-gradient(168deg, var(--accent), var(--accent2));
+    color: #fff;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .score-label {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.85;
+  }
+
+  .score {
+    font-family: var(--font-headline);
+    font-size: 86px;
+    line-height: 0.95;
+    margin-top: 12px;
+    font-weight: 900;
+  }
+
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    color: #111827;
+    font-family: var(--font-headline);
+    font-size: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.3px;
+    font-weight: 800;
+  }
+
+  .footer {
+    margin-top: 24px;
+  }
+
+  .rail {
+    margin-top: 16px;
+    height: 7px;
+    border-radius: 99px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.9), rgba(255,255,255,0.18));
+  }
+</style>
+</head>
+<body data-theme="{{theme}}" data-direction="{{artDirection}}">
+  <div class="card">
+    <div class="mesh"></div>
+    <section class="layout">
+      <div class="left">
+        <div>
+          <div class="kicker">Data Insight</div>
+          <h1 class="headline">{{headline}}</h1>
+          {{#if subtext}}<p class="subtext">{{subtext}}</p>{{/if}}
+        </div>
+        <div class="footer">
+          {{#unless (eq showLogo false)}}<img class="logo" src="{{logoUrl}}" />{{/unless}}
+        </div>
+      </div>
+      <aside class="right">
+        <div>
+          <div class="score-label">Confidence</div>
+          <div class="score">96%</div>
+          <div class="rail"></div>
+        </div>
+        {{#if cta}}<div class="cta-btn">{{cta}}</div>{{/if}}
+      </aside>
+    </section>
+  </div>
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@700;800;900&display=swap');
+      :root {
+        --font-headline: 'Montserrat', sans-serif;
+        --font-body: 'Inter', sans-serif;
+        --canvas-w: 1080px;
+        --canvas-h: 1920px;
+        --bg1: #faf5ff;
+        --bg2: #ede9fe;
+        --accent: #7c3aed;
+        --accent2: #1e40af;
+        --text-primary: #1e1b4b;
+        --text-secondary: #6b7280;
+        --tag-bg: rgba(124,58,237,0.08);
+        --glow: rgba(0,0,0,0);
+        --btn-bg: #7c3aed;
+        --btn-text: #ffffff;
+      }
+    </style>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: var(--canvas-w);
+    height: var(--canvas-h);
+    font-family: var(--font-body);
+    overflow: hidden;
+  }
+
+  .card {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    background: var(--bg1);
+  }
+
+  /* Header */
+  .header {
+    padding: 52px 56px 28px;
+    position: relative;
+  }
+
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 56px;
+    right: 56px;
+    height: 1px;
+    background: var(--accent);
+    opacity: 0.15;
+  }
+
+  .headline {
+    font-family: var(--font-headline);
+    font-weight: 900;
+    font-size: 44px;
+    color: var(--text-primary, var(--accent));
+    line-height: 1.12;
+    letter-spacing: -0.5px;
+  }
+
+  .subtext {
+    font-size: 18px;
+    color: var(--text-secondary, rgba(255,255,255,0.5));
+    margin-top: 8px;
+    font-weight: 400;
+  }
+
+  /* Two-column split */
+  .split {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+  }
+
+  .side {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 36px 44px;
+  }
+
+  .side-left {
+    border-right: 1px solid rgba(128,128,128,0.12);
+  }
+
+  /* Column header with icon */
+  .col-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .col-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .side-left .col-icon {
+    background: rgba(239,68,68,0.12);
+    color: #ef4444;
+  }
+  .side-right .col-icon {
+    background: rgba(34,197,94,0.12);
+    color: #22c55e;
+  }
+
+  .side-label {
+    font-family: var(--font-headline);
+    font-weight: 800;
+    font-size: 24px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .side-left .side-label { color: #ef4444; }
+  .side-right .side-label { color: #22c55e; }
+
+  /* Items */
+  .side-items {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .side-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0;
+    font-size: 21px;
+    font-weight: 500;
+    color: var(--text-primary, var(--accent));
+    line-height: 1.3;
+    border-bottom: 1px solid rgba(128,128,128,0.08);
+  }
+
+  .side-item:last-child {
+    border-bottom: none;
+  }
+
+  .item-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  .side-left .item-icon {
+    background: rgba(239,68,68,0.10);
+    color: #ef4444;
+  }
+
+  .side-right .item-icon {
+    background: rgba(34,197,94,0.10);
+    color: #22c55e;
+  }
+
+  /* Footer */
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 44px;
+    border-top: 1px solid rgba(128,128,128,0.08);
+  }
+
+  .logo {
+    height: 36px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  .cta-btn {
+    background: var(--btn-bg, var(--accent));
+    color: var(--btn-text, #fff);
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 13px;
+    padding: 12px 28px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <h1 class="headline">Reading Labels Changes Everything</h1>
+      <p class="subtext">Same shelf, different story</p>
+    </div>
+
+    <div class="split">
+      <div class="side side-left">
+        <div class="col-header">
+          <div class="col-icon">&times;</div>
+          <div class="side-label">Avoid</div>
+        </div>
+        <div class="side-items">
+          <div class="side-item"><span class="item-icon">&times;</span>High fructose corn syrup</div>
+          <div class="side-item"><span class="item-icon">&times;</span>Partially hydrogenated oils</div>
+          <div class="side-item"><span class="item-icon">&times;</span>Artificial colors (Red 40, Yellow 5)</div>
+          <div class="side-item"><span class="item-icon">&times;</span>Sodium benzoate</div>
+        </div>
+      </div>
+      <div class="side side-right">
+        <div class="col-header">
+          <div class="col-icon">&check;</div>
+          <div class="side-label">Choose</div>
+        </div>
+        <div class="side-items">
+          <div class="side-item"><span class="item-icon">&check;</span>Whole grain flour</div>
+          <div class="side-item"><span class="item-icon">&check;</span>Extra virgin olive oil</div>
+          <div class="side-item"><span class="item-icon">&check;</span>Turmeric and beet for color</div>
+          <div class="side-item"><span class="item-icon">&check;</span>Sea salt</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <img class="logo" src="https://storage.googleapis.com/wihy-web-assets/images/brands/vowels_logo.png" />
+      <div class="cta-btn">Learn How to Read Labels</div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+{{{brandStyles}}}
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: var(--canvas-w);
+    height: var(--canvas-h);
+    font-family: var(--font-body);
+    overflow: hidden;
+  }
+
+  .card {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 64px 72px;
+    position: relative;
+    background: linear-gradient(155deg, var(--bg1) 0%, var(--bg2) 100%);
+    overflow: hidden;
+  }
+
+  /* Top accent bar */
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--accent) 0%, transparent 80%);
+  }
+
+  /* Corner glow */
+  .glow {
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, var(--glow) 0%, transparent 55%);
+    pointer-events: none;
+  }
+
+  /* Geometric accent ring */
+  .deco-ring {
+    position: absolute;
+    bottom: 160px; right: 54px;
+    width: 140px; height: 140px;
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+    opacity: 0.07;
+    pointer-events: none;
+  }
+
+  .stat-block {
+    margin-bottom: 12px;
+  }
+
+  .stat-number {
+    font-family: var(--font-headline);
+    font-weight: 900;
+    font-size: 108px;
+    color: var(--accent);
+    line-height: 1;
+    letter-spacing: -4px;
+  }
+
+  .stat-label {
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 28px;
+    color: #f8fafc;
+    line-height: 1.2;
+    margin-top: 4px;
+    max-width: 85%;
+  }
+
+  .divider {
+    width: 56px;
+    height: 4px;
+    background: var(--accent);
+    margin: 20px 0;
+    border-radius: 2px;
+  }
+
+  .data-points {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .data-point {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .data-point-icon {
+    width: 8px;
+    height: 8px;
+    min-width: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    margin-top: 8px;
+  }
+
+  .data-point-text {
+    font-size: 20px;
+    font-weight: 500;
+    color: rgba(248,250,252,0.7);
+    line-height: 1.45;
+  }
+
+  .source-line {
+    font-size: 13px;
+    color: rgba(248,250,252,0.25);
+    margin-top: 8px;
+    font-style: italic;
+  }
+
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .logo {
+    height: 64px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 14px;
+    padding: 12px 28px;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="glow"></div>
+    <div class="deco-ring"></div>
+
+    <div class="stat-block">
+      <div class="stat-number">{{statNumber}}</div>
+      <div class="stat-label">{{statLabel}}</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="data-points">
+      {{#each dataPoints}}
+      <div class="data-point">
+        <div class="data-point-icon"></div>
+        <div class="data-point-text">{{this}}</div>
+      </div>
+      {{/each}}
+    </div>
+
+    {{#if source}}<div class="source-line">Source: {{source}}</div>{{/if}}
+
+    <div class="footer">
+      {{#unless (eq showLogo false)}}<img class="logo" src="{{logoUrl}}" />{{/unless}}
+      {{#if cta}}<div class="cta-btn">{{cta}}</div>{{/if}}
+    </div>
+  </div>
+</body>
+</html>

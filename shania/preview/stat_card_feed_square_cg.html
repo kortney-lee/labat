@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@700;800;900&display=swap');
+      :root {
+        --font-headline: 'Montserrat', sans-serif;
+        --font-body: 'Inter', sans-serif;
+        --canvas-w: 1080px;
+        --canvas-h: 1080px;
+        --bg1: #f0fdf4;
+        --bg2: #ecfdf5;
+        --accent: #059669;
+        --accent2: #d97706;
+        --text-primary: #064e3b;
+        --text-secondary: #6b7280;
+        --tag-bg: rgba(5,150,105,0.08);
+        --glow: rgba(0,0,0,0);
+        --btn-bg: #059669;
+        --btn-text: #ffffff;
+      }
+    </style>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: var(--canvas-w);
+    height: var(--canvas-h);
+    font-family: var(--font-body);
+    overflow: hidden;
+  }
+
+  .card {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 64px 72px;
+    position: relative;
+    background: linear-gradient(155deg, var(--bg1) 0%, var(--bg2) 100%);
+    overflow: hidden;
+  }
+
+  /* Top accent bar */
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--accent) 0%, transparent 80%);
+  }
+
+  /* Corner glow */
+  .glow {
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, var(--glow) 0%, transparent 55%);
+    pointer-events: none;
+  }
+
+  /* Geometric accent ring */
+  .deco-ring {
+    position: absolute;
+    bottom: 160px; right: 54px;
+    width: 140px; height: 140px;
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+    opacity: 0.07;
+    pointer-events: none;
+  }
+
+  .stat-block {
+    margin-bottom: 12px;
+  }
+
+  .stat-number {
+    font-family: var(--font-headline);
+    font-weight: 900;
+    font-size: 108px;
+    color: var(--accent);
+    line-height: 1;
+    letter-spacing: -4px;
+  }
+
+  .stat-label {
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 28px;
+    color: #f8fafc;
+    line-height: 1.2;
+    margin-top: 4px;
+    max-width: 85%;
+  }
+
+  .divider {
+    width: 56px;
+    height: 4px;
+    background: var(--accent);
+    margin: 20px 0;
+    border-radius: 2px;
+  }
+
+  .data-points {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .data-point {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .data-point-icon {
+    width: 8px;
+    height: 8px;
+    min-width: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    margin-top: 8px;
+  }
+
+  .data-point-text {
+    font-size: 20px;
+    font-weight: 500;
+    color: rgba(248,250,252,0.7);
+    line-height: 1.45;
+  }
+
+  .source-line {
+    font-size: 13px;
+    color: rgba(248,250,252,0.25);
+    margin-top: 8px;
+    font-style: italic;
+  }
+
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .logo {
+    height: 64px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 14px;
+    padding: 12px 28px;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="glow"></div>
+    <div class="deco-ring"></div>
+
+    <div class="stat-block">
+      <div class="stat-number">73%</div>
+      <div class="stat-label">of packaged foods contain additives linked to inflammation</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="data-points">
+      <div class="data-point">
+        <div class="data-point-icon"></div>
+        <div class="data-point-text">Ultra-processed foods now make up 60% of the American diet</div>
+      </div>
+      <div class="data-point">
+        <div class="data-point-icon"></div>
+        <div class="data-point-text">The average child consumes 17 teaspoons of added sugar daily</div>
+      </div>
+      <div class="data-point">
+        <div class="data-point-icon"></div>
+        <div class="data-point-text">Only 1 in 10 adults meets daily vegetable intake recommendations</div>
+      </div>
+    </div>
+
+    <div class="source-line">Source: CDC National Health Report, 2025</div>
+
+    <div class="footer">
+      <img class="logo" src="https://storage.googleapis.com/cg-web-assets/images/Logo_CG.png" />
+      <div class="cta-btn">Learn More</div>
+    </div>
+  </div>
+</body>
+</html>

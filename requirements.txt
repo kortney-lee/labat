@@ -1,0 +1,32 @@
+# Core API Framework
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+python-dotenv==1.0.1
+python-multipart==0.0.6
+
+# HTTP clients
+httpx==0.27.0
+aiohttp==3.9.1
+requests==2.31.0
+
+# Authentication
+pyjwt==2.8.0
+
+# AI Services
+openai>=1.75.0,<2.0.0
+google-genai>=1.0.0
+
+# Google Cloud
+google-cloud-firestore>=2.16.0
+
+# Data processing
+numpy>=1.18.2,<2.0.0
+pandas==2.1.4
+
+# Monitoring (optional)
+sentry-sdk[fastapi]>=2.0.0
+opentelemetry-api>=1.20.0
+opentelemetry-sdk>=1.20.0
+opentelemetry-exporter-gcp-trace>=1.6.0
+opentelemetry-instrumentation-fastapi>=0.45b0
+opentelemetry-instrumentation-httpx>=0.45b0

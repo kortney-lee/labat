@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@700;800;900&display=swap');
+      :root {
+        --font-headline: 'Montserrat', sans-serif;
+        --font-body: 'Inter', sans-serif;
+        --canvas-w: 1080px;
+        --canvas-h: 1920px;
+        --bg1: #fffbeb;
+        --bg2: #fef3c7;
+        --accent: #b45309;
+        --accent2: #166534;
+        --text-primary: #78350f;
+        --text-secondary: #6b7280;
+        --tag-bg: rgba(180,83,9,0.08);
+        --glow: rgba(0,0,0,0);
+        --btn-bg: #b45309;
+        --btn-text: #ffffff;
+      }
+    </style>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: var(--canvas-w);
+    height: var(--canvas-h);
+    font-family: var(--font-body);
+    overflow: hidden;
+  }
+
+  .card {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 72px 64px;
+    position: relative;
+    background: var(--bg1);
+    text-align: center;
+  }
+
+  /* Top banner bar */
+  .banner {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 120px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    border-radius: 0 0 40% 40%;
+  }
+
+  /* Bottom wave decoration */
+  .wave {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 100px;
+    background: linear-gradient(180deg, transparent 0%, var(--accent) 100%);
+    opacity: 0.06;
+    clip-path: ellipse(60% 100% at 50% 100%);
+    pointer-events: none;
+  }
+
+  /* Floating soft circles */
+  .circle-1, .circle-2, .circle-3 {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .circle-1 {
+    width: 200px; height: 200px;
+    bottom: 60px; left: -40px;
+    background: var(--accent);
+    opacity: 0.06;
+  }
+  .circle-2 {
+    width: 120px; height: 120px;
+    top: 180px; right: 40px;
+    background: var(--accent2);
+    opacity: 0.08;
+  }
+  .circle-3 {
+    width: 80px; height: 80px;
+    top: 280px; left: 60px;
+    background: var(--accent);
+    opacity: 0.05;
+  }
+
+  .quote-open {
+    font-size: 64px;
+    color: var(--accent);
+    font-family: Georgia, serif;
+    line-height: 0.5;
+    margin-bottom: 12px;
+    opacity: 0.5;
+  }
+
+  .headline {
+    font-family: var(--font-headline);
+    font-weight: 800;
+    font-size: 46px;
+    color: var(--text-primary);
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+    max-width: 90%;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .divider {
+    width: 48px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    margin: 0 auto 20px;
+    border-radius: 2px;
+  }
+
+  .subtext {
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--text-secondary);
+    max-width: 80%;
+    line-height: 1.6;
+    margin-bottom: 28px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 14px;
+    padding: 14px 36px;
+    border-radius: 28px;
+    letter-spacing: 1px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .logo {
+    height: 96px;
+    width: auto;
+    object-fit: contain;
+    margin-bottom: 32px;
+    position: relative;
+    z-index: 2;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.12));
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="banner"></div>
+    <div class="wave"></div>
+    <div class="circle-1"></div>
+    <div class="circle-2"></div>
+    <div class="circle-3"></div>
+
+    <img class="logo" src="https://storage.googleapis.com/cg-web-assets/images/Logo_CG.png" />
+    <div class="quote-open">&ldquo;</div>
+    <h1 class="headline">Dinner Doesn&#x27;t Have to Be Complicated</h1>
+    <div class="divider"></div>
+    <p class="subtext">5 ingredients. 20 minutes. A meal your whole family will love.</p>
+    <div class="cta-btn">Get the Recipe</div>
+
+
+  </div>
+</body>
+</html>

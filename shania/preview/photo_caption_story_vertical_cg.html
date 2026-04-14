@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@700;800;900&display=swap');
+      :root {
+        --font-headline: 'Montserrat', sans-serif;
+        --font-body: 'Inter', sans-serif;
+        --canvas-w: 1080px;
+        --canvas-h: 1920px;
+        --bg1: #fafaf9;
+        --bg2: #f5f5f4;
+        --accent: #15803d;
+        --accent2: #fb923c;
+        --text-primary: #1c1917;
+        --text-secondary: #78716c;
+        --tag-bg: rgba(21,128,61,0.08);
+        --glow: rgba(0,0,0,0);
+        --btn-bg: #15803d;
+        --btn-text: #ffffff;
+      }
+    </style>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: var(--canvas-w);
+    height: var(--canvas-h);
+    font-family: var(--font-body);
+    overflow: hidden;
+  }
+
+  .card {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background: var(--bg1);
+  }
+
+  /* Top half: photo */
+  .photo-section {
+    width: 100%;
+    height: 55%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .photo-bg {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url('https://images.unsplash.com/photo-1540420773420-3366772f4999?w&#x3D;1080&amp;h&#x3D;1080&amp;fit&#x3D;crop');
+    background-size: cover;
+    background-position: center;
+  }
+
+  /* Gradient fade from photo into text area */
+  .photo-fade {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 80px;
+    background: linear-gradient(180deg, transparent 0%, var(--bg1) 100%);
+  }
+
+  /* Logo on the photo */
+  .logo {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    height: 44px;
+    width: auto;
+    object-fit: contain;
+    z-index: 2;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+  }
+
+  /* Bottom half: text */
+  .text-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 24px 56px 48px;
+    position: relative;
+  }
+
+  /* Left accent bar */
+  .text-section::before {
+    content: '';
+    position: absolute;
+    left: 32px;
+    top: 20%;
+    bottom: 20%;
+    width: 3px;
+    background: var(--accent);
+    border-radius: 2px;
+    opacity: 0.4;
+  }
+
+  .headline {
+    font-family: var(--font-headline);
+    font-weight: 900;
+    font-size: 40px;
+    color: #f8fafc;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+    margin-bottom: 12px;
+  }
+
+  .subtext {
+    font-size: 18px;
+    font-weight: 400;
+    color: rgba(248,250,252,0.5);
+    line-height: 1.5;
+    max-width: 90%;
+    margin-bottom: 24px;
+  }
+
+  .cta-btn {
+    display: inline-flex;
+    align-self: flex-start;
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 14px;
+    padding: 12px 32px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="photo-section">
+      <div class="photo-bg"></div>
+      <div class="photo-fade"></div>
+      <img class="logo" src="https://storage.googleapis.com/cg-web-assets/images/Logo_CG.png" />
+    </div>
+
+    <div class="text-section">
+      <h1 class="headline">This Is What 200 Calories Looks Like</h1>
+      <p class="subtext">Broccoli vs. candy — same calories, completely different outcomes for your body.</p>
+      <div class="cta-btn">See the Full Breakdown</div>
+    </div>
+  </div>
+</body>
+</html>

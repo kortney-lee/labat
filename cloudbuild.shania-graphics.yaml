@@ -1,0 +1,75 @@
+# Cloud Build — Shania Graphics: Template-driven graphic generation (wihy-shania-graphics)
+#
+# Flow: ALEX/LABAT → Gemini → template JSON → Puppeteer render → Cloud Storage → CDN
+#
+# FIRST-TIME SETUP:
+#   1. Create the GCS bucket:
+#      gsutil mb -l us-central1 gs://wihy-shania-graphics
+#      gsutil iam ch allUsers:objectViewer gs://wihy-shania-graphics
+#
+#   2. Ensure GOOGLE_API_KEY secret exists (for Gemini):
+#      echo -n "YOUR_KEY" | gcloud secrets create GOOGLE_API_KEY --data-file=- --project=wihy-ai
+#
+# Usage:    gcloud builds submit --config cloudbuild.shania-graphics.yaml
+# Service:  https://wihy-shania-graphics-n4l2vldq3q-uc.a.run.app
+
+steps:
+  # Build the Docker image (uses shania/Dockerfile)
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--no-cache'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/wihy-shania-graphics:latest'
+      - '-f'
+      - 'shania/Dockerfile'
+      - 'shania'
+    timeout: 1200s
+
+  # Push to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/wihy-shania-graphics:latest'
+
+  # Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'wihy-shania-graphics'
+      - '--image'
+      - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/wihy-shania-graphics:latest'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--timeout'
+      - '300'
+      - '--memory'
+      - '2Gi'
+      - '--cpu'
+      - '2'
+      - '--concurrency'
+      - '10'
+      - '--set-env-vars'
+      - 'GCS_BUCKET=wihy-shania-graphics,GCP_PROJECT=wihy-ai,ENV=production,LOG_LEVEL=INFO,BRAND_ENFORCEMENT_MODE=warn'
+      - '--set-secrets'
+      - >-
+        GOOGLE_API_KEY=GOOGLE_API_KEY:latest,
+        INTERNAL_ADMIN_TOKEN=internal-admin-token:latest
+      - '--min-instances'
+      - '0'
+      - '--max-instances'
+      - '5'
+      - '--allow-unauthenticated'
+      - '--service-account'
+      - 'wihy-ml-backend@wihy-ai.iam.gserviceaccount.com'
+    timeout: 600s
+
+options:
+  machineType: 'E2_HIGHCPU_8'
+
+images:
+  - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/wihy-shania-graphics:latest'

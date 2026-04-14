@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+{{{brandStyles}}}
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: var(--canvas-w);
+    height: var(--canvas-h);
+    font-family: var(--font-body);
+    overflow: hidden;
+  }
+
+  .card {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 72px 64px;
+    position: relative;
+    background: var(--bg1);
+    text-align: center;
+  }
+
+  /* Top accent line */
+  .accent-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    background: var(--accent);
+  }
+
+  /* Subtle grid pattern */
+  .grid-deco {
+    position: absolute;
+    top: 60px; right: 50px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    pointer-events: none;
+  }
+  .grid-deco span {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.10;
+  }
+
+  .logo {
+    height: 80px;
+    width: auto;
+    object-fit: contain;
+    margin-bottom: 28px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .headline {
+    font-family: var(--font-headline);
+    font-weight: 800;
+    font-size: 48px;
+    color: var(--text-primary);
+    line-height: 1.12;
+    letter-spacing: -0.5px;
+    max-width: 90%;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .rule {
+    width: 48px;
+    height: 3px;
+    background: var(--accent);
+    margin: 0 auto 20px;
+  }
+
+  .subtext {
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--text-secondary);
+    max-width: 80%;
+    line-height: 1.6;
+    margin-bottom: 28px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 13px;
+    padding: 14px 36px;
+    border-radius: 6px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 2;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="accent-bar"></div>
+    <div class="grid-deco">
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+    </div>
+
+    {{#unless (eq showLogo false)}}<img class="logo" src="{{logoUrl}}" />{{/unless}}
+    <h1 class="headline">{{headline}}</h1>
+    <div class="rule"></div>
+    {{#if subtext}}<p class="subtext">{{subtext}}</p>{{/if}}
+    {{#if cta}}<div class="cta-btn">{{cta}}</div>{{/if}}
+  </div>
+</body>
+</html>
