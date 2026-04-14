@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>You're In - What Is Healthy?</title>
+  <meta name="description" content="Your free copy is ready to download. Start your health reset now." />
+  <link rel="canonical" href="https://whatishealthy.org/thank-you.html" />
+  <link rel="icon" type="image/png" href="/VOWELS.png" />
+
+  <!-- Meta Pixel Code -->
+  <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){
+    n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window,document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+
+    window.__metaPixelReady = false;
+    fetch('/api/book/pixel-config').then(function(r){return r.json()}).then(function(d){
+      if(d.pixel_id){
+        fbq('init', d.pixel_id);
+        fbq('track', 'PageView');
+        window.__metaPixelReady = true;
+
+        // Fire Purchase event if user arrived from Stripe checkout
+        var params = new URLSearchParams(window.location.search);
+        if (params.get('purchase') === '1') {
+          fbq('track', 'Purchase', {
+            content_name: 'What Is Healthy? Physical Copy',
+            content_type: 'product',
+            currency: 'USD',
+            value: 24.99
+          });
+        }
+      }
+    }).catch(function(){});
+  </script>
+  <noscript><img height="1" width="1" style="display:none" src="" /></noscript>
+  <!-- End Meta Pixel Code -->
+
+  <style>
+    :root {
+      --green: #166534;
+      --green-dark: #14532d;
+      --green-pale: #f0fdf4;
+      --orange: #f97316;
+      --orange-hover: #ea580c;
+      --ink: #1e293b;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --bg: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      color: var(--ink);
+      background: linear-gradient(170deg, #f0fdf4 0%, #fff7ed 100%);
+      line-height: 1.65;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      width: 100%;
+      max-width: 860px;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.12);
+      overflow: hidden;
+    }
+    .top {
+      background: var(--green-dark);
+      color: #fff;
+      padding: 26px 28px;
+      text-align: center;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 0.76rem;
+      letter-spacing: 0.05em;
+      opacity: 0.85;
+    }
+    .brand img {
+      height: 48px;
+      width: auto;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+    .top h1 {
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      margin-bottom: 6px;
+    }
+    .top p { opacity: 0.85; font-size: 0.95rem; }
+    .body {
+      padding: 30px 28px 34px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    .box {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 20px;
+      background: #fff;
+    }
+    .box h2 {
+      font-size: 1.06rem;
+      color: var(--green-dark);
+      margin-bottom: 8px;
+    }
+    .box p {
+      font-size: 0.92rem;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+    .btn {
+      width: 100%;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none;
+      border-radius: 10px;
+      padding: 13px 16px;
+      font-size: 0.93rem;
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
+      transition: all 180ms ease;
+    }
+    .btn-primary {
+      background: var(--orange);
+      color: #fff;
+      box-shadow: 0 6px 22px rgba(249,115,22,0.3);
+    }
+    .btn-primary:hover {
+      background: var(--orange-hover);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: var(--green);
+      color: #fff;
+      box-shadow: 0 6px 22px rgba(22,101,52,0.25);
+    }
+    .btn-secondary:hover {
+      background: #0f4d26;
+      transform: translateY(-1px);
+    }
+    .guide {
+      grid-column: 1 / -1;
+      background: var(--green-pale);
+      border: 1px solid #bbf7d0;
+      border-radius: 14px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .guide p {
+      font-size: 0.9rem;
+      color: #14532d;
+      margin: 0;
+      font-weight: 600;
+    }
+    .guide a {
+      color: #fff;
+      background: var(--green-dark);
+      text-decoration: none;
+      border-radius: 9px;
+      padding: 11px 15px;
+      font-size: 0.86rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .tiny {
+      margin-top: 8px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: center;
+    }
+    @media (max-width: 860px) {
+      .body { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <section class="top">
+      <div class="brand"><img src="/VOWELS.png" alt="Vowels" /></div>
+      <h1>Your Book Is Ready!</h1>
+      <p>Tap below to download your free copy now.</p>
+    </section>
+
+    <section class="body" style="display:block; text-align:center;">
+      <p style="color:var(--muted); font-size:1rem; margin-bottom:18px;">Your PDF works on any device &mdash; phone, tablet, laptop, or desktop.</p>
+      <a class="btn btn-secondary" href="/WhatisHealthy_eBook.pdf" download style="max-width:320px; margin:0 auto;">Download Free Book (PDF)</a>
+    </section>
+  </main>
+</body>
+</html>

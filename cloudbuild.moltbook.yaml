@@ -1,0 +1,68 @@
+# Cloud Build — WIHY Moltbook Bot (wihy-moltbook-bot)
+# Always-on Cloud Run service that runs the @wihyhealthbot heartbeat loop.
+# - Replies to comments using WIHY-backed evidence
+# - Publishes new research posts on a rotation
+# - Upvotes good content in the health feed
+#
+# FIRST-TIME SETUP (run once before deploying):
+#   echo -n "moltbook_sk_y5PDGHUy-RojDJ95cjK7MopsYa6yA9uL" | \
+#     gcloud secrets create moltbook-api-key --data-file=- --project=wihy-ai
+#
+# Usage:
+#   gcloud builds submit --config cloudbuild.moltbook.yaml
+
+steps:
+  # Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--no-cache'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/moltbook-bot:latest'
+      - '-f'
+      - 'Dockerfile'
+      - '.'
+    timeout: 1200s
+
+  # Push to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/moltbook-bot:latest'
+
+  # Deploy to Cloud Run as wihy-moltbook-bot
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'wihy-moltbook-bot'
+      - '--image'
+      - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/moltbook-bot:latest'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--timeout'
+      - '300'
+      - '--memory'
+      - '512Mi'
+      - '--cpu'
+      - '1'
+      - '--concurrency'
+      - '10'
+      - '--set-env-vars'
+      - 'APP_MODULE=src.apps.moltbook_bot:app,ENV=production,LOG_LEVEL=INFO,MOLTBOOK_INTERVAL=160,MOLTBOOK_PUBLISH_EVERY=8,MOLTBOOK_AGENT_NAME=wihyhealthbot'
+      - '--set-secrets'
+      - 'MOLTBOOK_API_KEY=moltbook-api-key:latest,OPENAI_API_KEY=openai-api-key:latest,WIHY_OPENAI_API_KEY=openai-api-key:latest,WIHY_ML_CLIENT_SECRET=wihy-ml-client-secret:latest,INTERNAL_ADMIN_TOKEN=internal-admin-token:latest'
+      - '--min-instances'
+      - '1'
+      - '--max-instances'
+      - '1'
+      - '--allow-unauthenticated'
+      - '--service-account'
+      - 'wihy-ml-backend@wihy-ai.iam.gserviceaccount.com'
+    timeout: 600s
+
+images:
+  - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/moltbook-bot:latest'

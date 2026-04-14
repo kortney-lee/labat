@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wait - One-Time Offer | What Is Healthy?</title>
+  <meta name="description" content="Before you go, get the physical copy shipped to your door. This one-time offer is only available on this page." />
+  <link rel="canonical" href="https://whatishealthy.org/oto.html" />
+  <link rel="icon" type="image/png" href="/VOWELS.png" />
+
+  <!-- Meta Pixel Code -->
+  <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){
+    n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window,document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+
+    window.__metaPixelReady = false;
+    fetch('/api/book/pixel-config').then(function(r){return r.json()}).then(function(d){
+      if(d.pixel_id){
+        fbq('init', d.pixel_id);
+        fbq('track', 'PageView');
+        window.__metaPixelReady = true;
+      }
+    }).catch(function(){});
+  </script>
+  <noscript><img height="1" width="1" style="display:none" src="" /></noscript>
+  <!-- End Meta Pixel Code -->
+
+  <style>
+    :root {
+      --green: #166534;
+      --green-dark: #14532d;
+      --orange: #f97316;
+      --orange-hover: #ea580c;
+      --ink: #1e293b;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --bg: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      background: linear-gradient(170deg, #f0fdf4 0%, #fff7ed 100%);
+      color: var(--ink);
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card {
+      width: 100%;
+      max-width: 920px;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 24px 90px rgba(0,0,0,0.14);
+    }
+    .top {
+      background: var(--green-dark);
+      color: #fff;
+      padding: 18px 22px;
+      text-align: center;
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+    .content {
+      display: grid;
+      grid-template-columns: 0.43fr 0.57fr;
+      gap: 0;
+    }
+    .left {
+      background: #f8fafc;
+      border-right: 1px solid var(--line);
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .left img {
+      width: 220px;
+      border-radius: 12px;
+      box-shadow: 0 16px 46px rgba(0,0,0,0.18);
+    }
+    .price {
+      margin-top: 14px;
+      color: var(--green-dark);
+      font-size: 1.6rem;
+      font-weight: 900;
+    }
+    .right {
+      padding: 30px 30px 34px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    .brand img { height: 36px; width: auto; object-fit: contain; }
+    h1 {
+      color: var(--green-dark);
+      font-size: clamp(1.55rem, 3vw, 2.15rem);
+      line-height: 1.16;
+      margin-bottom: 10px;
+    }
+    .sub {
+      font-size: 1rem;
+      color: var(--muted);
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+    ul {
+      list-style: none;
+      margin-bottom: 22px;
+    }
+    li {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      margin-bottom: 9px;
+      color: #334155;
+      font-size: 0.92rem;
+    }
+    li::before {
+      content: "\2713";
+      color: #16a34a;
+      font-weight: 900;
+      margin-top: -1px;
+    }
+    .cta {
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      padding: 15px 18px;
+      font-size: 0.98rem;
+      font-weight: 900;
+      cursor: pointer;
+      transition: all 170ms ease;
+    }
+    .cta-primary {
+      background: var(--orange);
+      color: #fff;
+      box-shadow: 0 8px 26px rgba(249,115,22,0.35);
+      margin-bottom: 10px;
+    }
+    .cta-primary:hover { background: var(--orange-hover); transform: translateY(-1px); }
+    .cta-secondary {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--line);
+    }
+    .cta-secondary:hover { border-color: #cbd5e1; color: #475569; }
+    .status {
+      margin-top: 10px;
+      min-height: 20px;
+      font-size: 0.84rem;
+      color: var(--muted);
+      text-align: center;
+    }
+    .mini {
+      margin-top: 10px;
+      font-size: 0.77rem;
+      color: #94a3b8;
+      text-align: center;
+    }
+    @media (max-width: 860px) {
+      .content { grid-template-columns: 1fr; }
+      .left { border-right: 0; border-bottom: 1px solid var(--line); }
+      .left img { width: 180px; }
+      .right { padding: 24px 20px 26px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="top">THIS ONE-TIME OFFER IS ONLY AVAILABLE ON THIS PAGE</div>
+    <section class="content">
+      <aside class="left">
+        <img src="/book-green.jpg" alt="What Is Healthy physical book" />
+        <div class="price">$24.99</div>
+      </aside>
+      <section class="right">
+        <div class="brand"><img src="/VOWELS.png" alt="Vowels" /></div>
+        <h1>Wait - Before You Go...</h1>
+        <p class="sub">You're getting the digital version, but most people prefer the physical copy they can use directly in the store and keep in their kitchen.</p>
+
+        <ul>
+          <li>Full-color paperback shipped to your door</li>
+          <li>Quick-reference guide inside for grocery trips</li>
+          <li>No screen needed while shopping with family</li>
+          <li>Fast checkout and immediate confirmation</li>
+        </ul>
+
+        <button id="yes-offer" class="cta cta-primary">Yes, Ship Me The Paperback — $24.99</button>
+        <button id="no-offer" class="cta cta-secondary">No Thanks, I'll Stick With Digital</button>
+        <p id="status" class="status"></p>
+        <p class="mini">Your free digital book is still being delivered. This offer is optional.</p>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    var apiBase = '/api/book';
+    var yesBtn = document.getElementById('yes-offer');
+    var noBtn = document.getElementById('no-offer');
+    var statusEl = document.getElementById('status');
+
+    // ── Helper: fire server-side CAPI event ──
+    function trackCAPI(eventName, value) {
+      var body = { event_name: eventName, content_name: 'OTO Paperback' };
+      if (value) { body.value = value; body.currency = 'USD'; }
+      // Pull email from localStorage (set during lead capture)
+      var storedEmail = localStorage.getItem('wh_book_lead_email') || '';
+      if (storedEmail) { body.email = storedEmail; }
+      fetch(apiBase + '/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      }).catch(function(){});
+    }
+
+    // ── OTO Viewed (on page load) ──
+    var _viewFired = false;
+    function fireViewContent() {
+      if (_viewFired) return;
+      if (window.__metaPixelReady && typeof fbq === 'function') {
+        fbq('track', 'ViewContent', {
+          content_name: 'OTO Paperback',
+          content_type: 'product',
+          currency: 'USD',
+          value: 24.99
+        });
+        _viewFired = true;
+      }
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      fireViewContent();
+      trackCAPI('ViewContent');
+    });
+    // re-check after pixel loads (async)
+    setTimeout(fireViewContent, 2000);
+
+    function goThankYou(reason) {
+      window.location.href = '/thank-you.html?step=' + encodeURIComponent(reason || 'lead');
+    }
+
+    // ── OTO Declined ──
+    noBtn.addEventListener('click', function() {
+      if (window.__metaPixelReady && typeof fbq === 'function') {
+        fbq('trackCustom', 'OTODeclined', {
+          content_name: 'OTO Paperback'
+        });
+      }
+      trackCAPI('OTODeclined');
+      goThankYou('digital');
+    });
+
+    // ── OTO Accepted (checkout initiated) ──
+    yesBtn.addEventListener('click', function() {
+      yesBtn.disabled = true;
+      noBtn.disabled = true;
+      yesBtn.textContent = 'Redirecting to checkout...';
+      statusEl.textContent = '';
+
+      if (window.__metaPixelReady && typeof fbq === 'function') {
+        fbq('track', 'InitiateCheckout', {
+          content_name: 'OTO Paperback',
+          currency: 'USD',
+          value: 24.99
+        });
+      }
+      trackCAPI('OTOAccepted', 24.99);
+
+      window.location.href = 'https://buy.stripe.com/dRmbJ13cu4dYcdz5t0ejK0i';
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Confirm Your Download - What Is Healthy?</title>
+  <meta name="description" content="Confirm your email to download your free copy of What Is Healthy?" />
+  <link rel="canonical" href="https://whatishealthy.org/confirm-download.html" />
+  <link rel="icon" type="image/png" href="/VOWELS.png" />
+
+  <!-- Meta Pixel Code -->
+  <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){
+    n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window,document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+
+    window.__metaPixelReady = false;
+    fetch('/api/book/pixel-config').then(function(r){return r.json()}).then(function(d){
+      if(d.pixel_id){
+        fbq('init', d.pixel_id);
+        fbq('track', 'PageView');
+        window.__metaPixelReady = true;
+      }
+    }).catch(function(){});
+  </script>
+  <noscript><img height="1" width="1" style="display:none" src="" /></noscript>
+
+  <style>
+    :root {
+      --green: #166534;
+      --green-dark: #14532d;
+      --green-pale: #f0fdf4;
+      --orange: #f97316;
+      --orange-hover: #ea580c;
+      --ink: #1e293b;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --bg: #ffffff;
+      --red: #dc2626;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      color: var(--ink);
+      background: linear-gradient(170deg, #f0fdf4 0%, #fff7ed 100%);
+      line-height: 1.65;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      width: 100%;
+      max-width: 860px;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.12);
+      overflow: hidden;
+    }
+    .top {
+      background: var(--green-dark);
+      color: #fff;
+      padding: 30px 28px;
+      text-align: center;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 0.76rem;
+      letter-spacing: 0.05em;
+      opacity: 0.85;
+    }
+    .brand img { height: 48px; width: auto; object-fit: contain; border-radius: 8px; }
+    .top h1 { font-size: clamp(1.4rem, 3vw, 2rem); margin-bottom: 6px; }
+    .top p { opacity: 0.85; font-size: 0.95rem; }
+
+    /* ── Step 1: Email confirmation ── */
+    .step { padding: 34px 28px 40px; text-align: center; }
+    .step .cover {
+      width: 180px; height: auto; border-radius: 10px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.15); margin-bottom: 24px;
+    }
+    .step h2 { font-size: 1.15rem; color: var(--ink); margin-bottom: 8px; }
+    .step .sub { font-size: 0.95rem; color: var(--muted); margin-bottom: 22px; }
+    .email-form {
+      max-width: 400px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px;
+    }
+    .email-form input {
+      width: 100%; padding: 14px 16px; border: 2px solid var(--line);
+      border-radius: 10px; font-size: 1rem; outline: none; transition: border 150ms;
+    }
+    .email-form input:focus { border-color: var(--green); }
+    .email-form .err {
+      font-size: 0.84rem; color: var(--red); min-height: 20px; text-align: left;
+    }
+    .btn {
+      display: inline-flex; justify-content: center; align-items: center;
+      text-decoration: none; border-radius: 10px; padding: 15px 30px;
+      font-size: 1.02rem; font-weight: 800; border: none; cursor: pointer;
+      transition: all 180ms ease; width: 100%;
+    }
+    .btn-primary {
+      background: var(--orange); color: #fff;
+      box-shadow: 0 6px 22px rgba(249,115,22,0.3);
+    }
+    .btn-primary:hover {
+      background: var(--orange-hover); transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(249,115,22,0.4);
+    }
+    .btn-green {
+      background: var(--green); color: #fff;
+      box-shadow: 0 6px 22px rgba(22,101,52,0.25);
+    }
+    .btn-green:hover { background: #0f4d26; transform: translateY(-1px); }
+    .hide { display: none !important; }
+
+    /* ── Step 2: Download unlocked ── */
+    .unlocked { text-align: center; }
+    .unlocked .check {
+      width: 64px; height: 64px; border-radius: 50%; background: #dcfce7;
+      display: inline-flex; align-items: center; justify-content: center;
+      margin-bottom: 16px; font-size: 2rem;
+    }
+    .unlocked h2 { font-size: 1.3rem; color: var(--green-dark); margin-bottom: 6px; }
+    .unlocked .sub { font-size: 0.95rem; color: var(--muted); margin-bottom: 22px; }
+    .download-btn { max-width: 360px; margin: 0 auto; }
+
+    /* ── Step 3: Paperback upsell (dopamine) ── */
+    .upsell {
+      background: linear-gradient(180deg, #fffbeb 0%, #fef3c7 100%);
+      border-top: 3px solid var(--orange); padding: 32px 28px; text-align: center;
+    }
+    .upsell .badge {
+      display: inline-block; background: var(--orange); color: #fff;
+      font-size: 0.72rem; font-weight: 900; letter-spacing: 0.08em;
+      padding: 5px 14px; border-radius: 20px; margin-bottom: 14px;
+      text-transform: uppercase;
+    }
+    .upsell h2 {
+      font-size: clamp(1.2rem, 2.5vw, 1.6rem); color: var(--ink);
+      margin-bottom: 10px; line-height: 1.3;
+    }
+    .upsell .urgency {
+      font-size: 0.92rem; color: #92400e; margin-bottom: 18px; font-weight: 600;
+    }
+    .upsell .social {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-bottom: 18px; font-size: 0.88rem; color: #78350f; font-weight: 600;
+    }
+    .upsell .social .stars { color: var(--orange); font-size: 1.1rem; }
+    .upsell .benefits {
+      list-style: none; max-width: 420px; margin: 0 auto 22px; text-align: left;
+    }
+    .upsell .benefits li {
+      display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px;
+      font-size: 0.92rem; color: #1c1917;
+    }
+    .upsell .benefits li::before {
+      content: "\2713"; color: #16a34a; font-weight: 900; flex-shrink: 0;
+    }
+    .upsell .price-row {
+      display: flex; align-items: baseline; justify-content: center; gap: 10px;
+      margin-bottom: 6px;
+    }
+    .upsell .old-price {
+      font-size: 1rem; color: var(--muted); text-decoration: line-through;
+    }
+    .upsell .real-price {
+      font-size: 1.5rem; font-weight: 900; color: var(--green-dark);
+    }
+    .upsell .shipping { font-size: 0.82rem; color: #78350f; margin-bottom: 18px; }
+    .upsell-btns {
+      display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+      max-width: 480px; margin: 0 auto;
+    }
+    .upsell-btns a {
+      flex: 1; min-width: 200px; display: inline-flex; justify-content: center;
+      align-items: center; background: var(--orange); color: #fff;
+      text-decoration: none; border-radius: 12px; padding: 15px 18px;
+      font-size: 0.94rem; font-weight: 800; transition: all 180ms ease;
+      box-shadow: 0 6px 22px rgba(249,115,22,0.3);
+    }
+    .upsell-btns a:hover {
+      background: var(--orange-hover); transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(249,115,22,0.4);
+    }
+    .upsell .guarantee {
+      margin-top: 14px; font-size: 0.8rem; color: #92400e;
+    }
+
+    /* ── Footer strip ── */
+    .footer-strip {
+      background: var(--green-pale); border-top: 1px solid #bbf7d0;
+      padding: 16px 28px; text-align: center;
+    }
+    .footer-strip p { font-size: 0.82rem; color: var(--muted); }
+    .footer-strip a { color: var(--green); font-weight: 600; text-decoration: none; }
+
+    @media (max-width: 480px) {
+      .step { padding: 24px 18px 30px; }
+      .step .cover { width: 140px; }
+      .upsell { padding: 24px 18px; }
+      .upsell-btns a { min-width: 160px; font-size: 0.86rem; }
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+
+    <!-- ═══ HEADER ═══ -->
+    <section class="top">
+      <div class="brand"><img src="/VOWELS.png" alt="Vowels" /></div>
+      <h1>Your Free Book Is Almost Ready</h1>
+      <p>Just confirm your email and it's yours.</p>
+    </section>
+
+    <!-- ═══ STEP 1: Confirm email ═══ -->
+    <section id="step-confirm" class="step">
+      <img class="cover" src="/book-green.jpg" alt="What Is Healthy? book cover" />
+      <h2>Confirm Your Email to Download</h2>
+      <p class="sub">Enter the email you signed up with and your copy unlocks instantly.</p>
+
+      <div class="email-form">
+        <input id="email-input" type="email" placeholder="Enter your email address" autocomplete="email" />
+        <p id="email-err" class="err"></p>
+        <button id="confirm-btn" class="btn btn-primary">Confirm &amp; Unlock My Book</button>
+      </div>
+    </section>
+
+    <!-- ═══ STEP 2: Download unlocked (hidden initially) ═══ -->
+    <section id="step-download" class="step hide">
+      <div class="unlocked">
+        <div class="check">&#10003;</div>
+        <h2 id="welcome-msg">You're confirmed!</h2>
+        <p class="sub">Your PDF works on any device &mdash; phone, tablet, laptop, or desktop.</p>
+        <div class="download-btn">
+          <a id="download-btn" class="btn btn-green" href="/WhatisHealthy_eBook.pdf" download>
+            Download My Free Book Now
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ STEP 3: Paperback upsell (hidden until download) ═══ -->
+    <section id="step-upsell" class="upsell hide">
+      <span class="badge">Most Popular</span>
+      <h2>Readers Who Downloaded Also Grabbed the Physical Copy</h2>
+      <p class="urgency">Limited print run &mdash; we ship until inventory runs out.</p>
+
+      <div class="social">
+        <span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+        <span>"This book changed how my family shops." &mdash; 412 readers</span>
+      </div>
+
+      <ul class="benefits">
+        <li>Full-color paperback shipped free to your door</li>
+        <li>Quick-reference grocery guide inside the back cover</li>
+        <li>Highlight it, dog-ear it, hand it to your spouse</li>
+        <li>No screen needed &mdash; grab it before every grocery trip</li>
+        <li>Keep it on the kitchen counter where the family sees it</li>
+      </ul>
+
+      <div class="price-row">
+        <span class="old-price">$39.99</span>
+        <span class="real-price">$24.99</span>
+      </div>
+      <p class="shipping">Free shipping &bull; Ships in 3-5 business days</p>
+
+      <div class="upsell-btns">
+        <a id="buy-female" href="https://buy.stripe.com/dRmbJ13cu4dYcdz5t0ejK0i">
+          Ship Me the Paperback &mdash; Female&nbsp;Cover
+        </a>
+        <a id="buy-male" href="https://buy.stripe.com/aFafZheVc7qacdzg7EejK0j">
+          Ship Me the Paperback &mdash; Male&nbsp;Cover
+        </a>
+      </div>
+      <p class="guarantee">100% satisfaction guaranteed &bull; Real research, no filler</p>
+    </section>
+
+    <!-- ═══ FOOTER ═══ -->
+    <section class="footer-strip">
+      <p>Questions? <a href="mailto:info@vowels.org">info@vowels.org</a></p>
+    </section>
+
+  </main>
+
+  <script>
+    var confirmSection = document.getElementById('step-confirm');
+    var downloadSection = document.getElementById('step-download');
+    var upsellSection = document.getElementById('step-upsell');
+    var confirmBtn = document.getElementById('confirm-btn');
+    var emailInput = document.getElementById('email-input');
+    var emailErr = document.getElementById('email-err');
+    var welcomeMsg = document.getElementById('welcome-msg');
+    var downloadBtn = document.getElementById('download-btn');
+
+    // ── Step 1: Confirm email ──
+    confirmBtn.addEventListener('click', function() {
+      var email = (emailInput.value || '').trim().toLowerCase();
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        emailErr.textContent = 'Please enter a valid email address.';
+        return;
+      }
+      emailErr.textContent = '';
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = 'Verifying...';
+
+      fetch('/api/book/verify-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email })
+      })
+      .then(function(res) {
+        if (!res.ok) {
+          if (res.status === 404) throw new Error('not_found');
+          throw new Error('server');
+        }
+        return res.json();
+      })
+      .then(function(data) {
+        // Verified — show download
+        localStorage.setItem('wh_book_lead_captured', '1');
+        localStorage.setItem('wh_book_lead_email', email);
+
+        if (data.first_name) {
+          welcomeMsg.textContent = "You're confirmed, " + data.first_name + "!";
+        }
+
+        confirmSection.classList.add('hide');
+        downloadSection.classList.remove('hide');
+        downloadSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        if (window.__metaPixelReady && typeof fbq === 'function') {
+          fbq('trackCustom', 'EmailConfirmed', {
+            content_name: 'What Is Healthy? Free eBook'
+          });
+        }
+      })
+      .catch(function(err) {
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Confirm & Unlock My Book';
+        if (err.message === 'not_found') {
+          emailErr.textContent = "We couldn't find that email. Did you sign up with a different one?";
+        } else {
+          emailErr.textContent = 'Something went wrong. Please try again.';
+        }
+      });
+    });
+
+    // Enter key submits
+    emailInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') { e.preventDefault(); confirmBtn.click(); }
+    });
+
+    // ── Step 2 → 3: After download click, reveal upsell ──
+    downloadBtn.addEventListener('click', function() {
+      // Fire pixel
+      if (window.__metaPixelReady && typeof fbq === 'function') {
+        fbq('trackCustom', 'BookDownloadConfirmed', {
+          content_name: 'What Is Healthy? Free eBook',
+          source: 'confirm_page'
+        });
+      }
+
+      // Reveal upsell after a short delay so the download starts first
+      setTimeout(function() {
+        upsellSection.classList.remove('hide');
+        upsellSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 800);
+    });
+
+    // ── Track upsell clicks ──
+    document.getElementById('buy-female').addEventListener('click', function() {
+      if (window.__metaPixelReady && typeof fbq === 'function') {
+        fbq('track', 'InitiateCheckout', {
+          content_name: 'Paperback Female Cover',
+          currency: 'USD', value: 24.99
+        });
+      }
+    });
+    document.getElementById('buy-male').addEventListener('click', function() {
+      if (window.__metaPixelReady && typeof fbq === 'function') {
+        fbq('track', 'InitiateCheckout', {
+          content_name: 'Paperback Male Cover',
+          currency: 'USD', value: 24.99
+        });
+      }
+    });
+  </script>
+</body>
+</html>

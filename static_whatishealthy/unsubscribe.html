@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unsubscribe | What Is Healthy?</title>
+  <link rel="icon" type="image/png" href="/VOWELS.png" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      background: linear-gradient(170deg, #f0fdf4 0%, #ffffff 100%);
+      color: #1e293b;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      max-width: 480px;
+      width: 100%;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.10);
+      padding: 48px 36px;
+      text-align: center;
+    }
+    h1 { font-size: 24px; font-weight: 800; margin-bottom: 12px; }
+    p { font-size: 15px; line-height: 1.7; color: #64748b; margin-bottom: 24px; }
+    input[type="email"] {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 15px;
+      margin-bottom: 16px;
+      outline: none;
+    }
+    input[type="email"]:focus { border-color: #1e40af; box-shadow: 0 0 0 3px rgba(30,64,175,0.1); }
+    button {
+      width: 100%;
+      padding: 14px;
+      background: #1e40af;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover { background: #1e3a8a; }
+    button:disabled { background: #94a3b8; cursor: not-allowed; }
+    .msg { margin-top: 20px; padding: 14px; border-radius: 8px; font-size: 14px; display: none; }
+    .msg.success { display: block; background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+    .msg.error { display: block; background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+    .back { display: inline-block; margin-top: 24px; font-size: 13px; color: #94a3b8; text-decoration: none; }
+    .back:hover { color: #64748b; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Unsubscribe</h1>
+    <p>Enter the email address you'd like to unsubscribe. You'll stop receiving all emails from What Is Healthy.</p>
+    <form id="unsub-form">
+      <input type="email" id="unsub-email" placeholder="you@example.com" required />
+      <button type="submit" id="unsub-btn">Unsubscribe</button>
+    </form>
+    <div id="unsub-msg" class="msg"></div>
+    <a href="/" class="back">&larr; Back to What Is Healthy</a>
+  </div>
+  <script>
+    document.getElementById('unsub-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var btn = document.getElementById('unsub-btn');
+      var msg = document.getElementById('unsub-msg');
+      var email = document.getElementById('unsub-email').value.trim();
+      if (!email) return;
+      btn.disabled = true;
+      btn.textContent = 'Processing...';
+      msg.className = 'msg';
+      msg.style.display = 'none';
+      try {
+        var resp = await fetch('/api/book/unsubscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email })
+        });
+        var data = await resp.json();
+        msg.textContent = data.message || "You've been unsubscribed.";
+        msg.className = 'msg success';
+      } catch (err) {
+        msg.textContent = 'Something went wrong. Please try again.';
+        msg.className = 'msg error';
+      }
+      btn.disabled = false;
+      btn.textContent = 'Unsubscribe';
+    });
+  </script>
+</body>
+</html>

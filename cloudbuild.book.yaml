@@ -1,0 +1,65 @@
+# Cloud Build — WIHY Book Service (wihy-ml-book)
+# Email capture, book delivery, Stripe checkout for What Is Healthy?
+# Usage: gcloud builds submit --project=wihy-ai --config=cloudbuild.book.yaml .
+
+steps:
+  # Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--no-cache'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/ml-book:latest'
+      - '-f'
+      - 'Dockerfile'
+      - '.'
+    timeout: 1200s
+
+  # Push the image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/ml-book:latest'
+
+  # Deploy to Cloud Run as wihy-ml-book
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'wihy-ml-book'
+      - '--image'
+      - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/ml-book:latest'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--timeout'
+      - '60'
+      - '--memory'
+      - '512Mi'
+      - '--cpu'
+      - '1'
+      - '--concurrency'
+      - '80'
+      - '--set-env-vars'
+      - 'APP_MODULE=src.apps.book_app:app,ENV=production,LOG_LEVEL=INFO,GCP_PROJECT=wihy-ai,BOOK_FROM_EMAIL=info@vowels.org,BOOK_FROM_NAME=Vowels'
+      - '--set-secrets'
+      - 'SENDGRID_API_KEY=sendgrid-api-key:latest,STRIPE_SECRET_KEY=stripe-secret-key:latest,STRIPE_WEBHOOK_SECRET=wih-webhook-secret:latest,META_PIXEL_ID=wihy-agent-meta-pixel-id:latest,META_SYSTEM_USER_TOKEN=wihy-agent-meta-system-user-token:latest,INTERNAL_ADMIN_TOKEN=internal-admin-token:latest'
+      - '--min-instances'
+      - '0'
+      - '--max-instances'
+      - '3'
+      - '--allow-unauthenticated'
+      - '--service-account'
+      - 'wihy-ml-backend@wihy-ai.iam.gserviceaccount.com'
+    timeout: 600s
+
+images:
+  - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/ml-book:latest'
+
+timeout: 1800s
+
+options:
+  machineType: 'E2_HIGHCPU_8'
+  logging: CLOUD_LOGGING_ONLY
