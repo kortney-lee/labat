@@ -1,0 +1,64 @@
+# Cloud Build — Master Agent (Otaku): System orchestration and monitoring
+# Usage: gcloud builds submit --project=wihy-ai --config=cloudbuild.master.yaml .
+
+steps:
+  # Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--no-cache'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/wihy-master-agent:latest'
+      - '-f'
+      - 'Dockerfile'
+      - '.'
+    timeout: 1200s
+
+  # Push to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/wihy-master-agent:latest'
+
+  # Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'wihy-master-agent'
+      - '--image'
+      - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/wihy-master-agent:latest'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--timeout'
+      - '3600'
+      - '--memory'
+      - '1Gi'
+      - '--cpu'
+      - '1'
+      - '--concurrency'
+      - '40'
+      - '--set-env-vars'
+      - 'APP_MODULE=src.apps.master_agent_app:app,ENV=production,LOG_LEVEL=INFO,SERVICES_URL=https://services.wihy.ai,WIHY_ML_CLIENT_ID=wihy_ml_mk1waylw,WIHY_VECTOR_STORE_ID=vs_69b0bd9387dc8191b9bc4d8d8f9c4cb1,AUTH_SERVICE_URL=https://auth.wihy.ai,WIHY_FINE_TUNED_MODEL=ft:gpt-4o-mini-2024-07-18:personal::CYqyPf3Z'
+      - '--set-secrets'
+      - 'INTERNAL_ADMIN_TOKEN=internal-admin-token:latest,WIHY_ML_CLIENT_SECRET=wihy-ml-client-secret:latest,OPENAI_API_KEY=openai-api-key:latest,WIHY_OPENAI_API_KEY=openai-api-key:latest'
+      - '--min-instances'
+      - '1'
+      - '--max-instances'
+      - '5'
+      - '--allow-unauthenticated'
+      - '--service-account'
+      - 'wihy-ml-backend@wihy-ai.iam.gserviceaccount.com'
+    timeout: 600s
+
+images:
+  - 'us-central1-docker.pkg.dev/wihy-ai/wihy-repo/wihy-master-agent:latest'
+
+timeout: 1800s
+
+options:
+  machineType: 'E2_HIGHCPU_8'
+  logging: CLOUD_LOGGING_ONLY
