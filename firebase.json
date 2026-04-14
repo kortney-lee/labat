@@ -1,0 +1,106 @@
+{
+  "hosting": {
+    "target": "labat",
+    "public": "static_labat",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/api/astra/**",
+        "run": {
+          "serviceId": "wihy-astra",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/api/engagement/**",
+        "run": {
+          "serviceId": "wihy-maya",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/api/graphics/**",
+        "run": {
+          "serviceId": "wihy-shania-graphics",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/api/labat-wihy/**",
+        "run": {
+          "serviceId": "wihy-labat-wihy",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/api/labat-cg/**",
+        "run": {
+          "serviceId": "wihy-labat-cg",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/api/labat-vowels/**",
+        "run": {
+          "serviceId": "wihy-labat-vowels",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/api/labat-cn/**",
+        "run": {
+          "serviceId": "wihy-labat-cn",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/api/labat-pwc/**",
+        "run": {
+          "serviceId": "wihy-labat-pwc",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/api/labat/**",
+        "run": {
+          "serviceId": "wihy-labat",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/**",
+        "run": {
+          "serviceId": "wihy-labat",
+          "region": "us-central1"
+        }
+      }
+    ],
+    "headers": [
+      {
+        "source": "/**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          },
+          {
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
+          },
+          {
+            "key": "Access-Control-Allow-Methods",
+            "value": "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+          },
+          {
+            "key": "Access-Control-Allow-Headers",
+            "value": "*"
+          }
+        ]
+      }
+    ]
+  }
+}
