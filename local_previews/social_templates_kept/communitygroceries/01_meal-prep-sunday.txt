@@ -1,0 +1,14 @@
+brand: communitygroceries
+template_number: 2
+template_key: meal-prep-sunday
+headline: Meal prep Sunday, your week handled
+cta: Plan your prep week in Community Groceries
+layout: organized meal-grid composition with 5 containers, prep-time stamp, and total-cost callout for quick scanning
+supporting_points:
+- 5 family meals prepped in about 2 hours
+- complete grocery list included upfront
+- weekly cost target under $60
+- reheat-and-eat workflow for busy nights
+
+prompt:
+Create a branded social media post for communitygroceries. Use the template family 'meal-prep-sunday'. Visual direction: organized meal-grid composition with 5 containers, prep-time stamp, and total-cost callout for quick scanning. Primary headline: Meal prep Sunday, your week handled. Supporting ideas to communicate: 5 family meals prepped in about 2 hours, complete grocery list included upfront, weekly cost target under $60, reheat-and-eat workflow for busy nights. Call to action: Plan your prep week in Community Groceries. Keep the design clean and readable. Use one dominant headline, one concise support line, and one clear CTA. Prioritize mobile legibility, strong contrast, safe margins, and text that stays inside a centered content zone. Avoid clutter, tiny text, and generic motivational phrasing.

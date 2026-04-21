@@ -1,0 +1,14 @@
+brand: communitygroceries
+template_number: 1
+template_key: easy-recipe
+headline: Tonight's dinner in 30 minutes, start to table
+cta: Get tonight's full recipe in Community Groceries
+layout: warm food-first layout with appetizing close-up, recipe headline, prep time badge, and ingredient-count chip
+supporting_points:
+- everyday ingredients already in your kitchen
+- step-by-step instructions anyone can follow
+- family-approved and kid-friendly flavor profile
+- budget-friendly target under $15 total
+
+prompt:
+Create a branded social media post for communitygroceries. Use the template family 'easy-recipe'. Visual direction: warm food-first layout with appetizing close-up, recipe headline, prep time badge, and ingredient-count chip. Primary headline: Tonight's dinner in 30 minutes, start to table. Supporting ideas to communicate: everyday ingredients already in your kitchen, step-by-step instructions anyone can follow, family-approved and kid-friendly flavor profile, budget-friendly target under $15 total. Call to action: Get tonight's full recipe in Community Groceries. Keep the design clean and readable. Use one dominant headline, one concise support line, and one clear CTA. Prioritize mobile legibility, strong contrast, safe margins, and text that stays inside a centered content zone. Avoid clutter, tiny text, and generic motivational phrasing.

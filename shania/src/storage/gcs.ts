@@ -33,6 +33,22 @@ export interface UploadResult {
   signedUrl?: string;
 }
 
+export interface AssetLibraryUploadOptions {
+  brand?: string;
+  folder?: string;
+  tags?: string[];
+  metadata?: Record<string, string>;
+}
+
+export interface AssetLibraryItem {
+  path: string;
+  publicUrl: string;
+  contentType: string;
+  size: number;
+  updated?: string;
+  metadata?: Record<string, string>;
+}
+
 /**
  * Upload an image buffer to Cloud Storage.
  * Returns the public URL and metadata.
@@ -146,4 +162,93 @@ export async function ensureBucket(): Promise<void> {
   } catch (err) {
     logger.warn(`Could not verify GCS bucket: ${err}`);
   }
+}
+
+function sanitizePathPart(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80) || "asset";
+}
+
+/**
+ * Upload a source image to the shared asset library.
+ */
+export async function uploadLibraryAsset(
+  buffer: Buffer,
+  fileName: string,
+  contentType: string,
+  options: AssetLibraryUploadOptions = {},
+): Promise<UploadResult> {
+  const s = getStorage();
+  const id = uuid();
+  const date = new Date().toISOString().slice(0, 10);
+  const safeBrand = sanitizePathPart(options.brand || "shared");
+  const safeFolder = sanitizePathPart(options.folder || "images");
+  const safeName = sanitizePathPart(fileName || "asset");
+
+  const filePath = `asset-library/${safeBrand}/${safeFolder}/${date}/${id}-${safeName}`;
+  const bucket = s.bucket(BUCKET_NAME);
+  const file = bucket.file(filePath);
+
+  await file.save(buffer, {
+    contentType,
+    metadata: {
+      cacheControl: "public, max-age=31536000",
+      metadata: {
+        library: "asset-library",
+        brand: safeBrand,
+        folder: safeFolder,
+        originalFileName: fileName,
+        tags: (options.tags || []).join(","),
+        uploadedAt: new Date().toISOString(),
+        ...(options.metadata || {}),
+      },
+    },
+  });
+
+  const publicUrl = `https://storage.googleapis.com/${BUCKET_NAME}/${filePath}`;
+  logger.info(`Asset library upload complete: ${filePath} (${buffer.length} bytes)`);
+
+  return { id, bucket: BUCKET_NAME, path: filePath, publicUrl };
+}
+
+/**
+ * List asset library images by prefix/brand/folder.
+ */
+export async function listLibraryAssets(options?: {
+  brand?: string;
+  folder?: string;
+  prefix?: string;
+  limit?: number;
+}): Promise<AssetLibraryItem[]> {
+  const s = getStorage();
+  const limit = Math.min(Math.max(options?.limit || 50, 1), 200);
+
+  const prefix = options?.prefix
+    ? options.prefix
+    : options?.brand
+      ? `asset-library/${sanitizePathPart(options.brand)}/${sanitizePathPart(options.folder || "images")}/`
+      : "asset-library/";
+
+  const [files] = await s.bucket(BUCKET_NAME).getFiles({
+    prefix,
+    maxResults: limit,
+  });
+
+  return files
+    .filter((f) => !f.name.endsWith("/"))
+    .map((f) => {
+      const md = f.metadata || {};
+      return {
+        path: f.name,
+        publicUrl: `https://storage.googleapis.com/${BUCKET_NAME}/${f.name}`,
+        contentType: md.contentType || "application/octet-stream",
+        size: Number(md.size || 0),
+        updated: md.updated,
+        metadata: (md.metadata || {}) as Record<string, string>,
+      };
+    })
+    .sort((a, b) => (b.updated || "").localeCompare(a.updated || ""));
 }

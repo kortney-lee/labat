@@ -3,6 +3,17 @@
 import httpx
 import json
 import asyncio
+import os
+
+if os.getenv("ENABLE_MANUAL_TEST_SCRIPTS", "").strip().lower() not in (
+    "1",
+    "true",
+    "yes",
+):
+    raise SystemExit(
+        "Test scripts are disabled. Set ENABLE_MANUAL_TEST_SCRIPTS=true "
+        "for intentional manual runs."
+    )
 
 async def test():
     async with httpx.AsyncClient(timeout=60) as client:

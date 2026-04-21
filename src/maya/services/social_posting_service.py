@@ -180,15 +180,37 @@ def _select_topics(count: int) -> List[Dict[str, str]]:
     if LAUNCH_MODE and LAUNCH_TOPICS:
         n_launch = max(1, int(count * 0.75))
         n_evergreen = count - n_launch
-        picks = structured[: min(len(structured), count)]
+        picks: List[Dict[str, str]] = []
+
+        if structured:
+            picks.extend(structured[: min(n_launch, len(structured), count)])
+
         if len(picks) < n_launch and legacy_launch:
             picks += random.sample(legacy_launch, min(n_launch - len(picks), len(legacy_launch)))
+
         if n_evergreen > 0:
             picks += random.sample(legacy_evergreen, min(n_evergreen, len(legacy_evergreen)))
-        return picks
+
+        if len(picks) < count and structured:
+            remaining_structured = [item for item in structured if item not in picks]
+            picks.extend(remaining_structured[: max(0, count - len(picks))])
+
+        return picks[:count]
+
     # Normal mode — prefer structured template prompts for supported brands.
-    combined = structured + legacy_evergreen + legacy_launch
-    return random.sample(combined, min(count, len(combined)))
+    picks = structured[: min(count, len(structured))]
+    remaining = count - len(picks)
+
+    if remaining > 0 and legacy_evergreen:
+        extra = random.sample(legacy_evergreen, min(remaining, len(legacy_evergreen)))
+        picks.extend(extra)
+        remaining = count - len(picks)
+
+    if remaining > 0 and legacy_launch:
+        extra = random.sample(legacy_launch, min(remaining, len(legacy_launch)))
+        picks.extend(extra)
+
+    return picks[:count]
 
 
 class SocialPostingService:

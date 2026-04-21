@@ -23,6 +23,11 @@ from starlette.responses import Response
 
 logger = logging.getLogger(__name__)
 
+try:
+    from src.services.debug_logger import _debug_logger
+except ImportError:
+    _debug_logger = None
+
 # Routes to log at DEBUG level (noisy health-check traffic)
 _QUIET_ROUTES = frozenset(("/", "/health", "/api/status", "/favicon.ico", "/robots.txt"))
 
@@ -193,10 +198,6 @@ class VerboseRequestLoggerMiddleware(BaseHTTPMiddleware):
 
             # ── Push to remote debug logger (fire-and-forget) ──
             try:
-                try:
-    from src.services.debug_logger import _debug_logger
-except ImportError:
-    _debug_logger = None
                 if _debug_logger and _debug_logger._session_created:
                     log_type = "error" if is_error else ("warn" if is_warn else "info")
                     _debug_logger.log(

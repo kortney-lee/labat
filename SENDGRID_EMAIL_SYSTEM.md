@@ -262,7 +262,7 @@ The Day 10 email has two variants:
 >
 > **Community Groceries** — a new way to shop. Healthier products, better prices, delivered to your door.
 >
-> **WIHY** — a new way to track what you eat, shop smarter, and get answers to your health questions.
+> **WIHY** — a new way to capture what you eat, shop smarter, and get answers to your health questions.
 >
 > Both are still early, and we'd love for you to check them out when you're ready. No rush.
 >

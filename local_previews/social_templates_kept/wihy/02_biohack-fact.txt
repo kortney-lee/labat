@@ -1,0 +1,14 @@
+brand: wihy
+template_number: 3
+template_key: biohack-fact
+headline: Science-backed ways to upgrade your biology
+cta: Capture these metrics in WIHY
+layout: data-first stat card with one hero fact, two supporting proof lines, clean chart-like blocks, and minimal decorative noise
+supporting_points:
+- VO2 max outperforms most single blood markers for longevity
+- grip strength strongly correlates with lifespan outcomes
+- 10 minutes of cold exposure can sharply elevate dopamine
+- time-restricted eating supports cellular repair pathways
+
+prompt:
+Create a branded social media post for wihy. Use the template family 'biohack-fact'. Visual direction: data-first stat card with one hero fact, two supporting proof lines, clean chart-like blocks, and minimal decorative noise. Primary headline: Science-backed ways to upgrade your biology. Supporting ideas to communicate: VO2 max outperforms most single blood markers for longevity, grip strength strongly correlates with lifespan outcomes, 10 minutes of cold exposure can sharply elevate dopamine, time-restricted eating supports cellular repair pathways. Call to action: Track these metrics in WIHY. Keep the design clean and readable. Use one dominant headline, one concise support line, and one clear CTA. Prioritize mobile legibility, strong contrast, safe margins, and text that stays inside a centered content zone. Avoid clutter, tiny text, and generic motivational phrasing.

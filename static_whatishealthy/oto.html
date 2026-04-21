@@ -256,12 +256,14 @@
 
     // ── OTO Declined ──
     noBtn.addEventListener('click', function() {
+      // Use standard Lead event (no blocked custom events)
       if (window.__metaPixelReady && typeof fbq === 'function') {
-        fbq('trackCustom', 'OTODeclined', {
-          content_name: 'OTO Paperback'
+        fbq('track', 'Lead', {
+          content_name: 'OTO Paperback',
+          content_category: 'digital_only'
         });
       }
-      trackCAPI('OTODeclined');
+      trackCAPI('Lead');
       goThankYou('digital');
     });
 
@@ -279,7 +281,7 @@
           value: 24.99
         });
       }
-      trackCAPI('OTOAccepted', 24.99);
+      trackCAPI('InitiateCheckout', 24.99);
 
       window.location.href = 'https://buy.stripe.com/dRmbJ13cu4dYcdz5t0ejK0i';
     });

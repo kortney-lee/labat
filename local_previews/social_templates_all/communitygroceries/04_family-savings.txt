@@ -1,0 +1,14 @@
+brand: communitygroceries
+template_number: 5
+template_key: family-savings
+headline: Feed your family better for less
+cta: Try Community Groceries
+layout: family grocery promo with bold practical headline, 3 short benefits, and CTA
+supporting_points:
+- meal planning
+- smart grocery lists
+- less waste
+- more savings
+
+prompt:
+Create a branded social media post for communitygroceries. Use the template family 'family-savings'. Visual direction: family grocery promo with bold practical headline, 3 short benefits, and CTA. Primary headline: Feed your family better for less. Supporting ideas to communicate: meal planning, smart grocery lists, less waste, more savings. Call to action: Try Community Groceries. Keep the design clean and readable. Use one dominant headline, one concise support line, and one clear CTA. Prioritize mobile legibility, strong contrast, safe margins, and text that stays inside a centered content zone. Avoid clutter, tiny text, and generic motivational phrasing.

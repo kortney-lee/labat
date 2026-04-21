@@ -174,6 +174,9 @@ def _build_faq_schema(faqs: List[Dict[str, str]], page_url: str) -> str:
 
 def _build_article_schema(page: Dict[str, Any], brand: Dict[str, str]) -> str:
     """Generate JSON-LD Article schema."""
+    route_path = page.get("route_path") or f"{str(page.get('route_base', '/is-it-healthy')).rstrip('/')}/{page.get('slug', '')}"
+    if not str(route_path).startswith("/"):
+        route_path = f"/{route_path}"
     schema = {
         "@context": "https://schema.org",
         "@type": "Article",
@@ -197,7 +200,7 @@ def _build_article_schema(page: Dict[str, Any], brand: Dict[str, str]) -> str:
         "dateModified": page.get("updated_at", page.get("created_at", datetime.utcnow().isoformat())),
         "mainEntityOfPage": {
             "@type": "WebPage",
-            "@id": f"{brand['url']}/is-it-healthy/{page.get('slug', '')}",
+            "@id": f"{brand['url']}{route_path}",
         },
     }
     return json.dumps(schema, indent=2)
@@ -271,6 +274,19 @@ def render_page_html(
     # Schema markup
     faq_schema = _build_faq_schema(faqs, page_url)
     article_schema = _build_article_schema(page, brand)
+
+    route_base = str(page.get("route_base", "/is-it-healthy")).rstrip("/")
+    if not route_base:
+        route_base = "/is-it-healthy"
+    section_label = "Health Library"
+    if route_base == "/blog":
+        section_label = "Blog"
+    elif route_base == "/insights":
+        section_label = "Insights"
+    elif route_base == "/fitness":
+        section_label = "Fitness"
+    elif route_base == "/wellness":
+        section_label = "Wellness"
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -607,7 +623,7 @@ def render_page_html(
 
     <header class="hero">
         <div class="breadcrumb">
-            <a href="{brand['url']}">Home</a> › <a href="/is-it-healthy">Health Library</a> › {_e(title)}
+            <a href="{brand['url']}">Home</a> › <a href="{route_base}">{_e(section_label)}</a> › {_e(title)}
         </div>
         <h1>{_e(title)}</h1>
         {f'<div class="hero-summary">{_e(summary)}</div>' if summary else ''}
@@ -666,8 +682,14 @@ def render_index_html(
             slug = p.get("slug", "")
             title = _e(p.get("title", slug.replace("-", " ").title()))
             desc = _e(p.get("meta_description", "")[:120])
+            route_path = p.get("route_path", "")
+            if not route_path:
+                route_base = str(p.get("route_base", "/is-it-healthy")).rstrip("/")
+                route_path = f"{route_base}/{slug}"
+            if not str(route_path).startswith("/"):
+                route_path = f"/{route_path}"
             cat_cards += (
-                f'<a href="/is-it-healthy/{slug}" class="card">\n'
+                f'<a href="{route_path}" class="card">\n'
                 f"  <h3>{title}</h3>\n"
                 f"  <p>{desc}</p>\n"
                 f"</a>\n"
@@ -825,11 +847,17 @@ def render_sitemap_xml(
     static_pages = extra_urls or [
         {"loc": "/", "changefreq": "weekly", "priority": "1.0"},
         {"loc": "/about", "changefreq": "monthly", "priority": "0.8"},
+        {"loc": "/subscription", "changefreq": "monthly", "priority": "0.8"},
+        {"loc": "/chat", "changefreq": "weekly", "priority": "0.7"},
+        {"loc": "/is-it-healthy", "changefreq": "daily", "priority": "0.9"},
         {"loc": "/blog", "changefreq": "daily", "priority": "0.9"},
-        {"loc": "/trending", "changefreq": "daily", "priority": "0.9"},
-        {"loc": "/compare", "changefreq": "weekly", "priority": "0.8"},
-        {"loc": "/alternatives", "changefreq": "weekly", "priority": "0.8"},
-        {"loc": "/guides", "changefreq": "weekly", "priority": "0.8"},
+        {"loc": "/insights", "changefreq": "daily", "priority": "0.9"},
+        {"loc": "/fitness", "changefreq": "daily", "priority": "0.9"},
+        {"loc": "/wellness", "changefreq": "daily", "priority": "0.9"},
+        {"loc": "/trends", "changefreq": "daily", "priority": "0.9"},
+        {"loc": "/comparison", "changefreq": "daily", "priority": "0.9"},
+        {"loc": "/search", "changefreq": "weekly", "priority": "0.7"},
+        {"loc": "/support", "changefreq": "monthly", "priority": "0.5"},
     ]
     for s in static_pages:
         entries.append(
@@ -849,6 +877,8 @@ def render_sitemap_xml(
             slug = p.get("slug", "")
             if slug:
                 route_path = f"{route_base}/{slug}"
+        if route_path and not str(route_path).startswith("/"):
+            route_path = f"/{route_path}"
         if not route_path or route_path in seen:
             continue
         seen.add(route_path)

@@ -11,6 +11,19 @@ from datetime import datetime, timezone
 KW_FILE = Path("data/wihy_content_keywords.json")
 
 SEEDS = [
+    # === FOOD AS MEDICINE / NATURAL HEALING ===
+    "food as medicine", "food as medicine examples", "food as medicine meal plan",
+    "food as medicine on a budget", "food as medicine grocery list",
+    "natural healing foods", "natural healing diet", "natural healing meal plan",
+    "healing foods list", "healing foods for inflammation", "healing foods for gut health",
+    "anti inflammatory grocery list", "anti inflammatory foods on a budget",
+    "anti inflammatory meals for families", "gut healing foods",
+    "foods that heal your body", "foods to reduce inflammation naturally",
+    "whole foods for natural healing", "real food healing diet",
+    "medicinal foods list", "best medicinal foods",
+    "natural remedies with food", "immune boosting foods list",
+    "heart healthy grocery list budget", "blood sugar friendly grocery list",
+    "healthy grocery swaps for inflammation",
     # === SPECIFIC FOODS ===
     "eggs health benefits", "are eggs healthy", "eggs cholesterol myth",
     "avocado health benefits", "avocado nutrition", "is avocado good for you",
@@ -70,6 +83,11 @@ SEEDS = [
 ]
 
 _TOPIC_MAP = {
+    "food as medicine": "nutrition", "natural healing": "nutrition",
+    "healing foods": "nutrition", "anti inflammatory": "nutrition",
+    "inflammation": "nutrition", "gut healing": "gut-health",
+    "medicinal food": "nutrition", "immune boosting": "immune-health",
+    "blood sugar": "sugar-and-blood-health", "heart healthy": "heart-health",
     "egg": "nutrition", "avocado": "nutrition", "salmon": "nutrition",
     "fish": "nutrition", "omega": "nutrition", "almond": "nutrition",
     "walnut": "nutrition", "cashew": "nutrition", "nut": "nutrition",

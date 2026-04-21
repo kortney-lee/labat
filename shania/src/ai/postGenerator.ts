@@ -5,18 +5,21 @@
  *  1. Fetch WIHY RAG context for grounded health facts
  *  2. Gemini writes caption + hashtags using brand-specific voice
  *  3. Gemini generates structured graphic content (headline, subtext, template)
- *  4. Branded HTML template rendered via Puppeteer into a professional graphic
- *  5. Returns the final image + caption + hashtags
+ *  4. Create branded design via Canva API with structured data
+ *  5. Export design as PNG image via Canva
+ *  6. Returns the final image + caption + hashtags
  *
  * Supported brands: wihy, communitygroceries, vowels, snackingwell
+ *
+ * NOTE: Now 100% powered by Canva — no more HTML templates or Puppeteer
  */
 
 import { VertexAI, SchemaType } from "@google-cloud/vertexai";
 import { getHealthContext } from "./ragClient";
 import { generateGraphicContent } from "./geminiClient";
-import { renderTemplateForBrand, listTemplateIds } from "../renderer/renderHtml";
-import { screenshotHtml } from "../renderer/renderImage";
 import { generateImage, isImagenAvailable } from "./imagenClient";
+import { getCanvaClient } from "../services/canvaService";
+import type { DesignData } from "../services/canvaService";
 
 import { getBrand, BrandProfile, BrandId } from "../config/brand";
 import { FORMATS, FormatKey } from "../config/formats";
@@ -241,107 +244,113 @@ export async function generatePost(
   //         NOW with RAG facts so the graphic contains real data
   logger.info(`Post pipeline [${brand.id}]: generating graphic content...`);
   const graphicContent = await generateGraphicContent(userPrompt, undefined, brand, ragFacts);
+  const isCommunityGroceries = brand.id === "communitygroceries";
 
-  // Validate template exists, fallback to hook_square
-  const validTemplates = listTemplateIds();
-  let templateId = validTemplates.includes(graphicContent.template)
-    ? graphicContent.template
-    : graphicContent.template === "ai_photo" ? "ai_photo" : "hook_square";
+  // Now using Canva templates — map old template types to design content
+  // All template selection logic simplified since Canva handles layout variations
+  let selectedBrand = brand.id;
 
-  // Image-first mode: if we have a viable photo prompt, bias toward photo-led templates.
-  const imageFirstEnabled = (process.env.SHANIA_IMAGE_FIRST_MODE || "true").toLowerCase() !== "false";
-  const nonPhotoDataTemplates = new Set(["stat_card", "research_card", "ingredient_breakdown", "comparison_split"]);
-  const hasPhotoQuery = Boolean(graphicContent.photoQuery && graphicContent.photoQuery.trim().length > 0);
-  if (
-    imageFirstEnabled
-    && isImagenAvailable()
-    && hasPhotoQuery
-    && templateId !== "ai_photo"
-    && templateId !== "photo_overlay"
-    && templateId !== "photo_caption"
-    && !nonPhotoDataTemplates.has(templateId)
-  ) {
-    templateId = Math.random() < 0.55 ? "photo_overlay" : "photo_caption";
-    logger.info(`Post pipeline [${brand.id}]: image-first promoted template to ${templateId}`);
-  }
-
-  // If ai_photo mode: generate standalone Imagen image (no template wrapping)
-  if (templateId === "ai_photo" && graphicContent.photoQuery && isImagenAvailable()) {
-    try {
-      logger.info(`Post pipeline [${brand.id}]: generating standalone Imagen photo for "${graphicContent.photoQuery}"...`);
-      const imagenResult = await generateImage({ prompt: graphicContent.photoQuery, aspectRatio: "1:1" });
-
-      const elapsed = Date.now() - startTime;
-      logger.info(`Post pipeline [${brand.id}] complete (ai_photo) in ${elapsed}ms (${imagenResult.imageBytes.length} bytes)`);
-
-      return {
-        imageBytes: imagenResult.imageBytes,
-        mimeType: imagenResult.mimeType,
-        caption: plan.caption,
-        hashtags: combinedHashtags,
-        ragContext: ragFacts || undefined,
-        templateId: "ai_photo",
-        brand: brand.id,
-      };
-    } catch (err: unknown) {
-      logger.warn(`Imagen generation failed — falling back to hook_square: ${err instanceof Error ? err.message : String(err)}`);
-      templateId = "hook_square";
-    }
-  } else if (templateId === "ai_photo") {
-    // ai_photo without query or Imagen unavailable — fallback
-    templateId = "hook_square";
-  }
-
-  // Photo templates (photo_overlay, photo_caption): generate Imagen photo then embed in template
-  const isPhotoTemplate = templateId === "photo_overlay" || templateId === "photo_caption";
+  // Generate photo if needed for image-first mode
   let photoUrl: string | undefined;
+  let mealPhotoBytes: Buffer | undefined;
+  let mealPhotoMimeType: string | undefined;
+  const imageFirstEnabled = (process.env.SHANIA_IMAGE_FIRST_MODE || "true").toLowerCase() !== "false";
+  const hasPhotoQuery = Boolean(graphicContent.photoQuery && graphicContent.photoQuery.trim().length > 0);
+  const cgMealImagePriority = (process.env.SHANIA_CG_MEAL_IMAGE_PRIORITY || "true").toLowerCase() !== "false";
 
-  if (isPhotoTemplate && graphicContent.photoQuery && isImagenAvailable()) {
+  // CG must always have a meal-centric photo prompt; synthesize fallback if Gemini misses it.
+  if (isCommunityGroceries && !hasPhotoQuery) {
+    const fallbackPhotoQuery = [
+      "A warm, realistic home kitchen scene with a freshly plated healthy family meal",
+      graphicContent.headline ? `inspired by: ${graphicContent.headline}` : "",
+      graphicContent.subtext ? `${graphicContent.subtext}` : "",
+      "natural light, editorial food photography, appetizing textures, no text no signs no labels",
+    ]
+      .filter(Boolean)
+      .join(", ");
+
+    graphicContent.photoQuery = fallbackPhotoQuery;
+  }
+
+  const shouldGeneratePhoto =
+    (imageFirstEnabled && isImagenAvailable() && Boolean(graphicContent.photoQuery && graphicContent.photoQuery.trim().length > 0)) ||
+    (isCommunityGroceries && isImagenAvailable() && Boolean(graphicContent.photoQuery && graphicContent.photoQuery.trim().length > 0));
+
+  if (shouldGeneratePhoto) {
     try {
-      logger.info(`Post pipeline [${brand.id}]: generating Imagen photo for ${templateId}...`);
-      const imagenResult = await generateImage({ prompt: graphicContent.photoQuery, aspectRatio: "1:1" });
+      logger.info(`Post pipeline [${brand.id}]: generating Imagen photo...`);
+      const imagenResult = await generateImage({ prompt: graphicContent.photoQuery!, aspectRatio: "1:1" });
       photoUrl = `data:${imagenResult.mimeType};base64,${Buffer.from(imagenResult.imageBytes).toString("base64")}`;
+      mealPhotoBytes = Buffer.from(imagenResult.imageBytes);
+      mealPhotoMimeType = imagenResult.mimeType;
       logger.info(`Post pipeline [${brand.id}]: Imagen photo generated (${imagenResult.imageBytes.length} bytes)`);
     } catch (err: unknown) {
-      logger.warn(`Imagen photo generation failed for ${templateId} — falling back to hook_square: ${err instanceof Error ? err.message : String(err)}`);
-      templateId = "hook_square";
+      logger.warn(`Imagen photo generation failed — continuing without photo: ${err instanceof Error ? err.message : String(err)}`);
     }
-  } else if (isPhotoTemplate) {
-    // Photo template but no query or Imagen unavailable — fallback
-    logger.warn(`Photo template ${templateId} without photoQuery or Imagen — falling back to hook_square`);
-    templateId = "hook_square";
   }
 
-  // Template-based path: render branded template → Puppeteer screenshot
-  logger.info(`Post pipeline [${brand.id}]: rendering template "${templateId}"...`);
-  const templateData: TemplateData = {
+  // For Community Groceries, prioritize posting actual meal images through Labat.
+  // Falls back to Canva if photo generation failed.
+  if (isCommunityGroceries && cgMealImagePriority && mealPhotoBytes && mealPhotoMimeType) {
+    const elapsed = Date.now() - startTime;
+    logger.info(
+      `Post pipeline [${brand.id}] complete (meal-image-priority) in ${elapsed}ms (${mealPhotoBytes.length} bytes)`,
+    );
+
+    return {
+      imageBytes: mealPhotoBytes,
+      mimeType: mealPhotoMimeType,
+      caption: plan.caption,
+      hashtags: combinedHashtags,
+      ragContext: ragFacts || undefined,
+      templateId: "cg_meal_photo",
+      brand: brand.id,
+    };
+  }
+
+  // Step 4: Create design via Canva API using brand-specific template
+  logger.info(
+    `Post pipeline [${brand.id}]: creating Canva design (templateHint=${graphicContent.template || "none"})...`,
+  );
+
+  const designData: DesignData = {
     headline: graphicContent.headline,
     subtext: graphicContent.subtext,
     cta: graphicContent.cta,
-    theme: (graphicContent.theme as TemplateData["theme"]) || "wihy_default",
-    artDirection: (graphicContent.artDirection as TemplateData["artDirection"]) || undefined,
     quote: graphicContent.quote,
     attribution: graphicContent.attribution,
+    tip: graphicContent.tip,
+    tipLabel: graphicContent.tipLabel,
     statNumber: graphicContent.statNumber,
     statLabel: graphicContent.statLabel,
     dataPoints: graphicContent.dataPoints,
     source: graphicContent.source,
+    // photoUrl is used for future asset upload integration
     photoUrl,
   };
 
-  const html = renderTemplateForBrand(templateId, templateData, brand, outputSize);
-  const finalImage = await screenshotHtml({ html, outputSize, format: "png" });
+  try {
+    const canvaClient = getCanvaClient();
+    const finalImage = await canvaClient.generateDesignImage(
+      selectedBrand as BrandId,
+      designData,
+      { templateHint: graphicContent.template },
+    );
 
-  const elapsed = Date.now() - startTime;
-  logger.info(`Post pipeline [${brand.id}] complete in ${elapsed}ms (${finalImage.length} bytes)`);
+    const elapsed = Date.now() - startTime;
+    logger.info(`Post pipeline [${brand.id}] complete (Canva) in ${elapsed}ms (${finalImage.length} bytes)`);
 
-  return {
-    imageBytes: finalImage,
-    mimeType: "image/png",
-    caption: plan.caption,
-    hashtags: combinedHashtags,
-    ragContext: ragFacts || undefined,
-    templateId,
-    brand: brand.id,
-  };
+    return {
+      imageBytes: finalImage,
+      mimeType: "image/png",
+      caption: plan.caption,
+      hashtags: combinedHashtags,
+      ragContext: ragFacts || undefined,
+      templateId: graphicContent.template || selectedBrand,
+      brand: brand.id,
+    };
+  } catch (err: unknown) {
+    logger.error(`Canva design generation failed: ${err instanceof Error ? err.message : String(err)}`);
+    throw err;
+  }
 }

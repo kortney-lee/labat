@@ -1,0 +1,14 @@
+brand: wihy
+template_number: 4
+template_key: transformation
+headline: Lose weight with a system, not guesswork
+cta: Start your plan in WIHY
+layout: transformation concept with one bold promise headline, one proof-oriented subline, and a clear CTA anchored above the fold
+supporting_points:
+- personalized meals matched to your goals
+- training guidance you can actually stick to
+- weekly progress check-ins and course correction
+- one dashboard to keep consistency high
+
+prompt:
+Create a branded social media post for wihy. Use the template family 'transformation'. Visual direction: transformation concept with one bold promise headline, one proof-oriented subline, and a clear CTA anchored above the fold. Primary headline: Lose weight with a system, not guesswork. Supporting ideas to communicate: personalized meals matched to your goals, training guidance you can actually stick to, weekly progress check-ins and course correction, one dashboard to keep consistency high. Call to action: Start your plan in WIHY. Keep the design clean and readable. Use one dominant headline, one concise support line, and one clear CTA. Prioritize mobile legibility, strong contrast, safe margins, and text that stays inside a centered content zone. Avoid clutter, tiny text, and generic motivational phrasing.

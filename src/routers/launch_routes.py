@@ -109,6 +109,91 @@ async def nurture_cron(request: Request):
     return {"processed": sent}
 
 
+@router.post("/preview-all")
+async def preview_all(request: Request):
+    """Admin: send every launch nurture template to an address for review."""
+    token = request.headers.get("X-Admin-Token", "")
+    if token != ADMIN_TOKEN:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    body = await request.json()
+    to_email = body.get("email", "").strip().lower()
+    first_name = body.get("first_name", "Kortney")
+    brand = body.get("brand", "wihy").strip().lower()
+
+    if not to_email:
+        raise HTTPException(status_code=400, detail="email required")
+    if brand not in ("wihy", "communitygroceries"):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid brand. Use 'wihy' or 'communitygroceries'.",
+        )
+
+    from src.services.launch_nurture_service import send_launch_email, LAUNCH_SEQUENCE
+
+    results = {}
+    for _stage, days, template_id, subject in LAUNCH_SEQUENCE:
+        preview_subject = f"[PREVIEW Day {days}] {subject}"
+        sent = await send_launch_email(
+            to_email=to_email,
+            first_name=first_name,
+            template_id=template_id,
+            subject=preview_subject,
+            brand=brand,
+        )
+        results[template_id] = sent
+
+    return {
+        "status": "ok",
+        "sent_to": to_email,
+        "brand": brand,
+        "results": results,
+    }
+
+
+@router.post("/preview-local")
+async def preview_local(request: Request):
+    """Admin: render launch templates locally for visual QA (no email send)."""
+    token = request.headers.get("X-Admin-Token", "")
+    if token != ADMIN_TOKEN:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    body = await request.json()
+    first_name = str(body.get("first_name", "Kortney")).strip() or "Kortney"
+    output_dir = str(body.get("output_dir", "local_previews/launch_templates")).strip()
+    keep_active_only = bool(body.get("keep_active_only", False))
+
+    brands_raw = body.get("brands", ["wihy", "communitygroceries"])
+    if not isinstance(brands_raw, list):
+        raise HTTPException(status_code=400, detail="brands must be a list")
+
+    brands = [str(b).strip().lower() for b in brands_raw if str(b).strip()]
+    allowed = {"wihy", "communitygroceries"}
+    invalid = [b for b in brands if b not in allowed]
+    if invalid:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid brand(s): {', '.join(invalid)}. Use 'wihy' or 'communitygroceries'.",
+        )
+
+    from src.services.launch_nurture_service import export_launch_templates_local
+
+    files = export_launch_templates_local(
+        output_dir=output_dir,
+        first_name=first_name,
+        brands=brands,
+        keep_active_only=keep_active_only,
+    )
+
+    return {
+        "status": "ok",
+        "mode": "active_only" if keep_active_only else "all_templates",
+        "output_dir": output_dir,
+        "brands": brands,
+        "files": files,
+    }
+
+
 @router.get("/stats")
 async def launch_stats(request: Request):
     """Return signup stats by brand. Admin only."""

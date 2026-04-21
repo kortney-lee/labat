@@ -15,11 +15,20 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from src.api.config import (
-    CORS_ORIGINS, CORS_ALLOW_CREDENTIALS,
-    CORS_ALLOW_METHODS, CORS_ALLOW_HEADERS,
-    DEFAULT_PORT,
-)
+
+_raw_cors_origins = os.getenv("CORS_ORIGINS", "")
+if _raw_cors_origins:
+    CORS_ORIGINS = [o.strip() for o in _raw_cors_origins.split(",") if o.strip()]
+else:
+    CORS_ORIGINS = [
+        "http://localhost:3000",
+        "http://localhost:5173",
+    ]
+
+CORS_ALLOW_CREDENTIALS = os.getenv("CORS_ALLOW_CREDENTIALS", "true").lower() == "true"
+CORS_ALLOW_METHODS = [m.strip() for m in os.getenv("CORS_ALLOW_METHODS", "*").split(",") if m.strip()]
+CORS_ALLOW_HEADERS = [h.strip() for h in os.getenv("CORS_ALLOW_HEADERS", "*").split(",") if h.strip()]
+DEFAULT_PORT = int(os.getenv("DEFAULT_PORT", "8083"))
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -62,7 +71,7 @@ app.add_middleware(
 # ── Middleware ────────────────────────────────────────────────────────────
 
 try:
-    from src.middleware.request_logger import VerboseRequestLoggerMiddleware
+    from src.shared.middleware.request_logger import VerboseRequestLoggerMiddleware
     app.add_middleware(VerboseRequestLoggerMiddleware, service_name="wihy-ml-book")
 except ImportError:
     pass
@@ -78,7 +87,7 @@ async def enforce_utf8_charset(request: Request, call_next):
 
 
 try:
-    from src.monitoring import setup_telemetry
+    from src.shared.monitoring import setup_telemetry
     setup_telemetry(app, service_name="wihy-ml-book")
 except ImportError:
     pass
@@ -101,19 +110,19 @@ except Exception as e:
     logger.error(f"Launch routes failed to load: {e}", exc_info=True)
 
 
+# ── Health ────────────────────────────────────────────────────────────────
+
+@app.get("/health", tags=["Health"])
+async def health():
+    return {"status": "healthy", "service": "wihy-ml-book"}
+
+
 # ── Static Files (serve landing page + assets) ───────────────────────────
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "static_whatishealthy")
 if os.path.isdir(STATIC_DIR):
     app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")
     logger.info(f"Serving static files from {STATIC_DIR}")
-
-
-# ── Health ────────────────────────────────────────────────────────────────
-
-@app.get("/health", tags=["Health"])
-async def health():
-    return {"status": "healthy", "service": "wihy-ml-book"}
 
 
 if __name__ == "__main__":

@@ -13,7 +13,18 @@ Tests the master agent's ability to:
 
 import asyncio
 import sys
+import os
 from datetime import datetime
+
+if os.getenv("ENABLE_MANUAL_TEST_SCRIPTS", "").strip().lower() not in (
+    "1",
+    "true",
+    "yes",
+):
+    raise SystemExit(
+        "Test scripts are disabled. Set ENABLE_MANUAL_TEST_SCRIPTS=true "
+        "for intentional manual runs."
+    )
 
 # Add src to path
 sys.path.insert(0, "/c/Users/Kortn/Repo/wihy_ml")

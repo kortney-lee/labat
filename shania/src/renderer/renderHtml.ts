@@ -12,6 +12,91 @@ import { logger } from "../utils/logger";
 
 type ArtDirection = "editorial" | "poster" | "data_lab" | "lifestyle";
 
+// ── Local logo cache (base64 data URIs) ─────────────────────────────────────
+const ASSETS_DIR = path.resolve(__dirname, "../../assets");
+const logoDataUriCache: Record<string, string> = {};
+
+const LOCAL_LOGO_MAP: Record<string, string> = {
+  communitygroceries: "CommunityGroceries/Logo_CG.png",
+  wihy: "Wihy/wihy_logo.png",
+  vowels: "Vowels/Vowels_logo.png",
+};
+
+function resolveLogoDataUri(brand?: BrandProfile): string {
+  const brandId = brand?.id ?? "wihy";
+  // Check parent brand for sub-brands
+  const key = LOCAL_LOGO_MAP[brandId]
+    ? brandId
+    : (brand?.parentBrand && LOCAL_LOGO_MAP[brand.parentBrand])
+    ? brand.parentBrand
+    : "wihy";
+
+  if (logoDataUriCache[key]) return logoDataUriCache[key];
+
+  const localPath = path.join(ASSETS_DIR, LOCAL_LOGO_MAP[key]);
+  if (fs.existsSync(localPath)) {
+    const buf = fs.readFileSync(localPath);
+    const dataUri = `data:image/png;base64,${buf.toString("base64")}`;
+    logoDataUriCache[key] = dataUri;
+    return dataUri;
+  }
+
+  // Fallback to remote URL
+  return resolveLogoUrl(brand ?? getBrand("wihy"));
+}
+
+// ── Local asset resolver (base64 data URIs for app screenshots, book covers) ─
+const assetDataUriCache: Record<string, string> = {};
+
+/** Brand-specific showcase assets: CG = app screenshots, Vowels = book covers */
+const BRAND_ASSETS: Record<string, string[]> = {
+  communitygroceries: [
+    "CommunityGroceries/CG_home.png",
+    "CommunityGroceries/smartmealhome.png",
+    "CommunityGroceries/chatscreen.png",
+    "CommunityGroceries/shoppinglist.png",
+    "CommunityGroceries/MealTemplatesScreen.png",
+    "CommunityGroceries/cookinginstructions.png",
+    "CommunityGroceries/mypantry.png",
+    "CommunityGroceries/calendarplan.png",
+    "CommunityGroceries/instacartpage.png",
+  ],
+  vowels: [
+    "ChildrensNutrition/BookGreen.jpg",
+    "ChildrensNutrition/BookOrange.jpg",
+    "ChildrensNutrition/Book6.jpg",
+  ],
+};
+
+/** Resolve a brand asset file to a base64 data URI. Picks randomly from available assets. */
+function resolveBrandAssetDataUri(brand?: BrandProfile): string | undefined {
+  const brandId = brand?.id ?? "wihy";
+  const key = BRAND_ASSETS[brandId]
+    ? brandId
+    : (brand?.parentBrand && BRAND_ASSETS[brand.parentBrand])
+    ? brand.parentBrand
+    : undefined;
+  if (!key) return undefined;
+
+  const assets = BRAND_ASSETS[key];
+  const pick = assets[Math.floor(Math.random() * assets.length)];
+  const cacheKey = `${key}:${pick}`;
+
+  if (assetDataUriCache[cacheKey]) return assetDataUriCache[cacheKey];
+
+  const localPath = path.join(ASSETS_DIR, pick);
+  if (fs.existsSync(localPath)) {
+    const buf = fs.readFileSync(localPath);
+    const ext = path.extname(pick).toLowerCase();
+    const mime = ext === ".jpg" || ext === ".jpeg" ? "image/jpeg" : "image/png";
+    const dataUri = `data:${mime};base64,${buf.toString("base64")}`;
+    assetDataUriCache[cacheKey] = dataUri;
+    return dataUri;
+  }
+
+  return undefined;
+}
+
 function pickArtDirection(brand?: BrandProfile): ArtDirection {
   const family = brand?.id === "communitygroceries"
     ? ["lifestyle", "editorial", "poster"]
@@ -108,6 +193,14 @@ function randomVowelsPalette(): VowelsPalette {
   return VOWELS_PALETTES[Math.floor(Math.random() * VOWELS_PALETTES.length)];
 }
 
+function findPaletteByName<T extends { name: string }>(
+  palettes: T[],
+  name: string,
+  fallback: T,
+): T {
+  return palettes.find((p) => p.name === name) ?? fallback;
+}
+
 // ── Handlebars helpers ──────────────────────────────────────────────────────
 
 Handlebars.registerHelper("eq", (a: unknown, b: unknown) => a === b);
@@ -119,7 +212,14 @@ Handlebars.registerHelper("indexPlusOne", function (this: { index?: number }, op
 // ── Template cache ──────────────────────────────────────────────────────────
 
 const templateCache = new Map<string, HandlebarsTemplateDelegate>();
-const TEMPLATES_DIR = path.join(__dirname, "..", "templates");
+const COMPILED_TEMPLATES_DIR = path.join(__dirname, "..", "templates");
+const SOURCE_TEMPLATES_DIR = path.join(process.cwd(), "src", "templates");
+
+function resolveTemplatesDir(): string {
+  if (fs.existsSync(SOURCE_TEMPLATES_DIR)) return SOURCE_TEMPLATES_DIR;
+  if (fs.existsSync(COMPILED_TEMPLATES_DIR)) return COMPILED_TEMPLATES_DIR;
+  return COMPILED_TEMPLATES_DIR;
+}
 
 function getTemplateDir(templateId: string): string {
   // Map template IDs like "hook_square" to directory names like "hook-square"
@@ -131,7 +231,7 @@ function loadTemplate(templateId: string): HandlebarsTemplateDelegate {
   if (cached) return cached;
 
   const dir = getTemplateDir(templateId);
-  const htmlPath = path.join(TEMPLATES_DIR, dir, "template.html");
+  const htmlPath = path.join(resolveTemplatesDir(), dir, "template.html");
 
   if (!fs.existsSync(htmlPath)) {
     throw new Error(`Template not found: ${templateId} (looked in ${htmlPath})`);
@@ -183,7 +283,8 @@ export function renderTemplate(
     showLogo: data.showLogo !== false,
     theme: data.theme || "wihy_default",
     artDirection: data.artDirection || pickArtDirection(),
-    logoUrl: BRAND.assets.wihy.logo,
+    logoUrl: resolveLogoDataUri(),
+    brandAssetUrl: resolveBrandAssetDataUri(),
   };
 
   return template(context);
@@ -191,10 +292,11 @@ export function renderTemplate(
 
 /** List available template IDs. */
 export function listTemplateIds(): string[] {
-  if (!fs.existsSync(TEMPLATES_DIR)) return [];
-  return fs.readdirSync(TEMPLATES_DIR, { withFileTypes: true })
+  const templatesDir = resolveTemplatesDir();
+  if (!fs.existsSync(templatesDir)) return [];
+  return fs.readdirSync(templatesDir, { withFileTypes: true })
     .filter((d) => d.isDirectory())
-    .filter((d) => fs.existsSync(path.join(TEMPLATES_DIR, d.name, "template.html")))
+    .filter((d) => fs.existsSync(path.join(templatesDir, d.name, "template.html")))
     .map((d) => d.name.replace(/-/g, "_"));
 }
 
@@ -224,7 +326,8 @@ export function renderTemplateForBrand(
     showLogo: data.showLogo !== false,
     theme: data.theme || "wihy_default",
     artDirection: data.artDirection || pickArtDirection(brand),
-    logoUrl: resolveLogoUrl(brand),
+    logoUrl: resolveLogoDataUri(brand),
+    brandAssetUrl: resolveBrandAssetDataUri(brand),
   };
 
   return template(context);
@@ -234,8 +337,8 @@ export function renderTemplateForBrand(
 function buildBrandStyleBlockForBrand(width: number, height: number, brand: BrandProfile): string {
   // CG brand → CG light palettes
   if (brand.id === "communitygroceries") {
-    const p = randomCGPalette();
-    logger.info(`Using CG palette: ${p.name}`);
+    const p = findPaletteByName(CG_PALETTES, "garden-cream", CG_PALETTES[0]);
+    logger.info(`Using CG palette: ${p.name} (fixed)`);
     return `<style>${BRAND.fontImport}
       :root {
         --font-headline: ${BRAND.fonts.headline};
@@ -259,8 +362,16 @@ function buildBrandStyleBlockForBrand(width: number, height: number, brand: Bran
   // Vowels family (vowels + sub-brands) → Vowels blue/purple palettes
   const isVowelsFamily = brand.id === "vowels" || brand.parentBrand === "vowels";
   if (isVowelsFamily) {
-    const p = randomVowelsPalette();
-    logger.info(`Using Vowels palette: ${p.name} (brand: ${brand.id})`);
+    const paletteNameByBrand: Record<string, string> = {
+      vowels: "ice-blue",
+      childrennutrition: "ice-blue",
+      parentingwithchrist: "lavender-mist",
+      snackingwell: "steel-white",
+      otakulounge: "arctic-indigo",
+    };
+    const preferred = paletteNameByBrand[brand.id] ?? "ice-blue";
+    const p = findPaletteByName(VOWELS_PALETTES, preferred, VOWELS_PALETTES[0]);
+    logger.info(`Using Vowels palette: ${p.name} (fixed, brand: ${brand.id})`);
     return `<style>${BRAND.fontImport}
       :root {
         --font-headline: ${BRAND.fonts.headline};
@@ -282,8 +393,8 @@ function buildBrandStyleBlockForBrand(width: number, height: number, brand: Bran
   }
 
   // Default: WIHY dark palettes
-  const p = randomPalette();
-  logger.info(`Using color palette: ${p.name}`);
+  const p = findPaletteByName(PALETTES, "ocean", PALETTES[0]);
+  logger.info(`Using WIHY palette: ${p.name} (fixed)`);
   return `<style>${BRAND.fontImport}
     :root {
       --font-headline: ${BRAND.fonts.headline};

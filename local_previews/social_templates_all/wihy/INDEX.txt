@@ -1,0 +1,7 @@
+brand: wihy
+templates:
+1. superhuman-protocol | Build your superhuman baseline in 30 days | 00_superhuman-protocol.txt
+2. performance-stack | Your daily performance stack, simplified | 01_performance-stack.txt
+3. biohack-fact | Science-backed ways to upgrade your biology | 02_biohack-fact.txt
+4. transformation | Lose weight with a system, not guesswork | 03_transformation.txt
+5. feature-stack | 10 things in 1 health app | 04_feature-stack.txt

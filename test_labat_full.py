@@ -3,6 +3,17 @@ import json
 import urllib.request
 import ssl
 import datetime
+import os
+
+if os.getenv("ENABLE_MANUAL_TEST_SCRIPTS", "").strip().lower() not in (
+    "1",
+    "true",
+    "yes",
+):
+    raise SystemExit(
+        "Test scripts are disabled. Set ENABLE_MANUAL_TEST_SCRIPTS=true "
+        "for intentional manual runs."
+    )
 
 ctx = ssl.create_default_context()
 BASE = "https://wihy-labat-n4l2vldq3q-uc.a.run.app"
@@ -100,14 +111,26 @@ else:
 
 # 3. Create Post
 print("\n=== 3. CREATE POST ===")
-r = graph_post(f"{PAGE_ID}/feed", {"message": "LABAT live test - WiHy AI health intelligence platform! #WiHy #HealthTech #AI"})
-if "ERROR" not in r:
-    post_id = r.get("id", "")
-    print(f"  POST CREATED! ID: {post_id}")
-    results["create_post"] = f"PASS (id={post_id})"
+if os.getenv("ALLOW_LIVE_POST_TESTS", "").strip().lower() in ("1", "true", "yes"):
+    r = graph_post(
+        f"{PAGE_ID}/feed",
+        {
+            "message": (
+                "LABAT live test - WiHy AI health intelligence platform! "
+                "#WiHy #HealthTech #AI"
+            )
+        },
+    )
+    if "ERROR" not in r:
+        post_id = r.get("id", "")
+        print(f"  POST CREATED! ID: {post_id}")
+        results["create_post"] = f"PASS (id={post_id})"
+    else:
+        print(f"  {r.get('msg','')[:200]}")
+        results["create_post"] = f"BLOCKED ({r.get('msg','')[:80]})"
 else:
-    print(f"  {r.get('msg','')[:200]}")
-    results["create_post"] = f"BLOCKED ({r.get('msg','')[:80]})"
+    print("  SKIPPED - Set ALLOW_LIVE_POST_TESTS=true to enable live posting test")
+    results["create_post"] = "SKIPPED"
 
 # 4. Page Insights
 print("\n=== 4. PAGE INSIGHTS ===")

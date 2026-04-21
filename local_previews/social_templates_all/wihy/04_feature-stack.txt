@@ -1,0 +1,14 @@
+brand: wihy
+template_number: 5
+template_key: feature-stack
+headline: 10 things in 1 health app
+cta: Try WIHY
+layout: clean app-style promo with bold headline, 3 short support lines, minimal clutter
+supporting_points:
+- weight loss planning
+- fitness and workouts
+- meal planning and groceries
+- behavior insights
+
+prompt:
+Create a branded social media post for wihy. Use the template family 'feature-stack'. Visual direction: clean app-style promo with bold headline, 3 short support lines, minimal clutter. Primary headline: 10 things in 1 health app. Supporting ideas to communicate: weight loss planning, fitness and workouts, meal planning and groceries, progress tracking. Call to action: Try WIHY. Keep the design clean and readable. Use one dominant headline, one concise support line, and one clear CTA. Prioritize mobile legibility, strong contrast, safe margins, and text that stays inside a centered content zone. Avoid clutter, tiny text, and generic motivational phrasing.

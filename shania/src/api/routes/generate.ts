@@ -621,6 +621,8 @@ router.post("/orchestrate-post", async (req: Request, res: Response): Promise<vo
       prompt,
       brand,
       brandKey,
+      imageUrl,
+      heroImage,
       platforms,
       outputSize,
       scheduledTime,
@@ -640,6 +642,10 @@ router.post("/orchestrate-post", async (req: Request, res: Response): Promise<vo
 
     const size: FormatKey = outputSize || DEFAULT_FORMAT;
     const results: Record<string, unknown> = {};
+    const providedImageUrl =
+      (typeof imageUrl === "string" && imageUrl.trim())
+      || (typeof heroImage === "string" && heroImage.trim())
+      || "";
 
     // Step 1: Alex realtime signals
     let alexSignals: { hashtags?: string[] } | null = null;
@@ -663,44 +669,82 @@ router.post("/orchestrate-post", async (req: Request, res: Response): Promise<vo
       results.alex = { status: "skipped", reason: "no admin token" };
     }
 
-    // Step 2: Shania generates content + asset
-    const post = await generatePost(prompt, size, brandId);
+    // Step 2: Shania generates content + asset (or reuses provided blog image URL)
+    let caption = "";
+    let hashtags: string[] = [];
+    let imageUrlForDelivery: string | null = null;
+    let responseBrand = brandId;
 
-    // Merge Alex hashtags with Shania hashtags
-    if (alexSignals?.hashtags?.length) {
-      const existing = new Set(post.hashtags.map((h) => h.toLowerCase()));
-      for (const tag of alexSignals.hashtags) {
-        const clean = tag.replace(/^#+/, "").trim();
-        if (clean && !existing.has(clean.toLowerCase())) {
-          post.hashtags.push(clean);
-          existing.add(clean.toLowerCase());
+    if (providedImageUrl) {
+      const plan = await planPostOnly(prompt, brandId);
+      caption = plan.caption;
+      hashtags = [...plan.hashtags];
+      responseBrand = plan.brand;
+      imageUrlForDelivery = providedImageUrl;
+
+      if (alexSignals?.hashtags?.length) {
+        const existing = new Set(hashtags.map((h) => h.toLowerCase()));
+        for (const tag of alexSignals.hashtags) {
+          const clean = tag.replace(/^#+/, "").trim();
+          if (clean && !existing.has(clean.toLowerCase())) {
+            hashtags.push(clean);
+            existing.add(clean.toLowerCase());
+          }
+          if (hashtags.length >= 12) break;
         }
-        if (post.hashtags.length >= 12) break;
       }
-    }
 
-    // Step 3: Upload asset to GCS
-    const ext = post.mimeType.includes("png") ? "png" : "webp";
-    let uploaded: { id: string; publicUrl: string } | null = null;
-    try {
-      uploaded = await uploadImage(post.imageBytes, ext as "png" | "webp", "orchestrated-post");
-    } catch (uploadErr) {
-      logger.warn(`GCS upload failed: ${uploadErr}`);
-    }
+      results.shania = {
+        status: "ok",
+        mode: "reuse-image",
+        captionLength: caption.length,
+        hashtags: hashtags.length,
+        imageUrl: imageUrlForDelivery,
+      };
+    } else {
+      const post = await generatePost(prompt, size, brandId);
+      caption = post.caption;
+      hashtags = [...post.hashtags];
+      responseBrand = post.brand;
 
-    results.shania = {
-      status: "ok",
-      captionLength: post.caption.length,
-      hashtags: post.hashtags.length,
-      imageSize: post.imageBytes.length,
-      imageUrl: uploaded?.publicUrl || null,
-    };
+      // Merge Alex hashtags with Shania hashtags
+      if (alexSignals?.hashtags?.length) {
+        const existing = new Set(hashtags.map((h) => h.toLowerCase()));
+        for (const tag of alexSignals.hashtags) {
+          const clean = tag.replace(/^#+/, "").trim();
+          if (clean && !existing.has(clean.toLowerCase())) {
+            hashtags.push(clean);
+            existing.add(clean.toLowerCase());
+          }
+          if (hashtags.length >= 12) break;
+        }
+      }
+
+      // Step 3: Upload asset to GCS
+      const ext = post.mimeType.includes("png") ? "png" : "webp";
+      let uploaded: { id: string; publicUrl: string } | null = null;
+      try {
+        uploaded = await uploadImage(post.imageBytes, ext as "png" | "webp", "orchestrated-post");
+      } catch (uploadErr) {
+        logger.warn(`GCS upload failed: ${uploadErr}`);
+      }
+      imageUrlForDelivery = uploaded?.publicUrl || null;
+
+      results.shania = {
+        status: "ok",
+        mode: "generated-image",
+        captionLength: caption.length,
+        hashtags: hashtags.length,
+        imageSize: post.imageBytes.length,
+        imageUrl: imageUrlForDelivery,
+      };
+    }
 
     // Step 4: Deliver to platforms (unless dry run)
-    const fullCaption = `${post.caption}\n\n${post.hashtags.map((h) => `#${h}`).join(" ")}`;
+    const fullCaption = `${caption}\n\n${hashtags.map((h) => `#${h}`).join(" ")}`;
     const deliveryResults = await deliverToPlatforms({
       platforms: targetPlatforms,
-      imageUrl: uploaded?.publicUrl,
+      imageUrl: imageUrlForDelivery || undefined,
       message: fullCaption,
       brandId,
       scheduledTime,
@@ -711,10 +755,10 @@ router.post("/orchestrate-post", async (req: Request, res: Response): Promise<vo
 
     res.json({
       status: "posted",
-      caption: post.caption,
-      hashtags: post.hashtags.map((h) => `#${h}`),
-      brand: post.brand,
-      imageUrl: uploaded?.publicUrl || null,
+      caption,
+      hashtags: hashtags.map((h) => `#${h}`),
+      brand: responseBrand,
+      imageUrl: imageUrlForDelivery || null,
       pipeline: results,
       dryRun,
       createdAt: new Date().toISOString(),

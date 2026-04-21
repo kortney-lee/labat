@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://wihy.ai/sitemap.xml

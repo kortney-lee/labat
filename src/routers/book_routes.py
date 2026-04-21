@@ -227,7 +227,7 @@ async def stripe_webhook(request: Request):
 
 # ── OTO Conversion Tracking ──────────────────────────────────────────────
 
-_ALLOWED_OTO_EVENTS = {"ViewContent", "InitiateCheckout", "OTODeclined", "OTOAccepted"}
+_ALLOWED_OTO_EVENTS = {"ViewContent", "InitiateCheckout", "Lead"}
 
 
 class TrackRequest(BaseModel):

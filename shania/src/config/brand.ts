@@ -83,35 +83,35 @@ export const BRANDS: Record<BrandId, BrandProfile> = {
     logoUrl: "https://storage.googleapis.com/wihy-web-assets/images/Logo_wihy.png",
     colors: { primary: "#fa5f06", accent: "#4cbb17", bg: "#e0f2fe", text: "#111827" },
     colorWords: "warm orange and vibrant green on light blue",
-    voice: `Bold, ambitious, and science-backed — like a performance coach who reads research papers.
-"Become superhuman through science." That's the mission. Not preachy, not gentle — direct and empowering.
-Uses strong hooks that stop scrolling. Challenges people to upgrade their biology.
-Speaks with authority: cold exposure data, VO2 max studies, longevity research, protein science.
-Every claim backed by peer-reviewed research. Tone: "Here's exactly what to do and why it works."
-Backed by 48M+ research articles. Inspires action, not just awareness.`,
+    voice: `Clear, credible, and practical - like a trusted clinician translating complex research into everyday decisions.
+  Direct and empowering without hype. Never preachy, never vague, never fear-based.
+  Explains what to do, why it matters, and how to apply it in real life.
+  Every claim should be traceable to evidence and presented in plain language.
+  Core product language: "capture, don't track," "understand, don't guess," "decide with evidence."
+  Backed by 48M+ research records, 4.1M+ products analyzed, and condition-aware guidance.
+  Focus on helping people make better choices at the grocery store, at home, and over time.`,
     topics: [
-      "biohacking protocols and daily performance stacks",
-      "cold exposure, sauna, and heat/cold therapy science",
-      "longevity and anti-aging research breakthroughs",
-      "VO2 max, grip strength, and biological age markers",
-      "sleep optimization and recovery science",
-      "protein timing, creatine, and evidence-based supplementation",
-      "zone 2 cardio, strength training, and optimal fitness programming",
-      "mitochondrial health and cellular energy production",
-      "grounding, red light therapy, and photobiomodulation",
-      "dopamine, cortisol, and hormonal optimization",
-      "fasting protocols and autophagy activation",
-      "body composition and metabolic health transformation",
+      "evidence-based nutrition guidance for everyday decisions",
+      "condition-aware meal planning and food selection",
+      "barcode and label analysis for ingredient risk awareness",
+      "carcinogen and additive detection in common products",
+      "research-backed answers to common health questions",
+      "metabolic health, blood sugar, and sustainable habits",
+      "gut health and digestive nutrition insights",
+      "family meal planning across different health needs",
+      "sleep, stress, movement, and nutrition pattern connections",
+      "shopping decisions that reduce confusion and guesswork",
+      "how to evaluate health claims using real evidence",
+      "long-term behavior change through small daily wins",
     ],
-    contentFocus: `WIHY is for people who want to become SUPERHUMAN — optimizing biology through science-backed protocols.
-WiHY = "Why is Health about You" — built by clinical nutrition researchers, RDs, data scientists, and engineers.
-Focus on actionable biohacking: cold exposure, sauna, sleep stacks, grounding, red light therapy, protein optimization.
-Tone is bold, ambitious, and empowering: "Do these things and you can become superhuman."
-Every post should give a specific protocol, research-backed stat, or actionable health upgrade.
-Reference real data: VO2 max, grip strength, dopamine levels, mitochondrial density.
-WIHY doesn't preach — it challenges you to upgrade your biology. Think Huberman meets Goggins meets science.
-Hard-hitting hooks: "Your body replaces 330 billion cells every day — feed it the right raw materials."
-WIHY does NOT do generic wellness or food industry exposés — that's Vowels territory.`,
+    contentFocus: `WIHY helps people make personal health decisions with evidence they can actually use.
+  WiHY = "Why is Health about You" - built by clinical nutrition researchers, RDs, data scientists, and engineers.
+  Positioning: one platform that connects food, conditions, behavior, and research into clear daily actions.
+  Primary promise: capture behavior -> reveal patterns -> guide decisions. Prefer "capture" over "track" and "understand" over "log."
+  Every post should deliver one clear action, one evidence-backed reason, and one practical next step.
+  Use proof points consistently: 48M+ research records, 4.1M+ products analyzed, 347 carcinogens tracked, 65+ conditions supported.
+  WIHY is not generic wellness advice and not a food-industry exposé feed. It is personal health intelligence.
+  When uncertain, prioritize clarity, usability, and scientific integrity over clever language.`,
     hashtagPrefix: "WIHY",
     facebookPageId: "937763702752161",
   },

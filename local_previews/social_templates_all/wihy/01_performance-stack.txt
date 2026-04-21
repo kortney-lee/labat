@@ -1,0 +1,14 @@
+brand: wihy
+template_number: 2
+template_key: performance-stack
+headline: Your daily performance stack, simplified
+cta: Build your daily stack in WIHY
+layout: clean protocol card with a 1-4 numbered routine, strong typographic hierarchy, and mobile-first spacing
+supporting_points:
+- 5-minute morning sunlight reset
+- protein-first breakfast within 90 minutes
+- zone 2 cardio for metabolic endurance
+- evening magnesium and sleep wind-down
+
+prompt:
+Create a branded social media post for wihy. Use the template family 'performance-stack'. Visual direction: clean protocol card with a 1-4 numbered routine, strong typographic hierarchy, and mobile-first spacing. Primary headline: Your daily performance stack, simplified. Supporting ideas to communicate: 5-minute morning sunlight reset, protein-first breakfast within 90 minutes, zone 2 cardio for metabolic endurance, evening magnesium and sleep wind-down. Call to action: Build your daily stack in WIHY. Keep the design clean and readable. Use one dominant headline, one concise support line, and one clear CTA. Prioritize mobile legibility, strong contrast, safe margins, and text that stays inside a centered content zone. Avoid clutter, tiny text, and generic motivational phrasing.

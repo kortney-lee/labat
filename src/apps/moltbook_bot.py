@@ -29,7 +29,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
-from src.config.models import CHAT_MODEL
+from src.shared.config.models import CHAT_MODEL
 
 load_dotenv()
 

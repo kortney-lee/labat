@@ -1,9 +1,10 @@
 """Check SEO internal linking on wihy.ai"""
 import httpx
 import re
-import json
 
 def main():
+    posts = []
+
     # 1. Check blog index page
     print("=== Blog Index Page ===")
     r = httpx.get("https://wihy.ai/blog", timeout=15, follow_redirects=True)
@@ -41,7 +42,8 @@ def main():
     r3 = httpx.get("https://storage.googleapis.com/wihy-web-assets/blog/posts/index.json", timeout=15)
     print(f"Status: {r3.status_code}")
     if r3.status_code == 200:
-        posts = r3.json()
+        payload = r3.json()
+        posts = payload.get("posts", []) if isinstance(payload, dict) else payload
         print(f"Total posts in index: {len(posts)}")
         # Check related_posts field
         sample = posts[0] if posts else {}

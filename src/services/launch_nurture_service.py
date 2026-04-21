@@ -50,7 +50,9 @@ CONTENT_CELL_STYLE = "padding:40px 32px 16px;"
 BODY_TEXT_STYLE = (
     "margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;"
 )
-BODY_END_STYLE = "margin:20px 0 0;font-size:17px;line-height:1.8;color:#374151;"
+BODY_END_STYLE = (
+    "margin:20px 0 0;font-size:17px;line-height:1.8;color:#374151;"
+)
 BODY_SINGLE_STYLE = "margin:0;font-size:17px;line-height:1.8;color:#374151;"
 LIST_STYLE = (
     "margin:0 0 24px;padding-left:20px;font-size:16px;line-height:2.2;"
@@ -60,9 +62,16 @@ CENTER_ROW_STYLE = "padding:0 32px 16px;text-align:center;"
 BOTTOM_ROW_STYLE = "padding:16px 32px 32px;"
 BADGE_TABLE_STYLE = "margin:0 auto;"
 BADGE_CELL_STYLE = "padding:0 8px 12px;"
-APPLE_BADGE_STYLE = "display:block;width:160px;max-width:100%;height:auto;border:0;"
+BADGE_HEIGHT = 40
+APPLE_BADGE_WIDTH = 120
+GOOGLE_BADGE_WIDTH = 135
+APPLE_BADGE_STYLE = (
+    f"display:block;width:{APPLE_BADGE_WIDTH}px;max-width:100%;"
+    f"height:{BADGE_HEIGHT}px;border:0;"
+)
 GOOGLE_BADGE_STYLE = (
-    "display:block;width:180px;max-width:100%;height:auto;border:0;"
+    f"display:block;width:{GOOGLE_BADGE_WIDTH}px;max-width:100%;"
+    f"height:{BADGE_HEIGHT}px;border:0;"
 )
 WEB_LINK_STYLE = "color:#1e40af;"
 
@@ -261,7 +270,7 @@ def _app_download_buttons(brand: str) -> str:
         f'<a href="{cfg["ios_url"]}" style="text-decoration:none;">',
         (
             f'<img src="{cfg["apple_badge_url"]}" alt="{apple_alt}" '
-            'width="160" '
+            f'width="{APPLE_BADGE_WIDTH}" height="{BADGE_HEIGHT}" '
             f'style="{APPLE_BADGE_STYLE}" />'
         ),
         "</a>",
@@ -270,7 +279,7 @@ def _app_download_buttons(brand: str) -> str:
         f'<a href="{cfg["android_url"]}" style="text-decoration:none;">',
         (
             f'<img src="{cfg["google_badge_url"]}" alt="{google_alt}" '
-            'width="180" '
+            f'width="{GOOGLE_BADGE_WIDTH}" height="{BADGE_HEIGHT}" '
             f'style="{GOOGLE_BADGE_STYLE}" />'
         ),
         "</a>",
@@ -303,7 +312,9 @@ def _render_welcome(first_name: str, brand: str, **kw) -> str:
 
 def _render_feature_preview(first_name: str, brand: str, **kw) -> str:
     cfg = BRAND_CONFIG[brand]
-    features_html = "".join(f"<li>{feature}</li>" for feature in cfg["features"])
+    features_html = "".join(
+        f"<li>{feature}</li>" for feature in cfg["features"]
+    )
     content = _html_join(
         f'<tr><td style="{CONTENT_CELL_STYLE}">',
         _paragraph(f"Hey {first_name},"),
@@ -571,7 +582,10 @@ async def trigger_welcome(email: str, first_name: str, brand: str) -> bool:
 
 async def process_pending_launch_nurture() -> int:
     """Process all pending launch nurture emails. Called by cron."""
-    from src.services.launch_leads_service import advance_nurture, get_pending_nurture
+    from src.services.launch_leads_service import (
+        advance_nurture,
+        get_pending_nurture,
+    )
 
     pending = await get_pending_nurture(limit=200)
     sent = 0

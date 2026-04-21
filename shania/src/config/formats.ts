@@ -8,7 +8,9 @@ export interface FormatSpec {
 
 export const FORMATS: Record<string, FormatSpec> = {
   feed_square: { width: 1080, height: 1080, label: "Feed Post (1:1)" },
+  feed_portrait: { width: 1080, height: 1350, label: "Feed Post (4:5)" },
   story_vertical: { width: 1080, height: 1920, label: "Story / Reel Cover (9:16)" },
+  hd_landscape: { width: 1920, height: 1080, label: "HD Landscape (16:9)" },
   ad_landscape: { width: 1200, height: 628, label: "Ad / Social Share" },
   blog_hero: { width: 1600, height: 900, label: "Blog / SEO Hero (16:9)" },
 } as const;

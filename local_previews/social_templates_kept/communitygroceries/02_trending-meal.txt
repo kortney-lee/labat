@@ -1,0 +1,14 @@
+brand: communitygroceries
+template_number: 3
+template_key: trending-meal
+headline: This trending meal is viral for a reason
+cta: Find this trending meal in Community Groceries
+layout: high-energy food visual with trending badge, recipe title lockup, and compact nutrition stats row
+supporting_points:
+- trending across social feeds this week
+- beginner-friendly steps and quick prep
+- high-protein and genuinely satisfying
+- family-tested, repeat-request favorite
+
+prompt:
+Create a branded social media post for communitygroceries. Use the template family 'trending-meal'. Visual direction: high-energy food visual with trending badge, recipe title lockup, and compact nutrition stats row. Primary headline: This trending meal is viral for a reason. Supporting ideas to communicate: trending across social feeds this week, beginner-friendly steps and quick prep, high-protein and genuinely satisfying, family-tested, repeat-request favorite. Call to action: Find this trending meal in Community Groceries. Keep the design clean and readable. Use one dominant headline, one concise support line, and one clear CTA. Prioritize mobile legibility, strong contrast, safe margins, and text that stays inside a centered content zone. Avoid clutter, tiny text, and generic motivational phrasing.

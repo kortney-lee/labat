@@ -233,7 +233,7 @@ EDITORIAL_QUEUE: List[Dict[str, str]] = [
 
     # ── Weight Management ───────────────────────────────────────────────
     {"slug": "calorie-counting-does-it-work", "brand": "wihy", "topic_slug": "weight-management",
-     "topic": "Does calorie counting actually work? What long-term studies say about tracking for fat loss."},
+     "topic": "Does calorie counting actually work? Why capturing habits beats tracking calories for fat loss."},
     {"slug": "sustainable-fat-loss-habits", "brand": "wihy", "topic_slug": "weight-management",
      "topic": "The 5 fat loss habits that actually stick — what research says about sustainable weight management."},
     {"slug": "appetite-hormones-explained", "brand": "wihy", "topic_slug": "weight-management",
@@ -250,6 +250,16 @@ EDITORIAL_QUEUE: List[Dict[str, str]] = [
      "topic": "15 weeknight dinners that take 30 minutes or less — from real family kitchens."},
     {"slug": "grocery-budget-strategies", "brand": "communitygroceries", "topic_slug": "food-swaps",
      "topic": "Smart grocery shopping: the strategies that actually cut your bill without coupons."},
+    {"slug": "food-as-medicine-budget-guide", "brand": "communitygroceries", "topic_slug": "nutrition",
+     "topic": "Food as medicine on a budget: how families can use everyday groceries to support blood sugar, heart health, and energy."},
+    {"slug": "natural-healing-foods-weekly-list", "brand": "communitygroceries", "topic_slug": "nutrition",
+     "topic": "Natural healing foods weekly list: practical grocery picks for inflammation support, gut health, and recovery meals."},
+    {"slug": "healing-meals-for-busy-families", "brand": "communitygroceries", "topic_slug": "meal-planning",
+     "topic": "Healing meals for busy families: a 7-day plan using anti-inflammatory staples and affordable pantry foods."},
+    {"slug": "anti-inflammatory-grocery-list-under-100", "brand": "communitygroceries", "topic_slug": "nutrition",
+     "topic": "Anti-inflammatory grocery list under $100: what to buy, what to swap, and how to cook it fast."},
+    {"slug": "food-swaps-that-help-natural-healing", "brand": "communitygroceries", "topic_slug": "food-swaps",
+     "topic": "Food swaps that support natural healing: simple replacements for high-sugar, ultra-processed staples."},
 ]
 
 

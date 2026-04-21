@@ -20,7 +20,7 @@ const GRAPHIC_SCHEMA = {
   properties: {
     template: {
       type: SchemaType.STRING,
-      description: "Template ID: hook_square, hook_vertical, ingredient_breakdown, quote_card, cta_card, stat_card, research_card, photo_overlay, photo_caption, ai_photo, cg_warm_card, cg_recipe_tip, cg_community, cg_fresh_pick, vowels_data_card, vowels_community, vowels_clean_card, vowels_research_tip",
+      description: "Template ID: editorial_signal, app_showcase, stat_pulse, wihy_signal_clean, hook_square, hook_vertical, ingredient_breakdown, quote_card, cta_card, stat_card, research_card, photo_overlay, photo_caption, ai_photo, cg_warm_card, cg_recipe_tip, cg_community, cg_fresh_pick, vowels_data_card, vowels_community, vowels_clean_card, vowels_research_tip",
     },
     headline: { type: SchemaType.STRING, description: "Bold primary text (max 8 words)" },
     subtext: { type: SchemaType.STRING, description: "Supporting text (max 15 words)" },
@@ -35,7 +35,9 @@ const GRAPHIC_SCHEMA = {
     },
 
     quote: { type: SchemaType.STRING, description: "Quote text (quote_card or cg_community only)" },
-    attribution: { type: SchemaType.STRING, description: "Quote attribution (quote_card only)" },
+    attribution: { type: SchemaType.STRING, description: "Quote attribution (quote_card or cg_community)" },
+    tip: { type: SchemaType.STRING, description: "Short actionable tip text (cg_community only). Shows a tip variant on the right panel. Max 25 words." },
+    tipLabel: { type: SchemaType.STRING, description: "Label above the tip, e.g. 'Quick Tip', 'Kitchen Hack', 'Pro Move' (cg_community only)" },
     photoQuery: {
       type: SchemaType.STRING,
       description: "AI image generation prompt for photo_overlay, photo_caption, or ai_photo. Describe a photorealistic scene with NO text, signs, labels, or writing visible. Focus on objects, food, people, and environments. Example: 'A warm family kitchen with a parent and child preparing a colorful salad together, natural light, editorial photography, no text no signs'. Required when template is photo_overlay, photo_caption, or ai_photo.",
@@ -71,6 +73,8 @@ export interface GeminiGraphicResult {
 
   quote?: string;
   attribution?: string;
+  tip?: string;
+  tipLabel?: string;
   photoQuery?: string;
   statNumber?: string;
   statLabel?: string;
@@ -144,12 +148,19 @@ CRITICAL: Use actual data points from this knowledge base. Do NOT generate vague
 COMMUNITY GROCERIES TEMPLATES (use ONLY these for CG):
 - cg_warm_card: Clean card with organic blob shapes, tag label — PREFERRED for most CG posts
 - cg_recipe_tip: Split layout with colored side panel + content area — great for tips, recipes, advice
-- cg_community: Centered layout with quote mark, floating circles — use for quotes, community messages, inspiration
+- cg_community: Split panel with community feel — adapts based on context:
+  * Provide quote + attribution for community testimonial/quote variant
+  * Provide tip + tipLabel for quick tip / kitchen hack variant
+  * Provide none of the above for clean branded default (stats/percentages should use stat_card or photo_overlay instead)
 - cg_fresh_pick: Clean card with leaf decorations — use for product picks, seasonal content, featured items
 
 DO NOT use hook_square, hook_vertical, quote_card, cta_card, stat_card, research_card, or ingredient_breakdown — those are WIHY-style templates.
 DO NOT use vowels_data_card, vowels_community, vowels_clean_card, or vowels_research_tip — those are Vowels templates.
 CG templates have LIGHT backgrounds (cream, ivory, soft green) with WARM colors. They feel personal and inviting, not dark and techy.
+
+CRITICAL FOR CG: Always provide a strong meal-focused photoQuery for EVERY post, even when using a non-photo template.
+Photo direction should show plated meals, prep containers, family dinner scenes, grocery ingredients, or cooking-in-progress.
+Avoid sterile studio shots; favor warm, realistic kitchen/editorial food photography.
 
 For ai_photo (use sparingly, ~20% of posts) — standalone AI-generated image, NO template:
 Show diverse families, real kitchens, farmers markets, packed lunch boxes, dinner tables, parent-child cooking moments. Warm and inviting. NEVER clinical or sterile.
@@ -158,6 +169,10 @@ Provide a photoQuery. Example: "A warm family kitchen with a parent and child pr
   } else {
     prompt += `
 WIHY DATA-DRIVEN TEMPLATES (prefer stat_card and research_card for data-rich topics):
+- wihy_signal_clean: Clean premium WIHY layout with strong headline + metric + insight cards. Use for most WIHY feed posts.
+- editorial_signal: Editorial WIHY layout with split media panel and concise bullet findings.
+- app_showcase: Product-forward WIHY layout with phone mockup and app narrative.
+- stat_pulse: Data-forward WIHY layout for metric + findings content.
 - stat_card: BIG stat number (73.6%, 2.3x, 48M) with supporting data points — USE when the topic has a striking statistic. Provide statNumber, statLabel, dataPoints (2-3 specific findings), and source.
 - research_card: Research headline + 3 numbered findings with sources — USE for multi-finding topics. Provide headline, dataPoints (3 specific findings with numbers), and source.
 - hook_square: Bold statement post (1080x1080) — use for provocative hooks WITHOUT heavy data
@@ -170,6 +185,10 @@ WIHY DATA-DRIVEN TEMPLATES (prefer stat_card and research_card for data-rich top
 - ai_photo: Standalone AI-generated photo with NO template overlay at all. Use sparingly for purely visual content. Provide a photoQuery only.
 
 TEMPLATE SELECTION GUIDE:
+- General WIHY feed post with headline + supporting copy? → wihy_signal_clean (DEFAULT)
+- Need product/app storytelling? → app_showcase
+- Need concise editorial split with media? → editorial_signal
+- Metric + findings with strong number? → stat_pulse or stat_card
 - Topic mentions a specific number/percentage/stat? → stat_card (PREFERRED)
 - Topic has multiple research findings? → research_card
 - Simple provocative hook? → hook_square

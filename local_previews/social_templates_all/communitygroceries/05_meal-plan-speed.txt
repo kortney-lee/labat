@@ -1,0 +1,14 @@
+brand: communitygroceries
+template_number: 6
+template_key: meal-plan-speed
+headline: A full week of meals in minutes
+cta: Plan smarter
+layout: practical utility-style post with one strong benefit headline and short support bullets
+supporting_points:
+- budget-aware planning
+- family-friendly meals
+- shopping list ready
+- less stress
+
+prompt:
+Create a branded social media post for communitygroceries. Use the template family 'meal-plan-speed'. Visual direction: practical utility-style post with one strong benefit headline and short support bullets. Primary headline: A full week of meals in minutes. Supporting ideas to communicate: budget-aware planning, family-friendly meals, shopping list ready, less stress. Call to action: Plan smarter. Keep the design clean and readable. Use one dominant headline, one concise support line, and one clear CTA. Prioritize mobile legibility, strong contrast, safe margins, and text that stays inside a centered content zone. Avoid clutter, tiny text, and generic motivational phrasing.

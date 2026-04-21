@@ -1,0 +1,6 @@
+brand: communitygroceries
+templates:
+1. easy-recipe | Tonight's dinner in 30 minutes, start to table | 00_easy-recipe.txt
+2. meal-prep-sunday | Meal prep Sunday, your week handled | 01_meal-prep-sunday.txt
+3. trending-meal | This trending meal is viral for a reason | 02_trending-meal.txt
+4. budget-hack | Cut grocery spend without cutting nutrition | 03_budget-hack.txt

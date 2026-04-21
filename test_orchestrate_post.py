@@ -15,7 +15,18 @@ Tests:
 import asyncio
 import json
 import httpx
+import os
 from datetime import datetime
+
+if os.getenv("ENABLE_MANUAL_TEST_SCRIPTS", "").strip().lower() not in (
+    "1",
+    "true",
+    "yes",
+):
+    raise SystemExit(
+        "Test scripts are disabled. Set ENABLE_MANUAL_TEST_SCRIPTS=true "
+        "for intentional manual runs."
+    )
 
 ADMIN_TOKEN = "wihy-admin-token-2026"
 SHANIA_GRAPHICS_URL = "https://wihy-shania-graphics-12913076533.us-central1.run.app"

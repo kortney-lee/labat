@@ -37,6 +37,9 @@ export interface TemplateData {
   dataPoints?: string[];
   /** stat_card, research_card — citation/source line */
   source?: string;
+  /** cg_community — tip variant */
+  tip?: string;
+  tipLabel?: string;
 }
 
 export interface GenerateRequest {

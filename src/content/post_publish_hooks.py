@@ -130,6 +130,7 @@ async def queue_social_post(
         "prompt": prompt,
         "brand": "wihy",
         "platforms": AUTO_POST_PLATFORMS,
+        "imageUrl": hero_image,
         "dryRun": False,
     }
 

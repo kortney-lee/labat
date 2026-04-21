@@ -7,58 +7,64 @@ dedicated renderer such as Bannerbear is introduced.
 from __future__ import annotations
 
 import random
-from typing import Any, Dict, List, Optional
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Set
 
 
-SOCIAL_TEMPLATE_REGISTRY: Dict[str, List[Dict[str, Any]]] = {
+_RECENT_TEMPLATE_KEYS_BY_BRAND: Dict[str, List[str]] = {}
+_MAX_RECENT_PER_BRAND = 2
+_BRAND_ROTATION_CURSOR = 0
+
+
+ALL_SOCIAL_TEMPLATE_REGISTRY: Dict[str, List[Dict[str, Any]]] = {
     "wihy": [
         {
             "template_key": "superhuman-protocol",
-            "headline": "Unlock superhuman health",
+            "headline": "Build your superhuman baseline in 30 days",
             "supporting_points": [
-                "cold exposure + sauna cycling",
-                "grounding and red light therapy",
-                "sleep optimization protocol",
-                "compound movement training",
+                "cold exposure and sauna cycling for recovery",
+                "morning light, grounding, and circadian alignment",
+                "sleep score optimization and deep-rest targets",
+                "compound lifts plus zone 2 for performance",
             ],
-            "cta": "Start your protocol on WIHY",
-            "layout": "bold dark futuristic design with one powerful headline, 3 biohacking tactics, and app CTA",
+            "cta": "Start your 30-day protocol in WIHY",
+            "layout": "high-contrast performance poster, dark base with electric accents, one dominant headline, three compact tactic chips, and one strong CTA button",
         },
         {
             "template_key": "performance-stack",
-            "headline": "Your daily performance stack",
+            "headline": "Your daily performance stack, simplified",
             "supporting_points": [
-                "morning sunlight exposure",
-                "protein-first breakfast",
-                "zone 2 cardio",
-                "magnesium before bed",
+                "5-minute morning sunlight reset",
+                "protein-first breakfast within 90 minutes",
+                "zone 2 cardio for metabolic endurance",
+                "evening magnesium and sleep wind-down",
             ],
-            "cta": "Build your stack on WIHY",
-            "layout": "clean protocol-style post with numbered daily habits and strong headline",
+            "cta": "Build your daily stack in WIHY",
+            "layout": "clean protocol card with a 1-4 numbered routine, strong typographic hierarchy, and mobile-first spacing",
         },
         {
             "template_key": "biohack-fact",
-            "headline": "Science says you can upgrade your biology",
+            "headline": "Science-backed ways to upgrade your biology",
             "supporting_points": [
-                "VO2 max predicts longevity better than any blood test",
-                "grip strength correlates with lifespan",
-                "10 min cold exposure = 250% dopamine increase",
-                "time-restricted eating repairs cellular damage",
+                "VO2 max outperforms most single blood markers for longevity",
+                "grip strength strongly correlates with lifespan outcomes",
+                "10 minutes of cold exposure can sharply elevate dopamine",
+                "time-restricted eating supports cellular repair pathways",
             ],
-            "cta": "Track it all on WIHY",
-            "layout": "data-driven bold stat card with one shocking research fact and supporting evidence line",
+            "cta": "Capture these metrics in WIHY",
+            "layout": "data-first stat card with one hero fact, two supporting proof lines, clean chart-like blocks, and minimal decorative noise",
         },
         {
             "template_key": "transformation",
-            "headline": "Lose weight with structure, not guesswork",
+            "headline": "Lose weight with a system, not guesswork",
             "supporting_points": [
-                "personalized meals",
-                "fitness guidance",
-                "wellness support",
-                "one place to stay consistent",
+                "personalized meals matched to your goals",
+                "training guidance you can actually stick to",
+                "weekly progress check-ins and course correction",
+                "one dashboard to keep consistency high",
             ],
-            "cta": "Start with WIHY",
-            "layout": "simple transformation-style post with one strong promise, one proof line, and one CTA",
+            "cta": "Start your plan in WIHY",
+            "layout": "transformation concept with one bold promise headline, one proof-oriented subline, and a clear CTA anchored above the fold",
         },
         {
             "template_key": "feature-stack",
@@ -67,7 +73,7 @@ SOCIAL_TEMPLATE_REGISTRY: Dict[str, List[Dict[str, Any]]] = {
                 "weight loss planning",
                 "fitness and workouts",
                 "meal planning and groceries",
-                "progress tracking",
+                "behavior insights",
             ],
             "cta": "Try WIHY",
             "layout": "clean app-style promo with bold headline, 3 short support lines, minimal clutter",
@@ -138,51 +144,51 @@ SOCIAL_TEMPLATE_REGISTRY: Dict[str, List[Dict[str, Any]]] = {
     "communitygroceries": [
         {
             "template_key": "easy-recipe",
-            "headline": "Tonight's dinner — ready in 30 minutes",
+            "headline": "Tonight's dinner in 30 minutes, start to table",
             "supporting_points": [
-                "simple ingredients you already have",
-                "step-by-step instructions",
-                "family-approved and kid-friendly",
-                "budget-friendly under $15",
+                "everyday ingredients already in your kitchen",
+                "step-by-step instructions anyone can follow",
+                "family-approved and kid-friendly flavor profile",
+                "budget-friendly target under $15 total",
             ],
-            "cta": "Get the full recipe at Community Groceries",
-            "layout": "warm inviting food photo style with recipe name as headline, prep time, and ingredient count",
+            "cta": "Get tonight's full recipe in Community Groceries",
+            "layout": "warm food-first layout with appetizing close-up, recipe headline, prep time badge, and ingredient-count chip",
         },
         {
             "template_key": "meal-prep-sunday",
-            "headline": "Meal prep Sunday — this week sorted",
+            "headline": "Meal prep Sunday, your week handled",
             "supporting_points": [
-                "5 meals prepped in 2 hours",
-                "full grocery list included",
-                "under $60 for the whole family",
-                "reheat and eat all week",
+                "5 family meals prepped in about 2 hours",
+                "complete grocery list included upfront",
+                "weekly cost target under $60",
+                "reheat-and-eat workflow for busy nights",
             ],
-            "cta": "Plan your week with Community Groceries",
-            "layout": "organized meal grid showing 5 prepped containers with prep time and total cost",
+            "cta": "Plan your prep week in Community Groceries",
+            "layout": "organized meal-grid composition with 5 containers, prep-time stamp, and total-cost callout for quick scanning",
         },
         {
             "template_key": "trending-meal",
-            "headline": "This recipe is going viral for a reason",
+            "headline": "This trending meal is viral for a reason",
             "supporting_points": [
-                "trending on social media this week",
-                "easy enough for beginners",
-                "high protein and satisfying",
-                "your family will ask for seconds",
+                "trending across social feeds this week",
+                "beginner-friendly steps and quick prep",
+                "high-protein and genuinely satisfying",
+                "family-tested, repeat-request favorite",
             ],
-            "cta": "Find trending meals at Community Groceries",
-            "layout": "eye-catching food visual with trending badge, recipe name, and quick nutrition stats",
+            "cta": "Find this trending meal in Community Groceries",
+            "layout": "high-energy food visual with trending badge, recipe title lockup, and compact nutrition stats row",
         },
         {
             "template_key": "budget-hack",
-            "headline": "Feed your family for less — without sacrificing nutrition",
+            "headline": "Cut grocery spend without cutting nutrition",
             "supporting_points": [
-                "smart grocery swaps that save $20+/week",
-                "seasonal produce = cheaper and fresher",
-                "buy in bulk, prep once, eat all week",
-                "stop paying for brands — store brands are the same",
+                "smart grocery swaps can save $20+ each week",
+                "seasonal produce is often cheaper and fresher",
+                "bulk-buy staples, prep once, eat all week",
+                "store-brand equivalents reduce cost fast",
             ],
-            "cta": "Shop smarter with Community Groceries",
-            "layout": "practical tip-style post with bold savings number and 3 short budget tips",
+            "cta": "Shop smarter in Community Groceries",
+            "layout": "practical savings card with bold dollar-callout, three short budget tips, and clean family-shopping visual cues",
         },
         {
             "template_key": "family-savings",
@@ -212,8 +218,44 @@ SOCIAL_TEMPLATE_REGISTRY: Dict[str, List[Dict[str, Any]]] = {
 }
 
 
+# Active registry used for generation/publishing.
+# Keep only strongest 4 template families for each launch app brand.
+SOCIAL_TEMPLATE_REGISTRY: Dict[str, List[Dict[str, Any]]] = {
+    "wihy": [
+        template
+        for template in ALL_SOCIAL_TEMPLATE_REGISTRY.get("wihy", [])
+        if template.get("template_key")
+        in {
+            "superhuman-protocol",
+            "performance-stack",
+            "biohack-fact",
+            "transformation",
+        }
+    ],
+    "communitygroceries": [
+        template
+        for template in ALL_SOCIAL_TEMPLATE_REGISTRY.get("communitygroceries", [])
+        if template.get("template_key")
+        in {
+            "easy-recipe",
+            "meal-prep-sunday",
+            "trending-meal",
+            "budget-hack",
+        }
+    ],
+    "vowels": ALL_SOCIAL_TEMPLATE_REGISTRY.get("vowels", []),
+}
+
+
 def _render_prompt(brand: str, template: Dict[str, Any]) -> str:
     points = ", ".join(template.get("supporting_points", []))
+    meal_image_clause = ""
+    if brand == "communitygroceries":
+        meal_image_clause = (
+            " Use a real appetizing meal image as the hero visual (plated food, meal prep, "
+            "or family dinner scene) with warm natural lighting."
+        )
+
     return (
         f"Create a branded social media post for {brand}. "
         f"Use the template family '{template['template_key']}'. "
@@ -221,8 +263,10 @@ def _render_prompt(brand: str, template: Dict[str, Any]) -> str:
         f"Primary headline: {template['headline']}. "
         f"Supporting ideas to communicate: {points}. "
         f"Call to action: {template['cta']}. "
-        "Keep the design clean and readable. Use a short headline, a short supporting line, "
-        "and a single clear CTA. Avoid clutter, tiny text, and generic motivational phrasing."
+        f"{meal_image_clause}"
+        "Keep the design clean and readable. Use one dominant headline, one concise support line, "
+        "and one clear CTA. Prioritize mobile legibility, strong contrast, safe margins, and text that "
+        "stays inside a centered content zone. Avoid clutter, tiny text, and generic motivational phrasing."
     )
 
 
@@ -242,13 +286,126 @@ def build_structured_social_topics(brand: Optional[str] = None) -> List[Dict[str
 
 
 def pick_structured_social_topics(count: int, brands: Optional[List[str]] = None) -> List[Dict[str, str]]:
+    global _BRAND_ROTATION_CURSOR
+
     pool = build_structured_social_topics()
     if brands:
         brand_set = {brand.lower() for brand in brands}
         pool = [item for item in pool if item["brand"].lower() in brand_set]
-    if not pool:
+    if not pool or count <= 0:
         return []
-    if count >= len(pool):
-        random.shuffle(pool)
-        return pool
-    return random.sample(pool, count)
+
+    by_brand: Dict[str, List[Dict[str, str]]] = {}
+    for item in pool:
+        by_brand.setdefault(item["brand"], []).append(item)
+
+    brand_order = sorted(by_brand.keys())
+    if not brand_order:
+        return []
+
+    start = _BRAND_ROTATION_CURSOR % len(brand_order)
+    brand_order = brand_order[start:] + brand_order[:start]
+    _BRAND_ROTATION_CURSOR += 1
+
+    selected: List[Dict[str, str]] = []
+    selected_keys: Set[str] = set()
+    max_unique = min(count, len(pool))
+
+    while len(selected) < max_unique:
+        added_this_round = False
+        for brand in brand_order:
+            candidates = [
+                item
+                for item in by_brand.get(brand, [])
+                if f"{item['brand']}:{item.get('template_key', '')}" not in selected_keys
+            ]
+            if not candidates:
+                continue
+
+            recent = _RECENT_TEMPLATE_KEYS_BY_BRAND.get(brand, [])
+            non_recent = [
+                item for item in candidates if item.get("template_key", "") not in recent
+            ]
+            pick_pool = non_recent or candidates
+            choice = random.choice(pick_pool)
+
+            selected.append(choice)
+            selected_keys.add(f"{choice['brand']}:{choice.get('template_key', '')}")
+
+            key = choice.get("template_key", "")
+            if key:
+                hist = [k for k in _RECENT_TEMPLATE_KEYS_BY_BRAND.get(brand, []) if k != key]
+                hist.append(key)
+                _RECENT_TEMPLATE_KEYS_BY_BRAND[brand] = hist[-_MAX_RECENT_PER_BRAND:]
+
+            added_this_round = True
+            if len(selected) >= max_unique:
+                break
+
+        if not added_this_round:
+            break
+
+    return selected
+
+
+def export_social_templates_local(
+    output_dir: str,
+    brands: Optional[List[str]] = None,
+    keep_active_only: bool = False,
+) -> Dict[str, List[str]]:
+    """Export social template prompts to local files with numbered indexes."""
+    registry = SOCIAL_TEMPLATE_REGISTRY if keep_active_only else ALL_SOCIAL_TEMPLATE_REGISTRY
+    selected_brands = brands or list(registry.keys())
+
+    out = Path(output_dir)
+    out.mkdir(parents=True, exist_ok=True)
+
+    results: Dict[str, List[str]] = {}
+    global_index_lines: List[str] = []
+    for brand in selected_brands:
+        templates = registry.get(brand, [])
+        if not templates:
+            continue
+
+        brand_dir = out / brand
+        brand_dir.mkdir(parents=True, exist_ok=True)
+
+        files: List[str] = []
+        brand_index_lines: List[str] = [f"brand: {brand}", "templates:"]
+        for index, template in enumerate(templates):
+            template_key = str(template.get("template_key", f"template_{index}")).strip() or f"template_{index}"
+            prompt = _render_prompt(brand, template)
+            template_number = index + 1
+            content = (
+                f"brand: {brand}\n"
+                f"template_number: {template_number}\n"
+                f"template_key: {template_key}\n"
+                f"headline: {template.get('headline', '')}\n"
+                f"cta: {template.get('cta', '')}\n"
+                f"layout: {template.get('layout', '')}\n"
+                f"supporting_points:\n"
+                + "\n".join(f"- {point}" for point in template.get("supporting_points", []))
+                + "\n\n"
+                f"prompt:\n{prompt}\n"
+            )
+            file_path = brand_dir / f"{index:02d}_{template_key}.txt"
+            file_path.write_text(content, encoding="utf-8")
+            files.append(str(file_path))
+            brand_index_lines.append(
+                f"{template_number}. {template_key} | {template.get('headline', '')} | {file_path.name}"
+            )
+            global_index_lines.append(
+                f"{brand} #{template_number}: {template_key} | {template.get('headline', '')}"
+            )
+
+        brand_index_path = brand_dir / "INDEX.txt"
+        brand_index_path.write_text("\n".join(brand_index_lines) + "\n", encoding="utf-8")
+        files.insert(0, str(brand_index_path))
+
+        results[brand] = files
+
+    if global_index_lines:
+        choices_path = out / "NUMBERED_CHOICES.txt"
+        choices_path.write_text("\n".join(global_index_lines) + "\n", encoding="utf-8")
+
+    return results

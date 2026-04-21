@@ -11,6 +11,34 @@ const router = Router();
 
 /** Static metadata for each template. */
 const TEMPLATE_META: Record<string, Omit<TemplateMeta, "id">> = {
+  wihy_signal_clean: {
+    name: "WIHY Signal Clean",
+    description: "Modern WIHY flagship layout with headline, metric card, and compact insight tiles.",
+    defaultFormat: "feed_square",
+    requiredFields: ["headline"],
+    optionalFields: ["subtext", "cta", "productName", "statNumber", "statLabel", "tip", "source", "quote", "dataPoints", "photoUrl", "badge", "showLogo"],
+  },
+  editorial_signal: {
+    name: "Editorial Signal",
+    description: "Editorial split layout with media panel, bold headline, and concise findings.",
+    defaultFormat: "feed_square",
+    requiredFields: ["headline"],
+    optionalFields: ["subtext", "cta", "productName", "statNumber", "statLabel", "tip", "source", "quote", "dataPoints", "photoUrl", "badge", "showLogo"],
+  },
+  app_showcase: {
+    name: "App Showcase",
+    description: "Product-forward app layout with device mockup and benefit-focused copy.",
+    defaultFormat: "feed_square",
+    requiredFields: ["headline"],
+    optionalFields: ["subtext", "cta", "productName", "statNumber", "statLabel", "tip", "source", "quote", "photoUrl", "badge", "showLogo"],
+  },
+  stat_pulse: {
+    name: "Stat Pulse",
+    description: "Data-forward layout combining a key metric with supporting findings and CTA.",
+    defaultFormat: "feed_square",
+    requiredFields: ["headline"],
+    optionalFields: ["subtext", "cta", "productName", "statNumber", "statLabel", "tip", "source", "quote", "dataPoints", "badge", "showLogo"],
+  },
   hook_square: {
     name: "Hook Square",
     description: "Bold statement post for feed (1:1). Grabs attention with a punchy headline.",

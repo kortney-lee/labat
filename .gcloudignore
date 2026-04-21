@@ -1,0 +1,40 @@
+# Cloud Build ignore — override .gitignore for deploy
+# This file controls what gets uploaded to Cloud Build
+
+# Standard ignores
+__pycache__/
+*.py[cod]
+.Python
+.env
+.venv
+env/
+venv/
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+*.log
+logs/
+node_modules/
+*.safetensors
+*.pt
+*.pth
+*.pkl
+models/
+
+# Large data files
+*.csv
+*.jsonl
+*.parquet
+data/
+
+# Ignore dist (built in container)
+shania/dist/
+
+# Do NOT ignore:
+# - shania/package.json, package-lock.json, tsconfig.json (needed for build)
+# - shania/assets/**/*.png (needed for Docker image)
+# - shania/assets/**/*.jpg
+# - shania/assets/**/*.mp4

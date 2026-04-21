@@ -1,5 +1,16 @@
 """Test ALL LABAT API endpoints through the deployed service."""
+import os
 import json, urllib.request, urllib.parse, ssl
+
+if os.getenv("ENABLE_MANUAL_TEST_SCRIPTS", "").strip().lower() not in (
+    "1",
+    "true",
+    "yes",
+):
+    raise SystemExit(
+        "Test scripts are disabled. Set ENABLE_MANUAL_TEST_SCRIPTS=true "
+        "for intentional manual runs."
+    )
 
 ctx = ssl.create_default_context()
 BASE = "https://wihy-labat-n4l2vldq3q-uc.a.run.app"
@@ -69,13 +80,20 @@ else:
 
 # 4. Create Post
 print("\n=== 4. CREATE POST ===")
-r = api_post("/api/labat/posts", {"message": "LABAT live test — WiHy.ai health intelligence! #WiHy #AI #Health"})
-if "ERROR" not in r:
-    print(f"  Post created: {r}")
-    results["create_post"] = "PASS"
+if os.getenv("ALLOW_LIVE_POST_TESTS", "").strip().lower() in ("1", "true", "yes"):
+    r = api_post(
+        "/api/labat/posts",
+        {"message": "LABAT live test — WiHy.ai health intelligence! #WiHy #AI #Health"},
+    )
+    if "ERROR" not in r:
+        print(f"  Post created: {r}")
+        results["create_post"] = "PASS"
+    else:
+        print(f"  {str(r.get('detail',''))[:200]}")
+        results["create_post"] = f"BLOCKED ({str(r.get('detail',''))[:80]})"
 else:
-    print(f"  {str(r.get('detail',''))[:200]}")
-    results["create_post"] = f"BLOCKED ({str(r.get('detail',''))[:80]})"
+    print("  SKIPPED - Set ALLOW_LIVE_POST_TESTS=true to enable live posting test")
+    results["create_post"] = "SKIPPED"
 
 # 5. List Campaigns
 print("\n=== 5. LIST CAMPAIGNS ===")

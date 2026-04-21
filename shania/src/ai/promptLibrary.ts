@@ -15,42 +15,42 @@ export const PROMPT_LIBRARY: PromptTemplate[] = [
     name: "Daily Health Hook",
     prompt:
       "Create a bold, scroll-stopping health fact that makes people rethink their daily food choices. Focus on hidden ingredients, misleading labels, or surprising nutrition facts.",
-    suggestedTemplate: "hook_square",
+    suggestedTemplate: "editorial_signal",
   },
   {
     id: "ingredient_expose",
     name: "Ingredient Exposé",
     prompt:
       "Create content exposing a common processed food ingredient. Show what it really is and why consumers should care. Be factual, not fear-mongering.",
-    suggestedTemplate: "hook_square",
+    suggestedTemplate: "wihy_signal_clean",
   },
   {
     id: "swap_comparison",
     name: "Food Swap Comparison",
     prompt:
       "Create a side-by-side comparison of a common unhealthy food choice vs a healthier alternative. Include 4-5 items on each side.",
-    suggestedTemplate: "comparison_split",
+    suggestedTemplate: "wihy_signal_clean",
   },
   {
     id: "nutrition_myth",
     name: "Nutrition Myth Buster",
     prompt:
       "Bust a common nutrition myth. Create a quote-style graphic with a surprising truth that challenges conventional wisdom.",
-    suggestedTemplate: "quote_card",
+    suggestedTemplate: "editorial_signal",
   },
   {
     id: "app_download",
     name: "App Download CTA",
     prompt:
       "Create a compelling call-to-action for downloading the WIHY app. Focus on the benefit of scanning food products to know what you're really eating.",
-    suggestedTemplate: "cta_card",
+    suggestedTemplate: "app_showcase",
   },
   {
     id: "label_reading",
     name: "Label Reading Tip",
     prompt:
       "Create educational content about how to read food labels better. One specific, actionable tip.",
-    suggestedTemplate: "hook_vertical",
+    suggestedTemplate: "stat_pulse",
   },
 ];
 

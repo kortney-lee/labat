@@ -1,0 +1,14 @@
+brand: communitygroceries
+template_number: 4
+template_key: budget-hack
+headline: Cut grocery spend without cutting nutrition
+cta: Shop smarter in Community Groceries
+layout: practical savings card with bold dollar-callout, three short budget tips, and clean family-shopping visual cues
+supporting_points:
+- smart grocery swaps can save $20+ each week
+- seasonal produce is often cheaper and fresher
+- bulk-buy staples, prep once, eat all week
+- store-brand equivalents reduce cost fast
+
+prompt:
+Create a branded social media post for communitygroceries. Use the template family 'budget-hack'. Visual direction: practical savings card with bold dollar-callout, three short budget tips, and clean family-shopping visual cues. Primary headline: Cut grocery spend without cutting nutrition. Supporting ideas to communicate: smart grocery swaps can save $20+ each week, seasonal produce is often cheaper and fresher, bulk-buy staples, prep once, eat all week, store-brand equivalents reduce cost fast. Call to action: Shop smarter in Community Groceries. Keep the design clean and readable. Use one dominant headline, one concise support line, and one clear CTA. Prioritize mobile legibility, strong contrast, safe margins, and text that stays inside a centered content zone. Avoid clutter, tiny text, and generic motivational phrasing.

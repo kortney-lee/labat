@@ -1,0 +1,14 @@
+brand: wihy
+template_number: 1
+template_key: superhuman-protocol
+headline: Build your superhuman baseline in 30 days
+cta: Start your 30-day protocol in WIHY
+layout: high-contrast performance poster, dark base with electric accents, one dominant headline, three compact tactic chips, and one strong CTA button
+supporting_points:
+- cold exposure and sauna cycling for recovery
+- morning light, grounding, and circadian alignment
+- sleep score optimization and deep-rest targets
+- compound lifts plus zone 2 for performance
+
+prompt:
+Create a branded social media post for wihy. Use the template family 'superhuman-protocol'. Visual direction: high-contrast performance poster, dark base with electric accents, one dominant headline, three compact tactic chips, and one strong CTA button. Primary headline: Build your superhuman baseline in 30 days. Supporting ideas to communicate: cold exposure and sauna cycling for recovery, morning light, grounding, and circadian alignment, sleep score optimization and deep-rest targets, compound lifts plus zone 2 for performance. Call to action: Start your 30-day protocol in WIHY. Keep the design clean and readable. Use one dominant headline, one concise support line, and one clear CTA. Prioritize mobile legibility, strong contrast, safe margins, and text that stays inside a centered content zone. Avoid clutter, tiny text, and generic motivational phrasing.

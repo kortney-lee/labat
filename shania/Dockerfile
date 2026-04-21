@@ -36,14 +36,17 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm ci 2>/dev/null || npm install
 
-# Copy source and build
+# Copy source, assets, and build
 COPY tsconfig.json ./
 COPY src/ ./src/
+COPY assets/ ./assets/
 RUN npx tsc
 
 # Keep templates (referenced at runtime), remove TS source
 # Use cp -rT to merge contents (tsc already creates dist/templates/ from .ts files)
 RUN cp -rT src/templates dist/templates && npm prune --omit=dev && rm -rf src/
+
+# Assets stay at /app/assets/ (referenced by renderHtml.ts via __dirname/../../assets)
 
 EXPOSE 8080
 
