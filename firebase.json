@@ -23,6 +23,34 @@
         }
       },
       {
+        "source": "/api/labat/webhooks",
+        "run": {
+          "serviceId": "wihy-maya",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/api/labat/comments/**",
+        "run": {
+          "serviceId": "wihy-maya",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/api/labat/messenger/**",
+        "run": {
+          "serviceId": "wihy-maya",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/api/labat/compliance",
+        "run": {
+          "serviceId": "wihy-maya",
+          "region": "us-central1"
+        }
+      },
+      {
         "source": "/api/graphics/**",
         "run": {
           "serviceId": "wihy-shania-graphics",
