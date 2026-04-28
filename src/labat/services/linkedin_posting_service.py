@@ -13,6 +13,7 @@ Handles:
 from __future__ import annotations
 
 import logging
+import os
 from typing import Any, Dict, Optional
 from datetime import datetime, timedelta
 
@@ -26,6 +27,16 @@ from src.labat.linkedin_client import (
 )
 
 logger = logging.getLogger("labat.linkedin_posting_service")
+_SOCIAL_POSTING_DISABLED = (
+    (os.getenv("SOCIAL_POSTING_DISABLED", "true") or "true").strip().lower()
+    in ("1", "true", "yes", "on")
+)
+
+
+def _ensure_linkedin_posting_enabled() -> None:
+    if _SOCIAL_POSTING_DISABLED:
+        logger.warning("Blocked LinkedIn publish because SOCIAL_POSTING_DISABLED is enabled")
+        raise LinkedInAPIError("LinkedIn posting is disabled", status_code=403)
 
 
 def _get_actor() -> str:
@@ -49,6 +60,7 @@ async def create_post(
 
     Returns the post URN and ID.
     """
+    _ensure_linkedin_posting_enabled()
     actor = _get_actor()
 
     # Build the post payload
@@ -107,6 +119,8 @@ async def schedule_post(
     if not publish_at and not hours_from_now:
         raise ValueError("Must provide either publish_at or hours_from_now")
 
+    _ensure_linkedin_posting_enabled()
+
     if hours_from_now:
         publish_at = datetime.utcnow() + timedelta(hours=hours_from_now)
 
@@ -122,6 +136,7 @@ async def update_post(post_id: str, message: str) -> Dict[str, Any]:
 
     Note: LinkedIn API only allows editing text; not all fields can be modified.
     """
+    _ensure_linkedin_posting_enabled()
     payload = {
         "text": {
             "text": message

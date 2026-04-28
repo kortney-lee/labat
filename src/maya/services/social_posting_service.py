@@ -36,6 +36,7 @@ SHANIA_GRAPHICS_URL = os.getenv(
     "https://wihy-shania-graphics-12913076533.us-central1.run.app",
 )
 INTERNAL_ADMIN_TOKEN = (os.getenv("INTERNAL_ADMIN_TOKEN", "") or "").strip()
+SOCIAL_POSTING_DISABLED = os.getenv("SOCIAL_POSTING_DISABLED", "true").strip().lower() in ("1", "true", "yes", "on")
 
 # Posting mode:
 #   auto        — Shania generates AI images and posts them (legacy, default)
@@ -245,6 +246,7 @@ class SocialPostingService:
     def status(self) -> dict:
         return {
             "running": self._running,
+            "posting_disabled": SOCIAL_POSTING_DISABLED,
             "posting_mode": POSTING_MODE,
             "launch_mode": LAUNCH_MODE,
             "brand_platforms": BRAND_PLATFORMS,
@@ -282,6 +284,18 @@ class SocialPostingService:
     async def run_once(self) -> Dict[str, Any]:
         """Run a single posting cycle (callable manually or by the loop)."""
         now = datetime.now(timezone.utc)
+        if SOCIAL_POSTING_DISABLED:
+            logger.warning("Shania: Skipping cycle because SOCIAL_POSTING_DISABLED is enabled")
+            self._skipped_runs += 1
+            return {
+                "cycle": "social_posting",
+                "posts_published": 0,
+                "errors": 0,
+                "skipped": True,
+                "reason": "posting_disabled",
+                "timestamp": now.isoformat(),
+            }
+
         if self._cycle_running:
             self._skipped_runs += 1
             logger.warning("Shania: Skipping cycle because another cycle is already running")

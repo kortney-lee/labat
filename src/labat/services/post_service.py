@@ -16,6 +16,7 @@ from src.labat.services.token_service import get_shania_page_access_token
 
 _BRAND_SCOPE = os.getenv("SHANIA_BRAND_SCOPE", "").strip().lower() or None
 _ENFORCE_MODE = (os.getenv("BRAND_ENFORCEMENT_MODE", "warn") or "warn").strip().lower() == "enforce"
+_SOCIAL_POSTING_DISABLED = (os.getenv("SOCIAL_POSTING_DISABLED", "true") or "true").strip().lower() in ("1", "true", "yes", "on")
 
 
 def _default_page_id() -> str:
@@ -67,6 +68,15 @@ async def _shania(page_id: Optional[str] = None) -> str:
 logger = logging.getLogger("labat.post_service")
 
 
+def _ensure_social_posting_enabled(channel: str) -> None:
+    if _SOCIAL_POSTING_DISABLED:
+        logger.warning("Blocked %s publish because SOCIAL_POSTING_DISABLED is enabled", channel)
+        raise MetaAPIError(
+            f"{channel} posting is disabled",
+            status_code=403,
+        )
+
+
 def _page_id_from_post_id(post_id: str) -> Optional[str]:
     if "_" not in post_id:
         return None
@@ -86,6 +96,7 @@ async def create_post(
     Use ``image_url`` to publish a **photo post** (uploaded via URL).
     Use ``link`` to publish a link-share post.
     """
+    _ensure_social_posting_enabled("Facebook")
     pid = _enforce_brand(page_id)
 
     token = await _shania(pid)
@@ -117,6 +128,7 @@ async def create_post(
 
 async def update_post(post_id: str, message: str) -> Dict[str, Any]:
     """Edit the text of an existing post."""
+    _ensure_social_posting_enabled("Facebook")
     result = await graph_post(
         post_id,
         data={"message": message},
@@ -150,6 +162,7 @@ async def create_video_post(
     page_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Publish a video to a Facebook Page via file_url (public URL to the video)."""
+    _ensure_social_posting_enabled("Facebook")
     pid = _enforce_brand(page_id)
 
     data: Dict[str, Any] = {
@@ -174,6 +187,7 @@ async def create_instagram_video(
     page_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Publish a video/reel on Instagram via the Page-linked Instagram business account."""
+    _ensure_social_posting_enabled("Instagram")
     pid = _enforce_brand(page_id)
 
     token = await _shania(pid)
@@ -233,6 +247,7 @@ async def create_instagram_post(
     page_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Publish an Instagram image post via the Page-linked Instagram business account."""
+    _ensure_social_posting_enabled("Instagram")
     pid = _enforce_brand(page_id)
 
     token = await _shania(pid)
@@ -302,6 +317,7 @@ async def create_threads_post(
       - Image posts (text + image_url)
       - Link posts (text + link_attachment)
     """
+    _ensure_social_posting_enabled("Threads")
     # Threads uses a user-level IG/Threads token, not the Page token
     threads_token = (
         os.getenv("THREADS_ACCESS_TOKEN", "")
