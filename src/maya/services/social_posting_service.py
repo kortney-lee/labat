@@ -24,7 +24,10 @@ from typing import Any, Dict, List, Optional
 
 import httpx
 
-from src.maya.services.social_template_registry import pick_structured_social_topics, SOCIAL_TEMPLATE_REGISTRY
+from src.maya.services.social_template_registry import (
+    get_template_driven_brands,
+    pick_structured_social_topics,
+)
 
 logger = logging.getLogger("shania.social_posting")
 
@@ -33,6 +36,14 @@ SHANIA_GRAPHICS_URL = os.getenv(
     "https://wihy-shania-graphics-12913076533.us-central1.run.app",
 )
 INTERNAL_ADMIN_TOKEN = (os.getenv("INTERNAL_ADMIN_TOKEN", "") or "").strip()
+
+# Posting mode:
+#   auto        — Shania generates AI images and posts them (legacy, default)
+#   bucket-only — Shania ONLY posts pre-approved photos/graphics from the GCS
+#                 asset-library bucket (uploaded to asset-library/{brand}/approved/).
+#                 No AI image generation. If no approved assets exist, the cycle is skipped.
+POSTING_MODE = os.getenv("SHANIA_POSTING_MODE", "auto").strip().lower()
+BUCKET_ONLY_MODE = POSTING_MODE == "bucket-only"
 
 # Launch mode: prioritise hype topics, post more often
 LAUNCH_MODE = os.getenv("SOCIAL_POSTING_LAUNCH_MODE", "").strip().lower() in ("true", "1", "yes")
@@ -43,10 +54,16 @@ SOCIAL_POSTING_INTERVAL = int(os.getenv(
     "10800" if LAUNCH_MODE else "14400",
 ))
 
-# Posts per cycle: 4 in launch mode, 2 normal
+# Posts per cycle: 2 in launch mode, 1 normal (can be overridden by env)
 MAX_POSTS_PER_CYCLE = int(os.getenv(
     "SHANIA_MAX_POSTS_PER_CYCLE",
-    "4" if LAUNCH_MODE else "2",
+    "2" if LAUNCH_MODE else "1",
+))
+
+# Safety guard: skip back-to-back runs (loop + manual trigger overlap)
+MIN_RUN_GAP_SECONDS = int(os.getenv(
+    "SHANIA_SOCIAL_MIN_RUN_GAP_SECONDS",
+    str(max(900, SOCIAL_POSTING_INTERVAL // 2)),
 ))
 
 # Platforms to publish on
@@ -57,7 +74,7 @@ BRAND_PLATFORMS: Dict[str, List[str]] = {
     "wihy":               ["facebook", "instagram", "threads"],
     "communitygroceries": ["facebook", "instagram", "threads"],
     "childrennutrition":  ["facebook", "instagram", "threads"],
-    "parentingwithchrist":["facebook", "instagram", "threads"],
+    "parentingwithchrist": ["facebook", "instagram", "threads"],
     "vowels":             ["facebook", "instagram", "threads"],
 }
 
@@ -164,7 +181,7 @@ EVERGREEN_TOPICS: List[Dict[str, str]] = [
     {"prompt": "The average school lunch in America contains 30% more sodium than recommended. Chicken nuggets, pizza, and chocolate milk — this is institutional nutrition failure, not a balanced meal", "brand": "vowels"},
 ]
 
-TEMPLATE_DRIVEN_BRANDS = set(SOCIAL_TEMPLATE_REGISTRY.keys())
+TEMPLATE_DRIVEN_BRANDS = get_template_driven_brands()
 
 
 def _select_topics(count: int) -> List[Dict[str, str]]:
@@ -219,6 +236,8 @@ class SocialPostingService:
     def __init__(self) -> None:
         self._task: Optional[asyncio.Task] = None
         self._running = False
+        self._cycle_running = False
+        self._skipped_runs = 0
         self._total_posts_published = 0
         self._total_errors = 0
         self._last_run: Optional[datetime] = None
@@ -226,12 +245,15 @@ class SocialPostingService:
     def status(self) -> dict:
         return {
             "running": self._running,
+            "posting_mode": POSTING_MODE,
             "launch_mode": LAUNCH_MODE,
             "brand_platforms": BRAND_PLATFORMS,
             "total_posts_published": self._total_posts_published,
             "total_errors": self._total_errors,
+            "skipped_runs": self._skipped_runs,
             "last_run": self._last_run.isoformat() if self._last_run else None,
             "interval_seconds": SOCIAL_POSTING_INTERVAL,
+            "min_run_gap_seconds": MIN_RUN_GAP_SECONDS,
             "posts_per_cycle": MAX_POSTS_PER_CYCLE,
             "launch_topics": len(LAUNCH_TOPICS),
             "evergreen_topics": len(EVERGREEN_TOPICS),
@@ -259,64 +281,131 @@ class SocialPostingService:
 
     async def run_once(self) -> Dict[str, Any]:
         """Run a single posting cycle (callable manually or by the loop)."""
+        now = datetime.now(timezone.utc)
+        if self._cycle_running:
+            self._skipped_runs += 1
+            logger.warning("Shania: Skipping cycle because another cycle is already running")
+            return {
+                "cycle": "social_posting",
+                "posts_published": 0,
+                "errors": 0,
+                "skipped": True,
+                "reason": "already_running",
+                "timestamp": now.isoformat(),
+            }
+
+        if self._last_run is not None:
+            elapsed = (now - self._last_run).total_seconds()
+            if elapsed < MIN_RUN_GAP_SECONDS:
+                self._skipped_runs += 1
+                logger.warning(
+                    "Shania: Skipping cycle due to cooldown (elapsed=%ss < min_gap=%ss)",
+                    int(elapsed),
+                    MIN_RUN_GAP_SECONDS,
+                )
+                return {
+                    "cycle": "social_posting",
+                    "posts_published": 0,
+                    "errors": 0,
+                    "skipped": True,
+                    "reason": "cooldown",
+                    "elapsed_seconds": int(elapsed),
+                    "min_run_gap_seconds": MIN_RUN_GAP_SECONDS,
+                    "timestamp": now.isoformat(),
+                }
+
+        self._cycle_running = True
         logger.info(
-            "Shania: Starting social posting cycle (launch_mode=%s, brands=%s)",
-            LAUNCH_MODE, list(BRAND_PLATFORMS.keys()),
+            "Shania: Starting social posting cycle (mode=%s, launch_mode=%s, brands=%s)",
+            POSTING_MODE, LAUNCH_MODE, list(BRAND_PLATFORMS.keys()),
         )
         posted = 0
         errors = 0
+        try:
+            if BUCKET_ONLY_MODE:
+                # Bucket-only: post one pre-approved asset per brand that has any
+                async with httpx.AsyncClient(timeout=90.0) as client:
+                    for brand in list(BRAND_PLATFORMS.keys())[:MAX_POSTS_PER_CYCLE]:
+                        try:
+                            resp = await client.post(
+                                f"{SHANIA_GRAPHICS_URL}/post-from-approved",
+                                json={"brand": brand, "dryRun": False},
+                                headers={
+                                    "X-Admin-Token": INTERNAL_ADMIN_TOKEN,
+                                    "Content-Type": "application/json",
+                                },
+                            )
+                            if resp.status_code == 200:
+                                posted += 1
+                                logger.info(
+                                    "Shania: Posted approved asset for brand=%s", brand,
+                                )
+                            elif resp.status_code == 404:
+                                logger.info(
+                                    "Shania: No approved assets for brand=%s — skipping", brand,
+                                )
+                            else:
+                                errors += 1
+                                logger.warning(
+                                    "Shania: post-from-approved failed brand=%s: %s %s",
+                                    brand, resp.status_code, resp.text[:200],
+                                )
+                        except Exception as e:
+                            errors += 1
+                            logger.error("Shania: post-from-approved error brand=%s: %s", brand, e)
+            else:
+                topics = _select_topics(MAX_POSTS_PER_CYCLE)
 
-        topics = _select_topics(MAX_POSTS_PER_CYCLE)
+                async with httpx.AsyncClient(timeout=90.0) as client:
+                    for topic in topics:
+                        try:
+                            platforms = _platforms_for_brand(topic["brand"])
+                            if not platforms:
+                                logger.info("Skipping brand=%s — no platforms configured", topic["brand"])
+                                continue
+                            resp = await client.post(
+                                f"{SHANIA_GRAPHICS_URL}/orchestrate-post",
+                                json={
+                                    "prompt": topic["prompt"],
+                                    "brand": topic["brand"],
+                                    "platforms": platforms,
+                                    "dryRun": False,
+                                },
+                                headers={
+                                    "X-Admin-Token": INTERNAL_ADMIN_TOKEN,
+                                    "Content-Type": "application/json",
+                                },
+                            )
+                            if resp.status_code == 200:
+                                posted += 1
+                                logger.info(
+                                    "Shania: Published post [%s] brand=%s template=%s platforms=%s",
+                                    topic["prompt"][:50], topic["brand"], topic.get("template_key", "legacy"), platforms,
+                                )
+                            else:
+                                errors += 1
+                                logger.warning(
+                                    "Shania: orchestrate-post failed [%s]: %s %s",
+                                    topic["prompt"][:50], resp.status_code, resp.text[:200],
+                                )
+                        except Exception as e:
+                            errors += 1
+                            logger.error("Shania: Post error [%s]: %s", topic["prompt"][:50], e)
 
-        async with httpx.AsyncClient(timeout=90.0) as client:
-            for topic in topics:
-                try:
-                    platforms = _platforms_for_brand(topic["brand"])
-                    if not platforms:
-                        logger.info("Skipping brand=%s — no platforms configured", topic["brand"])
-                        continue
-                    resp = await client.post(
-                        f"{SHANIA_GRAPHICS_URL}/orchestrate-post",
-                        json={
-                            "prompt": topic["prompt"],
-                            "brand": topic["brand"],
-                            "platforms": platforms,
-                            "dryRun": False,
-                        },
-                        headers={
-                            "X-Admin-Token": INTERNAL_ADMIN_TOKEN,
-                            "Content-Type": "application/json",
-                        },
-                    )
-                    if resp.status_code == 200:
-                        result = resp.json()
-                        posted += 1
-                        logger.info(
-                            "Shania: Published post [%s] brand=%s template=%s platforms=%s",
-                            topic["prompt"][:50], topic["brand"], topic.get("template_key", "legacy"), platforms,
-                        )
-                    else:
-                        errors += 1
-                        logger.warning(
-                            "Shania: orchestrate-post failed [%s]: %s %s",
-                            topic["prompt"][:50], resp.status_code, resp.text[:200],
-                        )
-                except Exception as e:
-                    errors += 1
-                    logger.error("Shania: Post error [%s]: %s", topic["prompt"][:50], e)
+            self._last_run = datetime.now(timezone.utc)
+            self._total_posts_published += posted
+            self._total_errors += errors
 
-        self._last_run = datetime.now(timezone.utc)
-        self._total_posts_published += posted
-        self._total_errors += errors
-
-        result = {
-            "cycle": "social_posting",
-            "posts_published": posted,
-            "errors": errors,
-            "timestamp": self._last_run.isoformat(),
-        }
-        logger.info("Shania: Social posting cycle complete — %s", result)
-        return result
+            result = {
+                "cycle": "social_posting",
+                "posts_published": posted,
+                "errors": errors,
+                "timestamp": self._last_run.isoformat(),
+            }
+            logger.info("Shania: Social posting cycle complete — %s", result)
+            return result
+        finally:
+            self._cycle_running = False
 
     async def _loop(self) -> None:
         await asyncio.sleep(180)  # 3 min initial delay to let services warm up

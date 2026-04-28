@@ -6,79 +6,227 @@ dedicated renderer such as Bannerbear is introduced.
 
 from __future__ import annotations
 
-import random
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
 
 _RECENT_TEMPLATE_KEYS_BY_BRAND: Dict[str, List[str]] = {}
-_MAX_RECENT_PER_BRAND = 2
+_MAX_RECENT_PER_BRAND = 8
 _BRAND_ROTATION_CURSOR = 0
+_TEMPLATE_CURSOR_BY_BRAND: Dict[str, int] = {}
+
+
+_WIHY_DYNAMIC_TOPICS: List[Dict[str, Any]] = [
+    {
+        "topic_key": "morning-energy",
+        "topic_label": "morning energy",
+        "duration": "10-minute",
+        "outcome": "steady morning energy",
+        "protocol_headline": "Do this in the first 10 minutes after you wake up",
+        "timing_headline": "If your morning energy is off, start here",
+        "research_headline": "4 research-backed ways to feel more awake without more coffee",
+        "action_points": [
+            "bright light within 30 minutes of waking",
+            "cold water on your face or a short cold rinse",
+            "protein before a high-sugar breakfast",
+            "5 minutes of movement before screens",
+        ],
+        "proof_points": [
+            "light exposure helps set circadian rhythm early",
+            "cold exposure can increase alertness without more caffeine",
+            "protein early in the day reduces the late-morning crash",
+            "short movement blocks raise energy faster than passive scrolling",
+        ],
+    },
+    {
+        "topic_key": "meal-timing",
+        "topic_label": "meal timing",
+        "duration": "same-day",
+        "outcome": "more stable blood sugar",
+        "protocol_headline": "Try this eating rhythm for steadier blood sugar",
+        "timing_headline": "The easiest meal-timing upgrade you can make today",
+        "research_headline": "4 small meal-timing shifts that change your whole day",
+        "action_points": [
+            "eat protein first instead of starting with refined carbs",
+            "front-load more calories earlier in the day",
+            "take a 10-minute walk after meals",
+            "stop eating about 3 hours before bed",
+        ],
+        "proof_points": [
+            "protein-first meals blunt glucose spikes",
+            "post-meal walking improves glucose handling quickly",
+            "late-night eating can make sleep and hunger signals worse",
+            "meal timing changes how energetic the next day feels",
+        ],
+    },
+    {
+        "topic_key": "better-sleep",
+        "topic_label": "better sleep",
+        "duration": "60-minute",
+        "outcome": "deeper sleep tonight",
+        "protocol_headline": "Do this in the hour before bed tonight",
+        "timing_headline": "Your sleep is usually lost before your head hits the pillow",
+        "research_headline": "4 research-backed ways to sleep deeper starting tonight",
+        "action_points": [
+            "dim lights one hour before bed",
+            "cool the room to roughly 65-68°F",
+            "cut screens late or use blue-light blockers",
+            "keep bedtime within the same 30-minute window",
+        ],
+        "proof_points": [
+            "light control is one of the fastest sleep-quality upgrades",
+            "cooler rooms help support deeper sleep stages",
+            "sleep timing consistency matters more than a perfect routine",
+            "late stimulation shows up as worse recovery the next morning",
+        ],
+    },
+    {
+        "topic_key": "all-day-energy",
+        "topic_label": "all-day energy",
+        "duration": "all-day",
+        "outcome": "energy without the caffeine crash",
+        "protocol_headline": "If your energy crashes by 2 p.m., start here",
+        "timing_headline": "How to keep your energy up without living on caffeine",
+        "research_headline": "4 fixes for the afternoon crash that have nothing to do with supplements",
+        "action_points": [
+            "use morning light before reaching for a second cup of coffee",
+            "swap the afternoon coffee for water and a 10-minute walk",
+            "eat a protein-heavy snack instead of sugar at 3 p.m.",
+            "stop caffeine early enough that sleep stays intact",
+        ],
+        "proof_points": [
+            "hydration and movement solve many fake energy crashes",
+            "afternoon caffeine often steals tomorrow's energy",
+            "protein is more reliable than sugar for stable focus",
+            "energy management is usually a schedule problem, not a supplement problem",
+        ],
+    },
+    {
+        "topic_key": "strength-basics",
+        "topic_label": "strength training",
+        "duration": "20-minute",
+        "outcome": "more useful strength with less gym time",
+        "protocol_headline": "Want more strength without wasting an hour at the gym?",
+        "timing_headline": "The 20-minute strength plan that is actually enough to matter",
+        "research_headline": "4 strength basics that outperform random gym time",
+        "action_points": [
+            "pick 3 compound movements like squats, rows, and presses",
+            "do 2 hard sets per movement instead of junk volume",
+            "train 3 times per week before adding complexity",
+            "progress reps or load slowly and track the numbers",
+        ],
+        "proof_points": [
+            "consistency beats program-hopping for actual strength gains",
+            "compound movements cover more ground than machine circuits",
+            "tracking reps exposes progress that motivation misses",
+            "short focused sessions outperform long unfocused workouts",
+        ],
+    },
+    {
+        "topic_key": "recovery-reset",
+        "topic_label": "recovery",
+        "duration": "15-minute",
+        "outcome": "better recovery between hard days",
+        "protocol_headline": "Use this 15-minute reset between hard training days",
+        "timing_headline": "Recovery is usually where good training plans fall apart",
+        "research_headline": "4 recovery basics that work better than expensive recovery gear",
+        "action_points": [
+            "take an easy walk after training instead of collapsing on the couch",
+            "eat protein in a practical post-workout window",
+            "get outside light again in the late afternoon",
+            "treat sleep as part of training, not the leftover time",
+        ],
+        "proof_points": [
+            "recovery habits determine whether training compounds or stalls",
+            "protein timing matters less than total protein, but it still helps",
+            "light and sleep quality shape how recovered you actually feel",
+            "better recovery usually comes from basics, not expensive tools",
+        ],
+    },
+]
+
+_WIHY_DYNAMIC_FRAMES: List[Dict[str, str]] = [
+    {
+        "frame_key": "protocol-card",
+        "layout_template": "recipe-style protocol card with a strong headline, four clear steps, clean spacing, and direct utility-first copy that feels immediately usable",
+        "point_source": "action_points",
+        "headline_field": "protocol_headline",
+    },
+    {
+        "frame_key": "timing-playbook",
+        "layout_template": "timeline-style layout with time anchors, cause-and-effect language, and practical moves someone can apply the same day",
+        "point_source": "action_points",
+        "headline_field": "timing_headline",
+    },
+    {
+        "frame_key": "research-checklist",
+        "layout_template": "clean editorial checklist with one evidence-led headline, four concise proof-driven lines, and no product-marketing treatment",
+        "point_source": "proof_points",
+        "headline_field": "research_headline",
+    },
+]
+
+
+def _build_wihy_dynamic_templates() -> List[Dict[str, Any]]:
+    templates: List[Dict[str, Any]] = []
+    for frame in _WIHY_DYNAMIC_FRAMES:
+        point_source = frame.get("point_source", "action_points")
+        headline_field = frame.get("headline_field", "")
+        for topic in _WIHY_DYNAMIC_TOPICS:
+            templates.append(
+                {
+                    "template_key": f"{frame['frame_key']}-{topic['topic_key']}",
+                    "headline": str(topic.get(headline_field) or topic.get("outcome") or topic.get("topic_label") or ""),
+                    "supporting_points": list(topic.get(point_source, [])),
+                    "cta": "",
+                    "layout": frame["layout_template"],
+                }
+            )
+    return templates
+
+
+def _copy_template(template: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        **template,
+        "supporting_points": list(template.get("supporting_points", [])),
+    }
+
+
+def get_templates_for_brand(brand: str, keep_active_only: bool = True) -> List[Dict[str, Any]]:
+    normalized_brand = (brand or "").strip().lower()
+    if not normalized_brand:
+        return []
+
+    if normalized_brand == "wihy":
+        return _build_wihy_dynamic_templates()
+
+    templates = [_copy_template(template) for template in ALL_SOCIAL_TEMPLATE_REGISTRY.get(normalized_brand, [])]
+    if not keep_active_only:
+        return templates
+
+    active_keys_by_brand: Dict[str, Set[str]] = {
+        "communitygroceries": {"easy-recipe", "meal-prep-sunday", "trending-meal", "budget-hack"},
+    }
+    active_keys = active_keys_by_brand.get(normalized_brand)
+    if not active_keys:
+        return templates
+    return [template for template in templates if template.get("template_key") in active_keys]
+
+
+def get_template_registry(keep_active_only: bool = True) -> Dict[str, List[Dict[str, Any]]]:
+    brands = sorted(set(ALL_SOCIAL_TEMPLATE_REGISTRY.keys()) | {"wihy"})
+    return {
+        brand: get_templates_for_brand(brand, keep_active_only=keep_active_only)
+        for brand in brands
+    }
+
+
+def get_template_driven_brands() -> Set[str]:
+    return {brand for brand, templates in get_template_registry(keep_active_only=True).items() if templates}
 
 
 ALL_SOCIAL_TEMPLATE_REGISTRY: Dict[str, List[Dict[str, Any]]] = {
-    "wihy": [
-        {
-            "template_key": "superhuman-protocol",
-            "headline": "Build your superhuman baseline in 30 days",
-            "supporting_points": [
-                "cold exposure and sauna cycling for recovery",
-                "morning light, grounding, and circadian alignment",
-                "sleep score optimization and deep-rest targets",
-                "compound lifts plus zone 2 for performance",
-            ],
-            "cta": "Start your 30-day protocol in WIHY",
-            "layout": "high-contrast performance poster, dark base with electric accents, one dominant headline, three compact tactic chips, and one strong CTA button",
-        },
-        {
-            "template_key": "performance-stack",
-            "headline": "Your daily performance stack, simplified",
-            "supporting_points": [
-                "5-minute morning sunlight reset",
-                "protein-first breakfast within 90 minutes",
-                "zone 2 cardio for metabolic endurance",
-                "evening magnesium and sleep wind-down",
-            ],
-            "cta": "Build your daily stack in WIHY",
-            "layout": "clean protocol card with a 1-4 numbered routine, strong typographic hierarchy, and mobile-first spacing",
-        },
-        {
-            "template_key": "biohack-fact",
-            "headline": "Science-backed ways to upgrade your biology",
-            "supporting_points": [
-                "VO2 max outperforms most single blood markers for longevity",
-                "grip strength strongly correlates with lifespan outcomes",
-                "10 minutes of cold exposure can sharply elevate dopamine",
-                "time-restricted eating supports cellular repair pathways",
-            ],
-            "cta": "Capture these metrics in WIHY",
-            "layout": "data-first stat card with one hero fact, two supporting proof lines, clean chart-like blocks, and minimal decorative noise",
-        },
-        {
-            "template_key": "transformation",
-            "headline": "Lose weight with a system, not guesswork",
-            "supporting_points": [
-                "personalized meals matched to your goals",
-                "training guidance you can actually stick to",
-                "weekly progress check-ins and course correction",
-                "one dashboard to keep consistency high",
-            ],
-            "cta": "Start your plan in WIHY",
-            "layout": "transformation concept with one bold promise headline, one proof-oriented subline, and a clear CTA anchored above the fold",
-        },
-        {
-            "template_key": "feature-stack",
-            "headline": "10 things in 1 health app",
-            "supporting_points": [
-                "weight loss planning",
-                "fitness and workouts",
-                "meal planning and groceries",
-                "behavior insights",
-            ],
-            "cta": "Try WIHY",
-            "layout": "clean app-style promo with bold headline, 3 short support lines, minimal clutter",
-        },
-    ],
+    "wihy": [],
     "vowels": [
         {
             "template_key": "nutrition-expose",
@@ -218,63 +366,56 @@ ALL_SOCIAL_TEMPLATE_REGISTRY: Dict[str, List[Dict[str, Any]]] = {
 }
 
 
-# Active registry used for generation/publishing.
-# Keep only strongest 4 template families for each launch app brand.
-SOCIAL_TEMPLATE_REGISTRY: Dict[str, List[Dict[str, Any]]] = {
-    "wihy": [
-        template
-        for template in ALL_SOCIAL_TEMPLATE_REGISTRY.get("wihy", [])
-        if template.get("template_key")
-        in {
-            "superhuman-protocol",
-            "performance-stack",
-            "biohack-fact",
-            "transformation",
-        }
-    ],
-    "communitygroceries": [
-        template
-        for template in ALL_SOCIAL_TEMPLATE_REGISTRY.get("communitygroceries", [])
-        if template.get("template_key")
-        in {
-            "easy-recipe",
-            "meal-prep-sunday",
-            "trending-meal",
-            "budget-hack",
-        }
-    ],
-    "vowels": ALL_SOCIAL_TEMPLATE_REGISTRY.get("vowels", []),
-}
+# Snapshot registry for callers that still import the constant directly.
+SOCIAL_TEMPLATE_REGISTRY: Dict[str, List[Dict[str, Any]]] = get_template_registry(keep_active_only=True)
 
 
 def _render_prompt(brand: str, template: Dict[str, Any]) -> str:
+    headline = str(template.get("headline", "")).strip()
+    if headline and headline[-1] not in ".!?":
+        headline = f"{headline}."
     points = ", ".join(template.get("supporting_points", []))
+    cta = str(template.get("cta", "")).strip()
     meal_image_clause = ""
+    brand_specific_guidance = ""
     if brand == "communitygroceries":
         meal_image_clause = (
-            " Use a real appetizing meal image as the hero visual (plated food, meal prep, "
+            "Use a real appetizing meal image as the hero visual (plated food, meal prep, "
             "or family dinner scene) with warm natural lighting."
         )
+    elif brand == "wihy":
+        brand_specific_guidance = (
+            "Keep this editorial and useful. Do not include app promotion, download language, "
+            "mock phones, CTA buttons, or product-marketing framing. Make it feel like a saved post, "
+            "not an ad."
+        )
+
+    cta_clause = f"Call to action: {cta}. " if cta else ""
+    closing_guidance = (
+        "Keep the design clean and readable. Use one dominant headline and concise supporting lines. "
+        "Prioritize mobile legibility, strong contrast, safe margins, and text that stays inside a centered content zone. "
+        "Avoid clutter, tiny text, and generic motivational phrasing."
+    )
+    optional_guidance = " ".join(
+        part for part in (meal_image_clause, brand_specific_guidance, cta_clause.strip()) if part
+    )
 
     return (
         f"Create a branded social media post for {brand}. "
         f"Use the template family '{template['template_key']}'. "
         f"Visual direction: {template['layout']}. "
-        f"Primary headline: {template['headline']}. "
+        f"Primary headline: {headline} "
         f"Supporting ideas to communicate: {points}. "
-        f"Call to action: {template['cta']}. "
-        f"{meal_image_clause}"
-        "Keep the design clean and readable. Use one dominant headline, one concise support line, "
-        "and one clear CTA. Prioritize mobile legibility, strong contrast, safe margins, and text that "
-        "stays inside a centered content zone. Avoid clutter, tiny text, and generic motivational phrasing."
+        f"{optional_guidance} "
+        f"{closing_guidance}"
     )
 
 
 def build_structured_social_topics(brand: Optional[str] = None) -> List[Dict[str, str]]:
-    brands = [brand] if brand else list(SOCIAL_TEMPLATE_REGISTRY.keys())
+    brands = [brand] if brand else sorted(get_template_driven_brands())
     topics: List[Dict[str, str]] = []
     for current_brand in brands:
-        for template in SOCIAL_TEMPLATE_REGISTRY.get(current_brand, []):
+        for template in get_templates_for_brand(current_brand, keep_active_only=True):
             topics.append(
                 {
                     "prompt": _render_prompt(current_brand, template),
@@ -322,12 +463,31 @@ def pick_structured_social_topics(count: int, brands: Optional[List[str]] = None
             if not candidates:
                 continue
 
+            ordered_candidates = sorted(
+                candidates,
+                key=lambda item: str(item.get("template_key", "")),
+            )
+            start_cursor = _TEMPLATE_CURSOR_BY_BRAND.get(brand, 0) % len(ordered_candidates)
             recent = _RECENT_TEMPLATE_KEYS_BY_BRAND.get(brand, [])
-            non_recent = [
-                item for item in candidates if item.get("template_key", "") not in recent
-            ]
-            pick_pool = non_recent or candidates
-            choice = random.choice(pick_pool)
+            choice = None
+            chosen_index = start_cursor
+
+            # First pass: find next non-recent template from this brand's cursor.
+            for offset in range(len(ordered_candidates)):
+                idx = (start_cursor + offset) % len(ordered_candidates)
+                candidate = ordered_candidates[idx]
+                if candidate.get("template_key", "") in recent:
+                    continue
+                choice = candidate
+                chosen_index = idx
+                break
+
+            # Fallback: if all are recent, advance cursor anyway and take the next one.
+            if choice is None:
+                choice = ordered_candidates[start_cursor]
+                chosen_index = start_cursor
+
+            _TEMPLATE_CURSOR_BY_BRAND[brand] = (chosen_index + 1) % len(ordered_candidates)
 
             selected.append(choice)
             selected_keys.add(f"{choice['brand']}:{choice.get('template_key', '')}")
@@ -354,7 +514,7 @@ def export_social_templates_local(
     keep_active_only: bool = False,
 ) -> Dict[str, List[str]]:
     """Export social template prompts to local files with numbered indexes."""
-    registry = SOCIAL_TEMPLATE_REGISTRY if keep_active_only else ALL_SOCIAL_TEMPLATE_REGISTRY
+    registry = get_template_registry(keep_active_only=keep_active_only)
     selected_brands = brands or list(registry.keys())
 
     out = Path(output_dir)

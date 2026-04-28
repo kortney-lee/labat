@@ -39,6 +39,7 @@ class LeadRequest(BaseModel):
     email: EmailStr
     first_name: str = ""
     last_name: str = ""
+    source: str = ""
     utm_source: str = ""
     utm_campaign: str = ""
     utm_content: str = ""
@@ -82,8 +83,17 @@ async def capture_lead(req: LeadRequest):
     # Save lead
     first_name = req.first_name.strip()
     last_name = req.last_name.strip()
+    raw_source = (req.source or req.utm_source or "").strip().lower()
+    if "communitygroceries" in raw_source:
+        lead_source = "communitygroceries"
+    elif "wihy" in raw_source:
+        lead_source = "wihy"
+    elif "whatishealthy" in raw_source:
+        lead_source = "whatishealthy"
+    else:
+        lead_source = raw_source or "whatishealthy"
     await save_lead(
-        email, source="whatishealthy", first_name=first_name, last_name=last_name,
+        email, source=lead_source, first_name=first_name, last_name=last_name,
         utm_source=req.utm_source, utm_campaign=req.utm_campaign,
         utm_content=req.utm_content, utm_medium=req.utm_medium,
         fbclid=req.fbclid,
@@ -527,18 +537,22 @@ async def sendgrid_webhook(request: Request):
     if not isinstance(events, list):
         return {"status": "ok", "processed": 0}
 
+    _HANDLED = {"open", "click", "unsubscribe", "group_unsubscribe", "bounce", "blocked", "dropped", "spamreport"}
     processed = 0
     for event in events:
         email = event.get("email", "")
         event_type = event.get("event", "")
-        template_id = event.get("template_id", "")
-        if not email or event_type not in ("open", "click", "unsubscribe", "group_unsubscribe"):
+        template_id = event.get("template_id", event.get("category", ""))
+        if not email or event_type not in _HANDLED:
             continue
-        mapped = "unsubscribe" if "unsubscribe" in event_type else event_type
+        if "unsubscribe" in event_type:
+            mapped = "unsubscribe"
+        else:
+            mapped = event_type
         try:
             await record_email_event(email, mapped, template_id)
             processed += 1
         except Exception as e:
-            logger.warning(f"Failed to record SendGrid event: {e}")
+            logger.warning(f"Failed to record SendGrid event {event_type} for {email}: {e}")
 
     return {"status": "ok", "processed": processed}

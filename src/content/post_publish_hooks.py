@@ -31,6 +31,10 @@ SHANIA_URL = os.getenv(
 )
 ADMIN_TOKEN = os.getenv("INTERNAL_ADMIN_TOKEN", "")
 
+# When SHANIA_POSTING_MODE=bucket-only, Shania only posts pre-approved assets
+# from the GCS bucket — auto-posting from blog publish hooks is disabled.
+SHANIA_POSTING_MODE = os.getenv("SHANIA_POSTING_MODE", "auto").strip().lower()
+
 # Platforms to auto-post to (can be overridden via env)
 AUTO_POST_PLATFORMS = os.getenv("AUTO_POST_PLATFORMS", "facebook,linkedin,threads,instagram").split(",")
 
@@ -113,6 +117,9 @@ async def queue_social_post(
     hero_image: str = "",
 ) -> bool:
     """Queue a social media post about a newly published blog post via Shania."""
+    if SHANIA_POSTING_MODE == "bucket-only":
+        logger.info("Shania social post skipped: SHANIA_POSTING_MODE=bucket-only (blog publish hooks disabled)")
+        return False
     if not ADMIN_TOKEN:
         logger.debug("Shania social post skipped: no INTERNAL_ADMIN_TOKEN")
         return False

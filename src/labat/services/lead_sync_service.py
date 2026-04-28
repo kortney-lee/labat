@@ -18,12 +18,9 @@ from __future__ import annotations
 import logging
 import os
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 logger = logging.getLogger("labat.lead_sync")
-
-# Import centralized brand mapping
-from src.labat.brands import PAGE_BRAND_MAP as _PAGE_BRAND_MAP
 
 # Brand mapping: campaign name prefix → brand key (fallback)
 _CAMPAIGN_BRAND_HINTS = {
@@ -35,6 +32,27 @@ _CAMPAIGN_BRAND_HINTS = {
     "whatishealthy": "childrennutrition",
     "children": "childrennutrition",
 }
+
+_BOOK_HINTS: Tuple[str, ...] = (
+    "book",
+    "vowels",
+    "what is healthy",
+    "whatishealthy",
+    "ebook",
+)
+
+_BOOK_BRANDS: Set[str] = {"book", "vowels", "vowelsbook", "whatishealthy"}
+
+# Controls whether sync processes all lead products, only book, or only launch.
+_PRODUCT_SCOPE = (os.getenv("LEAD_SYNC_PRODUCT_SCOPE", "all") or "all").strip().lower()
+
+# Optional explicit form allow-list for book campaigns (comma-separated form IDs).
+_BOOK_FORM_IDS: Set[str] = {
+    x.strip() for x in (os.getenv("LEAD_SYNC_BOOK_FORM_IDS", "") or "").split(",") if x.strip()
+}
+
+# How to message book leads from paid forms: buy_now|free_book
+_BOOK_LEAD_MODE = (os.getenv("BOOK_LEAD_MODE", "buy_now") or "buy_now").strip().lower()
 
 _sync_state_db = None
 
@@ -85,6 +103,46 @@ def _guess_brand(lead: Dict[str, Any], form_name: str = "") -> str:
             return brand
 
     return "wihy"  # default
+
+
+def _is_book_context(lead: Dict[str, Any], form_name: str = "") -> bool:
+    """Detect whether this lead should be treated as a book lead."""
+    text = " ".join(
+        [
+            str(lead.get("campaign_name") or ""),
+            str(lead.get("ad_name") or ""),
+            str(form_name or ""),
+        ]
+    ).lower()
+    return any(hint in text for hint in _BOOK_HINTS)
+
+
+def _resolve_track(lead: Dict[str, Any], form_name: str, brand_override: Optional[str]) -> Tuple[str, str]:
+    """Return (track, brand) where track is launch|book and brand is normalized."""
+    if brand_override:
+        normalized = brand_override.strip().lower()
+        if normalized in _BOOK_BRANDS:
+            return "book", "vowels"
+        return "launch", normalized
+
+    if _is_book_context(lead, form_name):
+        return "book", "vowels"
+
+    return "launch", _guess_brand(lead, form_name)
+
+
+def _should_process_form(form: Dict[str, Any], product_scope: str) -> bool:
+    """Apply coarse form-level scope filtering before lead fetch."""
+    if product_scope not in ("book", "launch"):
+        return True
+
+    form_id = str(form.get("id") or "").strip()
+    form_name = str(form.get("name") or "")
+    looks_book = form_id in _BOOK_FORM_IDS if _BOOK_FORM_IDS else _is_book_context({}, form_name)
+
+    if product_scope == "book":
+        return looks_book
+    return not looks_book
 
 
 async def sync_leads_from_form(
@@ -140,6 +198,8 @@ async def sync_leads_from_form(
     logger.info("Fetched %d leads from form %s (since=%s)", len(all_leads), form_id, last_sync)
 
     synced = 0
+    synced_book = 0
+    synced_launch = 0
     skipped = 0
     errors = 0
     synced_leads = []
@@ -159,11 +219,13 @@ async def sync_leads_from_form(
                 skipped += 1
                 continue
 
-            lead_brand = brand or _guess_brand(lead, form_name)
+            lead_track, lead_brand = _resolve_track(lead, form_name, brand)
 
-            # Check duplicate
-            if await email_exists(email, lead_brand):
-                logger.debug("Lead %s already exists (email=%s, brand=%s)", lead["id"], email, lead_brand)
+            # Apply per-lead scope guard (handles mixed forms safely).
+            if _PRODUCT_SCOPE == "book" and lead_track != "book":
+                skipped += 1
+                continue
+            if _PRODUCT_SCOPE == "launch" and lead_track != "launch":
                 skipped += 1
                 continue
 
@@ -175,28 +237,82 @@ async def sync_leads_from_form(
                 first_name = parts[0]
                 last_name = parts[1] if len(parts) > 1 else ""
 
-            # Save to Firestore
-            saved = await save_lead(
-                email=email,
-                first_name=first_name,
-                last_name=last_name,
-                brand=lead_brand,
-                utm_source="facebook_lead_ad",
-                utm_campaign=lead.get("campaign_id", ""),
-                fbclid=lead.get("ad_id", ""),
-            )
+            if lead_track == "book":
+                from src.services.book_leads_service import email_exists as book_email_exists
+                from src.services.book_leads_service import save_lead as save_book_lead
+                from src.services.nurture_service import trigger_buy_now, trigger_day0
 
-            # Trigger welcome email
-            await trigger_welcome(email=email, first_name=first_name, brand=lead_brand)
+                if await book_email_exists(email):
+                    logger.debug("Book lead already exists (email=%s)", email)
+                    skipped += 1
+                    continue
+
+                await save_book_lead(
+                    email=email,
+                    source=(
+                        "facebook_book_purchase"
+                        if _BOOK_LEAD_MODE == "buy_now"
+                        else "facebook_lead_form"
+                    ),
+                    first_name=first_name,
+                    last_name=last_name,
+                    utm_source="facebook",
+                    utm_campaign=lead.get("campaign_id", ""),
+                    utm_medium="paid",
+                    utm_content=form_name,
+                    fbclid=lead.get("ad_id", ""),
+                )
+                if _BOOK_LEAD_MODE == "buy_now":
+                    await trigger_buy_now(
+                        email=email,
+                        first_name=first_name,
+                        variant=form_name,
+                    )
+                else:
+                    await trigger_day0(
+                        email=email,
+                        first_name=first_name,
+                        variant=form_name,
+                    )
+                synced_book += 1
+            else:
+                # Check duplicate
+                if await email_exists(email, lead_brand):
+                    logger.debug("Lead %s already exists (email=%s, brand=%s)", lead["id"], email, lead_brand)
+                    skipped += 1
+                    continue
+
+                # Save to Firestore
+                await save_lead(
+                    email=email,
+                    first_name=first_name,
+                    last_name=last_name,
+                    brand=lead_brand,
+                    utm_source="facebook_lead_ad",
+                    utm_campaign=lead.get("campaign_id", ""),
+                    fbclid=lead.get("ad_id", ""),
+                )
+
+                # Trigger welcome email
+                await trigger_welcome(email=email, first_name=first_name, brand=lead_brand)
+                synced_launch += 1
 
             synced += 1
             synced_leads.append({
                 "email": email,
                 "first_name": first_name,
                 "brand": lead_brand,
+                "track": lead_track,
+                "book_mode": _BOOK_LEAD_MODE if lead_track == "book" else None,
                 "meta_lead_id": lead.get("id"),
             })
-            logger.info("Synced lead: %s (brand=%s, meta_id=%s)", email, lead_brand, lead.get("id"))
+            logger.info(
+                "Synced lead: %s (track=%s, brand=%s, meta_id=%s)",
+                email,
+                lead_track,
+                lead_brand,
+                lead.get("id"),
+            )
 
             # Track latest timestamp
             created = lead.get("created_time", "")
@@ -214,6 +330,8 @@ async def sync_leads_from_form(
     return {
         "form_id": form_id,
         "synced": synced,
+        "synced_book": synced_book,
+        "synced_launch": synced_launch,
         "skipped": skipped,
         "errors": errors,
         "total_fetched": len(all_leads),
@@ -221,18 +339,44 @@ async def sync_leads_from_form(
     }
 
 
-async def sync_all_forms(page_id: Optional[str] = None) -> Dict[str, Any]:
+async def sync_all_forms(page_id: Optional[str] = None, brand: Optional[str] = None) -> Dict[str, Any]:
     """
     Sync leads from ALL active lead forms on the page.
     Called by the cron job.
     """
+    from src.labat.brands import BRAND_PAGE_IDS, get_page_id
+    from src.labat.meta_client import MetaAPIError
     from src.labat.services.leads_service import list_lead_forms
 
-    forms_result = await list_lead_forms(page_id=page_id)
+    effective_page_id = page_id
+    if not effective_page_id:
+        if brand:
+            effective_page_id = get_page_id(brand)
+        elif _PRODUCT_SCOPE == "book":
+            effective_page_id = get_page_id("vowels")
+
+    try:
+        forms_result = await list_lead_forms(page_id=effective_page_id)
+    except MetaAPIError as exc:
+        # Some tokens are scoped to WIHY page only. Fall back so cron stays healthy.
+        fallback_page = BRAND_PAGE_IDS.get("wihy")
+        if effective_page_id and fallback_page and effective_page_id != fallback_page:
+            logger.warning(
+                "Lead form list failed for page %s (%s); retrying WIHY page %s",
+                effective_page_id,
+                exc,
+                fallback_page,
+            )
+            forms_result = await list_lead_forms(page_id=fallback_page)
+            effective_page_id = fallback_page
+        else:
+            raise
     forms = forms_result.get("data", [])
 
     results = []
     total_synced = 0
+    total_synced_book = 0
+    total_synced_launch = 0
     total_errors = 0
 
     for form in forms:
@@ -244,12 +388,19 @@ async def sync_all_forms(page_id: Optional[str] = None) -> Dict[str, Any]:
             logger.debug("Skipping inactive form %s (%s)", form_id, form_name)
             continue
 
+        if not _should_process_form(form, _PRODUCT_SCOPE):
+            logger.info("Skipping form %s (%s) due to LEAD_SYNC_PRODUCT_SCOPE=%s", form_id, form_name, _PRODUCT_SCOPE)
+            continue
+
         result = await sync_leads_from_form(
             form_id=form_id,
+            brand=brand,
             form_name=form_name,
         )
         results.append(result)
         total_synced += result["synced"]
+        total_synced_book += result.get("synced_book", 0)
+        total_synced_launch += result.get("synced_launch", 0)
         total_errors += result["errors"]
 
     logger.info("Lead sync complete: %d forms, %d synced, %d errors", len(results), total_synced, total_errors)
@@ -257,6 +408,11 @@ async def sync_all_forms(page_id: Optional[str] = None) -> Dict[str, Any]:
     return {
         "forms_processed": len(results),
         "total_synced": total_synced,
+        "total_synced_book": total_synced_book,
+        "total_synced_launch": total_synced_launch,
         "total_errors": total_errors,
+        "product_scope": _PRODUCT_SCOPE,
+        "book_lead_mode": _BOOK_LEAD_MODE,
+        "page_id": effective_page_id,
         "results": results,
     }

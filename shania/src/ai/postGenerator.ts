@@ -20,6 +20,7 @@ import { generateGraphicContent } from "./geminiClient";
 import { generateImage, isImagenAvailable } from "./imagenClient";
 import { getCanvaClient } from "../services/canvaService";
 import type { DesignData } from "../services/canvaService";
+import { pickAssetLibraryImage } from "../storage/assetLibrary";
 
 import { getBrand, BrandProfile, BrandId } from "../config/brand";
 import { FORMATS, FormatKey } from "../config/formats";
@@ -254,9 +255,22 @@ export async function generatePost(
   let photoUrl: string | undefined;
   let mealPhotoBytes: Buffer | undefined;
   let mealPhotoMimeType: string | undefined;
+  const libraryImageEnabled = (process.env.SHANIA_USE_ASSET_LIBRARY || "true").toLowerCase() !== "false";
   const imageFirstEnabled = (process.env.SHANIA_IMAGE_FIRST_MODE || "true").toLowerCase() !== "false";
   const hasPhotoQuery = Boolean(graphicContent.photoQuery && graphicContent.photoQuery.trim().length > 0);
   const cgMealImagePriority = (process.env.SHANIA_CG_MEAL_IMAGE_PRIORITY || "true").toLowerCase() !== "false";
+
+  // Prefer image/graphic asset library first, then fallback to generated images.
+  if (libraryImageEnabled) {
+    const imageHint = [plan.topicHint, userPrompt].filter(Boolean).join(" ");
+    const libraryPick = await pickAssetLibraryImage(brand.id, imageHint);
+    if (libraryPick) {
+      photoUrl = libraryPick.url;
+      logger.info(
+        `Post pipeline [${brand.id}]: using asset-library image (${libraryPick.provider}) ${libraryPick.label}`,
+      );
+    }
+  }
 
   // CG must always have a meal-centric photo prompt; synthesize fallback if Gemini misses it.
   if (isCommunityGroceries && !hasPhotoQuery) {
@@ -273,8 +287,9 @@ export async function generatePost(
   }
 
   const shouldGeneratePhoto =
+    !photoUrl &&
     (imageFirstEnabled && isImagenAvailable() && Boolean(graphicContent.photoQuery && graphicContent.photoQuery.trim().length > 0)) ||
-    (isCommunityGroceries && isImagenAvailable() && Boolean(graphicContent.photoQuery && graphicContent.photoQuery.trim().length > 0));
+    (!photoUrl && isCommunityGroceries && isImagenAvailable() && Boolean(graphicContent.photoQuery && graphicContent.photoQuery.trim().length > 0));
 
   if (shouldGeneratePhoto) {
     try {

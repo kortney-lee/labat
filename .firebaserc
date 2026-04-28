@@ -1,0 +1,13 @@
+{
+  "projects": {},
+  "targets": {
+    "wihy-ai": {
+      "hosting": {
+        "whatishealthy": [
+          "whatishealthy"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

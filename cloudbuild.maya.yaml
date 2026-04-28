@@ -47,7 +47,7 @@ steps:
       - '--concurrency'
       - '20'
       - '--set-env-vars'
-      - 'APP_MODULE=src.apps.maya_app:app,ENV=production,LOG_LEVEL=INFO,WIHY_ML_CLIENT_ID=wihy_ml_mk1waylw,META_GRAPH_API_VERSION=v21.0,INSTAGRAM_GRAPH_VERSION=v19.0,SOCIAL_POSTING_LAUNCH_MODE=true'
+      - 'APP_MODULE=src.apps.maya_app:app,ENV=production,LOG_LEVEL=INFO,WIHY_ML_CLIENT_ID=wihy_ml_mk1waylw,META_GRAPH_API_VERSION=v21.0,INSTAGRAM_GRAPH_VERSION=v19.0,SOCIAL_POSTING_LAUNCH_MODE=false,SHANIA_SOCIAL_POSTING_INTERVAL=21600,SHANIA_MAX_POSTS_PER_CYCLE=1,SHANIA_SOCIAL_MIN_RUN_GAP_SECONDS=10800'
       - '--set-secrets'
       - >-
         INTERNAL_ADMIN_TOKEN=internal-admin-token:latest,

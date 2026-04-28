@@ -215,6 +215,18 @@ export async function uploadLibraryAsset(
 }
 
 /**
+ * Move an asset within the bucket (copy to destination, then delete source).
+ * Used to transition approved assets to posted/ after delivery.
+ */
+export async function moveAsset(sourcePath: string, destPath: string): Promise<void> {
+  const s = getStorage();
+  const bucket = s.bucket(BUCKET_NAME);
+  await bucket.file(sourcePath).copy(bucket.file(destPath));
+  await bucket.file(sourcePath).delete();
+  logger.info(`Moved asset: ${sourcePath} → ${destPath}`);
+}
+
+/**
  * List asset library images by prefix/brand/folder.
  */
 export async function listLibraryAssets(options?: {

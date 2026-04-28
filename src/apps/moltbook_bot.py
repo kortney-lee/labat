@@ -15,11 +15,9 @@ Exposes:
 
 import asyncio
 import itertools
-import json
 import logging
 import os
 import re
-import time
 import uuid
 from contextlib import asynccontextmanager
 
@@ -34,29 +32,40 @@ from src.shared.config.models import CHAT_MODEL
 load_dotenv()
 
 logger = logging.getLogger("moltbook_bot")
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(message)s")
 
-# ── Config ─────────────────────────────────────────────────────────────────────
+# ── Config ──────────────────────────────────────────────────────────────
 MOLTBOOK_API_KEY = (os.getenv("MOLTBOOK_API_KEY", "") or "").strip()
-MOLTBOOK_BASE    = "https://www.moltbook.com/api/v1"
-WIHY_ASK         = "https://ml.wihy.ai/ask"
-SHANIA_GRAPHICS_URL = os.getenv("SHANIA_GRAPHICS_URL", "https://wihy-shania-graphics-n4l2vldq3q-uc.a.run.app")
+MOLTBOOK_BASE = "https://www.moltbook.com/api/v1"
+WIHY_ASK = "https://ml.wihy.ai/ask"
+SHANIA_GRAPHICS_URL = os.getenv(
+    "SHANIA_GRAPHICS_URL",
+    "https://wihy-shania-graphics-n4l2vldq3q-uc.a.run.app")
 INTERNAL_ADMIN_TOKEN = (os.getenv("INTERNAL_ADMIN_TOKEN", "") or "").strip()
 
-HEARTBEAT_INTERVAL = int(os.getenv("MOLTBOOK_INTERVAL", "160"))   # seconds between cycles
-PUBLISH_EVERY      = int(os.getenv("MOLTBOOK_PUBLISH_EVERY", "8")) # cycles between new posts
-COMMENT_DELAY      = 22   # seconds between comments (rate limit 1/20s)
+HEARTBEAT_INTERVAL = int(
+    os.getenv(
+        "MOLTBOOK_INTERVAL",
+        "160"))  # seconds between cycles
+PUBLISH_EVERY = int(
+    os.getenv(
+        "MOLTBOOK_PUBLISH_EVERY",
+        "8"))  # cycles between new posts
+COMMENT_DELAY = 22  # seconds between comments (rate limit 1/20s)
 
 # OpenAI client for tone rewriting
 _openai_client: openai.AsyncOpenAI | None = None
 
+
 def _get_openai() -> openai.AsyncOpenAI:
     global _openai_client
     if _openai_client is None:
-        _openai_client = openai.AsyncOpenAI(
-            api_key=os.getenv("OPENAI_API_KEY") or os.getenv("WIHY_OPENAI_API_KEY"),
-        )
+        _openai_client = openai.AsyncOpenAI(api_key=os.getenv(
+            "OPENAI_API_KEY") or os.getenv("WIHY_OPENAI_API_KEY"), )
     return _openai_client
+
 
 # WIHY voice — conversational, human, evidence-based
 WIHY_TONE_SYSTEM = """You are rewriting health/nutrition content for a social media post.
@@ -99,8 +108,9 @@ async def rewrite_in_wihy_tone(raw_text: str, mode: str = "post",
         system = WIHY_REPLY_TONE_SYSTEM if mode == "reply" else WIHY_TONE_SYSTEM
         user_prompt = raw_text.strip()
         if mode == "reply" and comment_context:
-            user_prompt = (f"The person said: \"{comment_context}\"\n\n"
-                           f"Raw research to rewrite as a reply:\n{raw_text.strip()}")
+            user_prompt = (
+                f"The person said: \"{comment_context}\"\n\n"
+                f"Raw research to rewrite as a reply:\n{raw_text.strip()}")
         resp = await client.chat.completions.create(
             model=CHAT_MODEL,
             messages=[
@@ -111,7 +121,8 @@ async def rewrite_in_wihy_tone(raw_text: str, mode: str = "post",
             max_tokens=800,
         )
         rewritten = resp.choices[0].message.content.strip()
-        logger.info(f"Tone rewrite ({mode}): {len(raw_text)} → {len(rewritten)} chars")
+        logger.info(
+            f"Tone rewrite ({mode}): {len(raw_text)} → {len(rewritten)} chars")
         return rewritten
     except Exception as e:
         logger.error(f"Tone rewrite failed, using raw text: {e}")
@@ -147,7 +158,7 @@ TOPICS = itertools.cycle([
     "time-restricted eating and weight loss",
 ])
 
-# ── Number-word solver (identical to moltbook_first_post.py) ───────────────────
+# ── Number-word solver (identical to moltbook_first_post.py) ────────────
 TENS = {"twenty": 20, "thirty": 30, "forty": 40, "fifty": 50,
         "sixty": 60, "seventy": 70, "eighty": 80, "ninety": 90}
 ONES = {"zero": 0, "one": 1, "two": 2, "three": 3, "four": 4,
@@ -190,7 +201,8 @@ def solve_challenge(challenge_text: str) -> str:
         i = 0
         while i < len(values_raw):
             v = values_raw[i]
-            if v in TENS.values() and i + 1 < len(values_raw) and values_raw[i + 1] in ONES.values():
+            if v in TENS.values() and i + \
+                    1 < len(values_raw) and values_raw[i + 1] in ONES.values():
                 values_merged.append(v + values_raw[i + 1])
                 i += 2
             else:
@@ -213,24 +225,36 @@ def solve_challenge(challenge_text: str) -> str:
     op = "add"
     for w in sub_kw:
         if w in cleaned:
-            op = "sub"; break
+            op = "sub"
+            break
     for w in mul_kw:
         if w in cleaned:
-            op = "mul"; break
+            op = "mul"
+            break
     for w in div_kw:
         if w in cleaned:
-            op = "div"; break
+            op = "div"
+            break
     for w in add_kw:
         if w in cleaned:
-            op = "add"; break
+            op = "add"
+            break
 
-    result = {"add": a + b, "sub": a - b, "mul": a * b, "div": a / b if b else 0}[op]
+    result = {
+        "add": a + b,
+        "sub": a - b,
+        "mul": a * b,
+        "div": a / b if b else 0}[op]
     return f"{result:.2f}"
 
 
-# ── Moltbook API helpers ───────────────────────────────────────────────────────
+# ── Moltbook API helpers ────────────────────────────────────────────────
 
-async def _post(client: httpx.AsyncClient, url: str, payload: dict, retry_on_429: bool = True) -> dict:
+async def _post(
+        client: httpx.AsyncClient,
+        url: str,
+        payload: dict,
+        retry_on_429: bool = True) -> dict:
     r = await client.post(url, headers=HEADERS, json=payload, timeout=30)
     data = r.json()
     if r.status_code == 429 and retry_on_429:
@@ -242,14 +266,21 @@ async def _post(client: httpx.AsyncClient, url: str, payload: dict, retry_on_429
     return data
 
 
-async def _get(client: httpx.AsyncClient, url: str, params: dict = None) -> dict:
+async def _get(
+        client: httpx.AsyncClient,
+        url: str,
+        params: dict = None) -> dict:
     r = await client.get(url, headers=HEADERS, params=params or {}, timeout=30)
     return r.json()
 
 
-async def verify_content(client: httpx.AsyncClient, verification: dict) -> bool:
-    code = verification.get("verification_code") or verification.get("code", "")
-    text = verification.get("challenge_text") or verification.get("challenge", "")
+async def verify_content(
+        client: httpx.AsyncClient,
+        verification: dict) -> bool:
+    code = verification.get(
+        "verification_code") or verification.get("code", "")
+    text = verification.get(
+        "challenge_text") or verification.get("challenge", "")
     if not code or not text:
         logger.warning(f"Missing verification fields: {verification}")
         return False
@@ -261,16 +292,18 @@ async def verify_content(client: httpx.AsyncClient, verification: dict) -> bool:
     result = await _post(client, f"{MOLTBOOK_BASE}/verify",
                          {"verification_code": code, "answer": answer})
     ok = result.get("success", False)
-    logger.info(f"Verification {'OK' if ok else 'FAILED'}: {answer} → {result.get('message', '')}")
+    logger.info(
+        f"Verification {'OK' if ok else 'FAILED'}: {answer} → {result.get('message', '')}")
     return ok
 
 
-# ── WIHY API ──────────────────────────────────────────────────────────────────
+# ── WIHY API ────────────────────────────────────────────────────────────
 
 def _strip_list_response(text: str) -> str:
     """Discard responses that are numbered paper lists, not narrative synthesis."""
     s = text.strip()
-    if s.startswith("Here are") or s.startswith("1.") or "research articles I found" in s:
+    if s.startswith("Here are") or s.startswith(
+            "1.") or "research articles I found" in s:
         return ""
     return s
 
@@ -280,7 +313,8 @@ async def query_wihy(client: httpx.AsyncClient, topic: str) -> dict:
     # Pass 1: synthesis — original formula that returns narrative response
     payload1 = {
         "message": f"What does science say about {topic}? What are the key findings?",
-        "session_id": str(uuid.uuid4()),
+        "session_id": str(
+            uuid.uuid4()),
         "source_site": "moltbook",
     }
     # Pass 2: environmental and processing angle
@@ -289,11 +323,8 @@ async def query_wihy(client: httpx.AsyncClient, topic: str) -> dict:
             f"What does the research say about environmental impact and food processing "
             f"concerns related to {topic}? Include carbon footprint of different sources, "
             f"farming practices, how processing degrades nutrient quality, and sourcing "
-            f"differences that affect health outcomes."
-        ),
-        "session_id": str(uuid.uuid4()),
-        "source_site": "moltbook",
-    }
+            f"differences that affect health outcomes."), "session_id": str(
+            uuid.uuid4()), "source_site": "moltbook", }
     try:
         r1 = await client.post(WIHY_ASK, json=payload1, timeout=60)
         data1 = r1.json()
@@ -326,7 +357,9 @@ async def query_wihy(client: httpx.AsyncClient, topic: str) -> dict:
     return {"message": combined_message, "citations": deduped}
 
 
-async def query_wihy_comment(client: httpx.AsyncClient, comment_body: str) -> dict:
+async def query_wihy_comment(
+        client: httpx.AsyncClient,
+        comment_body: str) -> dict:
     """Query WIHY with a user comment as-is, no research template wrapping."""
     payload = {
         "message": comment_body,
@@ -352,7 +385,8 @@ def _format_reply(wihy: dict, prefix: str = "") -> str:
     if prefix:
         lines.append(prefix)
         lines.append("")
-    lines.append(message[:800] if message else "The evidence on this is mixed.")
+    lines.append(
+        message[:800] if message else "The evidence on this is mixed.")
     if citations:
         lines.append("")
         for c in citations[:2]:
@@ -408,7 +442,7 @@ def _format_post(topic: str, wihy: dict) -> tuple[str, str]:
     return title, content
 
 
-# ── Core actions ──────────────────────────────────────────────────────────────
+# ── Core actions ────────────────────────────────────────────────────────
 
 async def publish_post(client: httpx.AsyncClient, topic: str) -> bool:
     logger.info(f"Publishing post: {topic}")
@@ -458,12 +492,14 @@ async def publish_post(client: httpx.AsyncClient, topic: str) -> bool:
                              {"submolt_name": submolt, "title": title[:300], "content": content})
         if result.get("success"):
             post_data = result.get("post") or result
-            verification = post_data.get("verification") or result.get("verification")
+            verification = post_data.get(
+                "verification") or result.get("verification")
             if verification:
                 await verify_content(client, verification)
             logger.info(f"Post published: {title}")
             return True
-        logger.warning(f"Post failed on submolt={submolt}: {str(result)[:100]}")
+        logger.warning(
+            f"Post failed on submolt={submolt}: {str(result)[:100]}")
     return False
 
 
@@ -475,12 +511,14 @@ async def post_comment(client: httpx.AsyncClient, post_id: str, content: str,
 
     result = await _post(client, f"{MOLTBOOK_BASE}/posts/{post_id}/comments", payload)
     if not result.get("success"):
-        logger.warning(f"Comment failed on post {post_id}: {str(result)[:100]}")
+        logger.warning(
+            f"Comment failed on post {post_id}: {str(result)[:100]}")
         return False
 
     # Comments also need verification
     comment_data = result.get("comment") or result
-    verification = comment_data.get("verification") or result.get("verification")
+    verification = comment_data.get(
+        "verification") or result.get("verification")
     if verification:
         await verify_content(client, verification)
 
@@ -494,7 +532,9 @@ async def reply_to_comments(client: httpx.AsyncClient, home: dict) -> int:
 
     # /home returns activity_on_your_posts: [{post_id, new_notification_count, ...}]
     activity = home.get("activity_on_your_posts") or []
-    posts_with_comments = [a for a in activity if a.get("new_notification_count", 0) > 0]
+    posts_with_comments = [
+        a for a in activity if a.get(
+            "new_notification_count", 0) > 0]
 
     for post_activity in posts_with_comments[:3]:  # cap at 3 posts per cycle
         post_id = post_activity.get("post_id")
@@ -511,25 +551,28 @@ async def reply_to_comments(client: httpx.AsyncClient, home: dict) -> int:
 
         comments = comments_resp.get("comments") or []
         for comment in comments[:5]:  # cap at 5 comments per post
-            comment_id     = comment.get("id")
-            author         = (comment.get("author") or {}).get("name", "unknown")
-            body           = (comment.get("content") or "").strip()
+            comment_id = comment.get("id")
+            author = (comment.get("author") or {}).get("name", "unknown")
+            body = (comment.get("content") or "").strip()
             existing_replies = comment.get("replies") or []
 
             # Skip our own comments and already-replied threads
             if author == "wihyhealthbot":
                 continue
-            # In-memory guard: prevents duplicate replies across rapid back-to-back cycles
+            # In-memory guard: prevents duplicate replies across rapid
+            # back-to-back cycles
             if comment_id in _replied_comment_ids:
                 continue
             if any((r.get("author") or {}).get("name") == "wihyhealthbot"
                    for r in existing_replies):
-                _replied_comment_ids.add(comment_id)  # sync state with what's on server
+                # sync state with what's on server
+                _replied_comment_ids.add(comment_id)
                 continue
             if not body:
                 continue
 
-            logger.info(f"Replying to @{author} on post {post_id}: '{body[:60]}'")
+            logger.info(
+                f"Replying to @{author} on post {post_id}: '{body[:60]}'")
             # Send the comment as a natural query — don't wrap in a
             # research template (that causes garbled echo-back queries).
             wihy = await query_wihy_comment(client, body[:300])
@@ -545,7 +588,8 @@ async def reply_to_comments(client: httpx.AsyncClient, home: dict) -> int:
             ok = await post_comment(client, post_id, reply, parent_id=comment_id)
             if ok:
                 replied += 1
-                _replied_comment_ids.add(comment_id)  # mark immediately so next cycle skips it
+                # mark immediately so next cycle skips it
+                _replied_comment_ids.add(comment_id)
 
         # Mark notifications read for this post
         try:
@@ -588,7 +632,7 @@ async def engage_feed(client: httpx.AsyncClient) -> int:
 _replied_comment_ids: set = set()   # comment IDs we've already replied to
 _upvoted_post_ids: set = set()      # post IDs we've already upvoted this run
 
-# ── Heartbeat loop ─────────────────────────────────────────────────────────────
+# ── Heartbeat loop ──────────────────────────────────────────────────────
 
 _cycle_count = 0
 
@@ -635,7 +679,8 @@ async def run_heartbeat() -> dict:
 
 
 async def heartbeat_loop():
-    logger.info(f"Heartbeat loop started. interval={HEARTBEAT_INTERVAL}s publish_every={PUBLISH_EVERY}")
+    logger.info(
+        f"Heartbeat loop started. interval={HEARTBEAT_INTERVAL}s publish_every={PUBLISH_EVERY}")
     while True:
         try:
             await run_heartbeat()
@@ -644,7 +689,7 @@ async def heartbeat_loop():
         await asyncio.sleep(HEARTBEAT_INTERVAL)
 
 
-# ── FastAPI app ────────────────────────────────────────────────────────────────
+# ── FastAPI app ─────────────────────────────────────────────────────────
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -662,8 +707,10 @@ app = FastAPI(title="WIHY Moltbook Bot", lifespan=lifespan)
 
 # ── Verbose Request Logger ──
 try:
-    from src.middleware.request_logger import VerboseRequestLoggerMiddleware
-    app.add_middleware(VerboseRequestLoggerMiddleware, service_name="wihy-moltbook-bot")
+    from src.shared.middleware.request_logger import VerboseRequestLoggerMiddleware
+    app.add_middleware(
+        VerboseRequestLoggerMiddleware,
+        service_name="wihy-moltbook-bot")
 except ImportError:
     pass
 

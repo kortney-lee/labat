@@ -1,0 +1,13 @@
+Hi {{first_name}},
+
+I am following up from Vowels. We reached out before and wanted to check in on a library collection suggestion.
+
+"What Is Healthy?" is a practical, reader-friendly guide to nutrition and healthier daily habits for individuals and families.
+
+We believe it can be a useful addition to your health and wellness collection.
+
+If interested, reply with "library" and we will send bibliographic details and acquisition information. If this is not a fit, reply "pass" and we will close the loop.
+
+Thank you for supporting your community,
+Vowels Editorial Team
+info@vowels.org

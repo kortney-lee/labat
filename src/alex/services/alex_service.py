@@ -1051,6 +1051,16 @@ class AlexService:
         """Generate a comprehensive ALEX status report (email-friendly flat structure)."""
         health = await self.health_check()
         stats = self.cycle_stats
+
+        # Book lead performance from LABAT
+        book_leads: Dict[str, Any] = {}
+        try:
+            raw = await self._labat_get("/api/labat/leads/sync/report", params={"days": "7"})
+            if raw:
+                book_leads = raw
+        except Exception as _bl_err:
+            logger.warning("Could not fetch book leads report: %s", _bl_err)
+
         return {
             "agent": "ALEX",
             "generated_at": datetime.utcnow().strftime("%B %d, %Y at %H:%M UTC"),
@@ -1074,19 +1084,32 @@ class AlexService:
                 name: f"{info.get('status', '?')} ({info.get('response_time_ms', '?')}ms)"
                 for name, info in health.items()
             },
+            "book_leads": book_leads,
         }
 
     async def send_report(self) -> bool:
         """Send report via auth notification service."""
         report = await self.generate_report()
+        bl = report.get("book_leads") or {}
+        engagement = bl.get("email_engagement") or {}
+        book_summary = (
+            f"Book leads: {bl.get('total_book_leads', '?')} total, "
+            f"{bl.get('new_leads_last_7d', bl.get('new_leads_last_30d', '?'))} new (7d), "
+            f"{bl.get('total_purchased', '?')} purchased | "
+            f"Email open {engagement.get('open_rate_pct', '?')}% "
+            f"click {engagement.get('click_rate_pct', '?')}%"
+        )
         return await send_notification(
             agent="alex",
             severity="info",
             title="ALEX Periodic Report",
-            message=f"Keywords: {self.cycle_stats['keywords_discovered']}, "
-                    f"Pages: {self.cycle_stats['pages_generated']}, "
-                    f"Refreshed: {self.cycle_stats['pages_refreshed']}, "
-                    f"Opportunities: {self.cycle_stats['opportunities_found']}",
+            message=(
+                f"Keywords: {self.cycle_stats['keywords_discovered']}, "
+                f"Pages: {self.cycle_stats['pages_generated']}, "
+                f"Refreshed: {self.cycle_stats['pages_refreshed']}, "
+                f"Opportunities: {self.cycle_stats['opportunities_found']} | "
+                f"{book_summary}"
+            ),
             service="alex-seo",
             details=report,
         )

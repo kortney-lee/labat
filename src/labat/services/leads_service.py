@@ -15,9 +15,9 @@ from src.labat.brands import BRAND_PAGE_IDS
 from src.labat.config import (
     META_AD_ACCOUNT_ID,
     META_SYSTEM_USER_TOKEN,
-    SHANIA_PAGE_ACCESS_TOKEN,
 )
 from src.labat.meta_client import graph_get, graph_post, MetaAPIError
+from src.labat.services.token_service import get_shania_page_access_token
 
 logger = logging.getLogger("labat.leads_service")
 
@@ -27,13 +27,6 @@ def _token() -> str:
     if not META_SYSTEM_USER_TOKEN:
         raise MetaAPIError("META_SYSTEM_USER_TOKEN not configured for leads", status_code=500)
     return META_SYSTEM_USER_TOKEN
-
-
-def _page_token() -> str:
-    """Shania page token — needed to list forms attached to the page."""
-    if not SHANIA_PAGE_ACCESS_TOKEN:
-        raise MetaAPIError("SHANIA_PAGE_ACCESS_TOKEN not configured", status_code=500)
-    return SHANIA_PAGE_ACCESS_TOKEN
 
 
 # ── Lead Gen Forms ────────────────────────────────────────────────────────────
@@ -50,6 +43,8 @@ async def list_lead_forms(
     if not pid:
         raise MetaAPIError("No page_id configured", status_code=400)
 
+    page_token = await get_shania_page_access_token(pid)
+
     return await graph_get(
         f"{pid}/leadgen_forms",
         params={
@@ -57,7 +52,7 @@ async def list_lead_forms(
                       "ad_id,campaign_id,questions",
             "limit": min(limit, 100),
         },
-        access_token=_page_token(),
+        access_token=page_token,
     )
 
 
@@ -70,7 +65,7 @@ async def get_lead_form(form_id: str) -> Dict[str, Any]:
                       "privacy_policy_url,follow_up_action_url,questions,context_card,"
                       "thank_you_page,locale"
         },
-        access_token=_page_token(),
+        access_token=_token(),
     )
 
 

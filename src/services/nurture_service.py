@@ -22,6 +22,7 @@ import httpx
 logger = logging.getLogger(__name__)
 
 SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY", "").strip()
+BOOK_EMAIL_BCC = (os.getenv("BOOK_EMAIL_BCC", "kortney@wihy.ai") or "").strip()
 
 # Brand-specific sender configs (matches SendGrid verified senders)
 BRAND_CONFIG = {
@@ -505,6 +506,27 @@ All the best,<br/>{_team(variant)}</p>
 </td></tr>""", variant=variant)
 
 
+def _render_buy_now_offer(first_name: str, variant: str = "", **kw) -> str:
+    """Immediate buyer-intent push for paid book leads."""
+    c = _get_copy(variant)
+    return _email_wrap(f"""
+<tr><td style="padding:40px 32px 32px;">
+<p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
+Hey {first_name},</p>
+<p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
+You clicked because you want real answers now. If you are serious about {c['goal']},
+get the physical copy of <strong>What Is Healthy?</strong> today.</p>
+<p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
+This is the same research-backed framework people use to clean up grocery decisions,
+drop the confusion, and make better choices fast. No fluff. No food-industry spin.</p>
+<p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
+$24.99. Free shipping. Choose your cover below:</p>
+{_paperback_buttons()}
+<p style="margin:24px 0 0;font-size:17px;line-height:1.8;color:#374151;">
+To your health,<br/>{_team(variant)}</p>
+</td></tr>""", variant=variant)
+
+
 # Template renderer lookup
 _RENDERERS = {
     "book_delivery": _render_book_delivery,
@@ -514,6 +536,7 @@ _RENDERERS = {
     "social_proof": _render_social_proof,
     "im_surprised": _render_im_surprised,
     "last_chance": _render_last_chance,
+    "buy_now_offer": _render_buy_now_offer,
 }
 
 
@@ -545,7 +568,10 @@ async def send_nurture_email(to_email: str, first_name: str, template_id: str, s
     # Resolve brand-specific sender
     brand = _get_brand_config(variant)
     payload = {
-        "personalizations": [{"to": [{"email": to_email}]}],
+        "personalizations": [{
+            "to": [{"email": to_email}],
+            **({"bcc": [{"email": BOOK_EMAIL_BCC}]} if BOOK_EMAIL_BCC else {}),
+        }],
         "from": {"email": brand["from_email"], "name": brand["from_name"]},
         "subject": rendered_subject,
         "content": [{"type": "text/html", "value": html_body}],
@@ -570,9 +596,14 @@ async def send_nurture_email(to_email: str, first_name: str, template_id: str, s
             if resp.status_code in (200, 201, 202):
                 logger.info(f"Nurture email [{template_id}] sent to {to_email}")
                 return True
+            elif resp.status_code == 401 and "credits" in resp.text.lower():
+                logger.error(f"SendGrid credit limit exceeded — aborting cron run")
+                raise _SendGridCreditExhausted(resp.text)
             else:
                 logger.error(f"SendGrid nurture error {resp.status_code}: {resp.text}")
                 return False
+        except _SendGridCreditExhausted:
+            raise
         except Exception as e:
             logger.error(f"Nurture email delivery failed: {e}")
             return False
@@ -590,7 +621,9 @@ async def trigger_day0(email: str, first_name: str, variant: str = "") -> bool:
     if sent:
         # Advance to stage 1 so cron doesn't resend Day 0
         try:
-            from src.services.book_leads_service import _get_firestore, COLLECTION
+            from src.services.book_leads_service import _get_firestore, COLLECTION, mark_delivered
+
+            await mark_delivered(email)
             db = _get_firestore()
             now = datetime.now(timezone.utc)
             query = db.collection(COLLECTION).where("email", "==", email.lower().strip()).limit(1)
@@ -606,7 +639,42 @@ async def trigger_day0(email: str, first_name: str, variant: str = "") -> bool:
     return sent
 
 
+async def trigger_buy_now(email: str, first_name: str, variant: str = "") -> bool:
+    """Send immediate buy-now email and close free-book nurture for this lead."""
+    sent = await send_nurture_email(
+        to_email=email,
+        first_name=first_name,
+        template_id="buy_now_offer",
+        subject="Start now, {first_name} - your copy is ready",
+        variant=variant,
+    )
+    if sent:
+        try:
+            from src.services.book_leads_service import _get_firestore, COLLECTION
+
+            db = _get_firestore()
+            now = datetime.now(timezone.utc)
+            query = (
+                db.collection(COLLECTION)
+                .where("email", "==", email.lower().strip())
+                .limit(1)
+            )
+            async for doc in query.stream():
+                await doc.reference.update({
+                    "funnel_stage": "buyer_intent_contacted",
+                    "sequence_status": "completed",
+                    "nurture_buy_now_offer_sent_at": now,
+                })
+        except Exception as e:
+            logger.warning(f"Failed to update buy-now status: {e}")
+    return sent
+
+
 # ── Cron processor ────────────────────────────────────────────────────────────
+
+class _SendGridCreditExhausted(Exception):
+    """Raised when SendGrid returns 401 credit limit exceeded — aborts the cron loop."""
+
 
 async def process_pending_nurture() -> dict:
     """Process all leads with pending nurture emails. Called by cron."""
@@ -647,9 +715,14 @@ async def process_pending_nurture() -> dict:
 
         _, _, template_id, subject = next_entry
 
-        sent = await send_nurture_email(
-            email, first_name, template_id, subject, variant=variant,
-        )
+        try:
+            sent = await send_nurture_email(
+                email, first_name, template_id, subject, variant=variant,
+            )
+        except _SendGridCreditExhausted:
+            stats["credit_exhausted"] = True
+            logger.error("SendGrid credits exhausted — stopping cron run early")
+            break
 
         if sent:
             stats["sent"] += 1
@@ -668,6 +741,7 @@ async def process_pending_nurture() -> dict:
                 await doc.reference.update({
                     "nurture_stage": next_stage,
                     "nurture_next_at": next_at,
+                    "send_failure_count": 0,
                     f"nurture_{template_id}_sent_at": now,
                 })
             else:
@@ -675,11 +749,18 @@ async def process_pending_nurture() -> dict:
                 await doc.reference.update({
                     "nurture_stage": next_stage,
                     "sequence_status": "completed",
+                    "send_failure_count": 0,
                     f"nurture_{template_id}_sent_at": now,
                 })
                 stats["completed"] += 1
         else:
             stats["errors"] += 1
+            failure_count = data.get("send_failure_count", 0) + 1
+            try:
+                from src.services.book_leads_service import mark_send_failed
+                await mark_send_failed(doc.reference, failure_count)
+            except Exception as fe:
+                logger.warning(f"Failed to record send failure for {email}: {fe}")
 
     logger.info(f"Nurture cron: {stats}")
     return stats

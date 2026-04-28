@@ -5,7 +5,7 @@
 import { Router, Request, Response } from "express";
 import { renderTemplate } from "../../renderer/renderHtml";
 import { screenshotHtml } from "../../renderer/renderImage";
-import { uploadImage } from "../../storage/gcs";
+import { uploadImage, listLibraryAssets, moveAsset } from "../../storage/gcs";
 import { generateGraphicContent } from "../../ai/geminiClient";
 import { generatePost, planPostOnly } from "../../ai/postGenerator";
 import { generateImage, isImagenAvailable } from "../../ai/imagenClient";
@@ -860,6 +860,105 @@ router.post("/generate-hero-image", async (req: Request, res: Response): Promise
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
     logger.error(`Generate hero image failed: ${message}`);
+    res.status(500).json({ error: message });
+  }
+});
+
+
+/**
+ * POST /post-from-approved
+ * Pull the oldest pre-approved asset from the GCS bucket and post it to platforms.
+ *
+ * Assets must be uploaded to asset-library/{brand}/approved/ beforehand.
+ * After posting, the asset is moved to asset-library/{brand}/posted/.
+ *
+ * Body: { brand?, platforms?: string[], scheduledTime?, dryRun?: boolean }
+ *
+ * Used when SHANIA_POSTING_MODE=bucket-only — Shania posts only pre-approved
+ * photos/graphics and never auto-generates content.
+ */
+router.post("/post-from-approved", async (req: Request, res: Response): Promise<void> => {
+  if (!ADMIN_TOKEN) {
+    res.status(503).json({ error: "INTERNAL_ADMIN_TOKEN not configured" });
+    return;
+  }
+  const authHeader = req.headers["x-admin-token"];
+  if (authHeader !== ADMIN_TOKEN) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
+  try {
+    const { brand, platforms, scheduledTime, dryRun = false } = req.body as {
+      brand?: string;
+      platforms?: string[];
+      scheduledTime?: string;
+      dryRun?: boolean;
+    };
+
+    const brandId = resolveBrandOrFail(req, res, brand, false);
+    if (!brandId) return;
+
+    // List pre-approved assets for this brand (oldest first via ascending sort)
+    const items = await listLibraryAssets({ brand: brandId, folder: "approved", limit: 50 });
+    if (items.length === 0) {
+      res.status(404).json({
+        status: "no_assets",
+        brand: brandId,
+        message: `No approved assets found in asset-library/${brandId}/approved/. Upload photos to the bucket first.`,
+      });
+      return;
+    }
+
+    // Pick the oldest asset (sort ascending by updated time, take first)
+    const sorted = [...items].sort((a, b) => (a.updated || "").localeCompare(b.updated || ""));
+    const asset = sorted[0];
+
+    // Generate caption + hashtags using the asset path as the prompt context
+    const promptHint = asset.metadata?.caption || asset.metadata?.topic || `New post for ${brandId}`;
+    const plan = await planPostOnly(promptHint, brandId);
+    const caption = plan.caption;
+    const hashtags = plan.hashtags;
+
+    const targetPlatforms = (platforms && platforms.length > 0 ? platforms : defaultPlatformsForBrand(brandId)) as PostPlatform[];
+    const fullCaption = `${caption}\n\n${hashtags.map((h) => `#${h}`).join(" ")}`;
+
+    let deliveryResults: Record<string, unknown> = {};
+    if (!dryRun) {
+      deliveryResults = await deliverToPlatforms({
+        platforms: targetPlatforms,
+        imageUrl: asset.publicUrl,
+        message: fullCaption,
+        brandId,
+        scheduledTime,
+        dryRun: false,
+      });
+
+      // Move asset from approved/ to posted/
+      const postedPath = asset.path.replace(
+        /asset-library\/([^/]+)\/approved\//,
+        `asset-library/$1/posted/`,
+      );
+      try {
+        await moveAsset(asset.path, postedPath);
+        logger.info(`Marked asset as posted: ${asset.path} → ${postedPath}`);
+      } catch (moveErr) {
+        logger.warn(`Could not move asset to posted/: ${moveErr}`);
+      }
+    }
+
+    res.json({
+      status: dryRun ? "dry_run" : "posted",
+      brand: brandId,
+      asset: { path: asset.path, publicUrl: asset.publicUrl },
+      caption,
+      hashtags: hashtags.map((h) => `#${h}`),
+      platforms: targetPlatforms,
+      delivery: deliveryResults,
+    });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    logger.error(`post-from-approved failed: ${message}`);
     res.status(500).json({ error: message });
   }
 });

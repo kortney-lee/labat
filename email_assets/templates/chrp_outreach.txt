@@ -1,0 +1,13 @@
+Hi {{first_name}},
+
+I am following up from Vowels. We reached out before and wanted to check in on a faith-and-health conversation opportunity for your podcast.
+
+Our book "What Is Healthy?" covers practical nutrition and family wellness in language that resonates with everyday households.
+
+If it is a fit for your audience, we can provide a review copy and interview talking points.
+
+If interested, reply with "faith-podcast" and we will send details right away. If this is not a fit, reply "pass" and we will close the loop.
+
+Thank you for your time,
+Vowels Editorial Team
+info@vowels.org

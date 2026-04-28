@@ -1,0 +1,13 @@
+Hi {{first_name}},
+
+I am following up from Vowels. We reached out before and wanted to check in on a title that may fit your health and wellness shelf.
+
+Our book "What Is Healthy?" is a practical nutrition guide focused on clear food choices, family health, and day-to-day habits readers can apply immediately.
+
+If useful, we can send title metadata and ordering details for your consideration.
+
+If interested, reply with "stock" and we will send the details promptly. If this is not a fit, reply "pass" and we will close the loop.
+
+Thank you for your time,
+Vowels Editorial Team
+info@vowels.org

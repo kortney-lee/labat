@@ -204,6 +204,7 @@ _BRAND_SCOPE = (os.getenv("LABAT_BRAND_SCOPE", "all") or "all").strip().lower()
 async def sync_leads(
     form_id: Optional[str] = Query(None, description="Sync a specific form; omit to sync all"),
     brand: Optional[str] = Query(None, description="Override brand detection"),
+    page_id: Optional[str] = Query(None, description="Override page for sync-all"),
     _=Depends(require_admin),
 ):
     """
@@ -220,10 +221,31 @@ async def sync_leads(
                 form_id=form_id, brand=effective_brand
             )
         else:
-            result = await lead_sync_service.sync_all_forms()
+            result = await lead_sync_service.sync_all_forms(
+                page_id=page_id,
+                brand=effective_brand,
+            )
         return result
     except MetaAPIError as e:
         raise HTTPException(status_code=e.status_code or 502, detail=str(e))
     except Exception as e:
         logger.error("Lead sync failed: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/sync/report")
+async def book_leads_report(
+    days: int = Query(7, ge=1, le=90, description="Lookback window for 'recent' and email engagement stats"),
+    _=Depends(require_admin),
+):
+    """
+    Book-lead performance report grouped by form name.
+    Includes all-time totals, funnel stage breakdown, and SendGrid email
+    engagement (opens / clicks) for the last N days.
+    """
+    from src.services.book_leads_service import get_book_leads_report
+    try:
+        return await get_book_leads_report(days=days)
+    except Exception as e:
+        logger.error("Book leads report failed: %s", e, exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
