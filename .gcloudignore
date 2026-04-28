@@ -30,8 +30,13 @@ models/
 *.parquet
 data/
 
-# Ignore dist (built in container)
-shania/dist/
+# Python Cloud Run image only copies src/ and requirements.txt
+# Exclude frontend and static assets from the build context.
+shania/
+static_whatishealthy/
+static/
+.firebase/
+email_assets/
 
 # Do NOT ignore:
 # - shania/package.json, package-lock.json, tsconfig.json (needed for build)
