@@ -106,6 +106,7 @@ export const BRANDS: Record<BrandId, BrandProfile> = {
     ],
     contentFocus: `WIHY helps people make personal health decisions with evidence they can actually use.
   WiHY = "Why is Health about You" - built by clinical nutrition researchers, RDs, data scientists, and engineers.
+  WIHY is app and product focused. Prioritize features, workflows, and outcomes users get inside the app.
   Positioning: one platform that connects food, conditions, behavior, and research into clear daily actions.
   Primary promise: capture behavior -> reveal patterns -> guide decisions. Prefer "capture" over "track" and "understand" over "log."
   Every post should deliver one clear action, one evidence-backed reason, and one practical next step.
@@ -145,6 +146,7 @@ Confident but never pushy. Helpful but never complicated. The meal planning app 
     ],
     contentFocus: `Community Groceries is a FOOD brand — every post should feature a specific meal, recipe, or food hack.
 CG drives commerce through food: recipes that link to meal plans, grocery lists that drive app usage.
+  Community Groceries is app and product focused. Tie posts to app actions like building lists, planning meals, and buying smarter.
 Post types: quick recipes with ingredients + cook time + cost, meal prep guides, viral food trends, budget grocery hauls.
 Show the FOOD: ingredients laid out, meals plated, prep in progress, grocery carts loaded.
 Include specifics: "320 cal, 25g protein, $12 for the family, ready in 25 minutes."
@@ -167,7 +169,7 @@ Never overlap with WIHY (biohacking) or Vowels (nutrition facts). CG is pure foo
 Drops hard truths with data: grams of sugar, ingredient lists, industry spending numbers.
 Academic authority meets social media punch. Every post is a mini-lesson backed by real labels and real research.
 Challenges what people assume is healthy with specific product callouts and comparisons.
-Promotes the "What Is Healthy?" book as the definitive guide to food literacy.`,
+  Built for nutrition education and publication-style explainers.`,
     topics: [
       "shocking sugar content in 'healthy' foods",
       "food label deception and ingredient tricks",
@@ -183,11 +185,12 @@ Promotes the "What Is Healthy?" book as the definitive guide to food literacy.`,
     contentFocus: `Vowels is the nutrition education brand — every post teaches a specific, surprising nutrition fact.
 The tone is "a bowl of Lucky Charms has no nutrition value" — direct, data-backed, eye-opening.
 Call out specific products by name with real nutrition data: sugar grams, ingredient lists, marketing claims vs reality.
-Promote the "What Is Healthy?" book as the source of truth for food literacy.
 Style: investigative journalism meets nutrition science. Show the label. Show the data. Let people decide.
 Vowels does NOT do recipes (that's CG) or biohacking (that's WIHY). Vowels is pure nutrition EDUCATION.
 Every post should make someone look at their pantry differently. "I didn't know that was in there."
-Reference real numbers: $14B food marketing, 19 hours of med school nutrition, 77g daily sugar average.`,
+  Reference real numbers: $14B food marketing, 19 hours of med school nutrition, 77g daily sugar average.
+  Future direction: evolve into a Google publication/news-style nutrition education site with frequent explainers and evidence-backed reporting.
+  Do not mention books, ebooks, hardcopy offers, or lead magnets.`,
     hashtagPrefix: "Vowels",
     facebookPageId: "100193518975897",
   },
@@ -258,6 +261,7 @@ Every post should teach ONE actionable thing a parent can do today to improve th
 Tone: supportive and encouraging, never guilt-tripping. Celebrate progress over perfection.`,
     hashtagPrefix: "ChildrensNutrition",
     facebookPageId: "269598952893508",
+    postingEnabled: false,
   },
 
   parentingwithchrist: {
@@ -281,7 +285,8 @@ Warm and supportive — never judgmental. Celebrates the journey of raising chil
     ],
     contentFocus: `Parenting with Christ supports faith-centered families with practical, biblical parenting wisdom.
 Focus on real-life parenting moments viewed through a faith lens.
-Every post should encourage and equip parents to raise children with purpose and love.`,
+  Every post should encourage and equip parents to raise children with purpose and love.
+  Do not mention Vowels branding, books, ebooks, hardcopy offers, or lead magnets.`,
     hashtagPrefix: "ParentingWithChrist",
     facebookPageId: "329626030226536",
   },
@@ -326,63 +331,3 @@ export function getBrand(brandId?: string): BrandProfile {
   return BRANDS.wihy;
 }
 
-/** Validate that a template is compatible with a brand. Branded templates require matching brand. */
-export function validateTemplateBrand(templateId: string, brandId?: string): { valid: boolean; reason?: string } {
-  const isCGTemplate = templateId.startsWith("cg_");
-  const isCGBrand = brandId === "communitygroceries";
-  const isVowelsTemplate = templateId.startsWith("vowels_");
-  const isVowelsBrand = brandId === "vowels" || (brandId && BRANDS[brandId as BrandId]?.parentBrand === "vowels");
-
-  if (isCGTemplate && !isCGBrand) {
-    return { valid: false, reason: `Template "${templateId}" is a Community Groceries template but brand is "${brandId || "wihy"}". Use brand="communitygroceries".` };
-  }
-  if (isCGBrand && !isCGTemplate) {
-    return { valid: false, reason: `Brand "communitygroceries" should use cg_* templates, not "${templateId}".` };
-  }
-  if (isVowelsTemplate && !isVowelsBrand) {
-    return { valid: false, reason: `Template "${templateId}" is a Vowels template but brand is "${brandId || "wihy"}". Use brand="vowels" (or a Vowels sub-brand).` };
-  }
-  if (isVowelsBrand && !isVowelsTemplate) {
-    return { valid: false, reason: `Brand "${brandId}" (Vowels family) should use vowels_* templates, not "${templateId}".` };
-  }
-  return { valid: true };
-}
-
-/** Resolve the effective logo URL for a brand, inheriting from parent when logoUrl is null. */
-export function resolveLogoUrl(brand: BrandProfile): string {
-  if (brand.logoUrl) return brand.logoUrl;
-  if (brand.parentBrand && brand.parentBrand in BRANDS) {
-    const parent = BRANDS[brand.parentBrand as BrandId];
-    if (parent.logoUrl) return parent.logoUrl;
-  }
-  return BRAND.assets.wihy.logo;
-}
-
-/** CSS custom properties injected into every template. */
-export function brandCSSVars(): string {
-  return `
-    :root {
-      --bg: ${BRAND.colors.background};
-      --bg-dark: ${BRAND.colors.backgroundDark};
-      --primary: ${BRAND.colors.primary};
-      --success: ${BRAND.colors.success};
-      --white: ${BRAND.colors.white};
-      --card: ${BRAND.colors.cardSurface};
-      --text-dark: ${BRAND.colors.textDark};
-      --text-muted: ${BRAND.colors.textMuted};
-      --text-light: ${BRAND.colors.textLight};
-      --danger: ${BRAND.colors.danger};
-      --font-headline: ${BRAND.fonts.headline};
-      --font-body: ${BRAND.fonts.body};
-      --sp-xs: ${BRAND.spacing.xs};
-      --sp-sm: ${BRAND.spacing.sm};
-      --sp-md: ${BRAND.spacing.md};
-      --sp-lg: ${BRAND.spacing.lg};
-      --sp-xl: ${BRAND.spacing.xl};
-      --sp-xxl: ${BRAND.spacing.xxl};
-      --radius-sm: ${BRAND.radius.sm};
-      --radius-md: ${BRAND.radius.md};
-      --radius-lg: ${BRAND.radius.lg};
-    }
-  `;
-}

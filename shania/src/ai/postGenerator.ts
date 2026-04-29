@@ -1,30 +1,14 @@
 /**
- * postGenerator.ts — Full AI post generation pipeline with multi-brand support.
- *
- * Pipeline:
- *  1. Fetch WIHY RAG context for grounded health facts
- *  2. Gemini writes caption + hashtags using brand-specific voice
- *  3. Gemini generates structured graphic content (headline, subtext, template)
- *  4. Create branded design via Canva API with structured data
- *  5. Export design as PNG image via Canva
- *  6. Returns the final image + caption + hashtags
- *
- * Supported brands: wihy, communitygroceries, vowels, snackingwell
- *
- * NOTE: Now 100% powered by Canva — no more HTML templates or Puppeteer
+ * postGenerator.ts — Gemini + Imagen post generation pipeline.
  */
 
 import { VertexAI, SchemaType } from "@google-cloud/vertexai";
 import { getHealthContext } from "./ragClient";
-import { generateGraphicContent } from "./geminiClient";
 import { generateImage, isImagenAvailable } from "./imagenClient";
-import { getCanvaClient } from "../services/canvaService";
-import type { DesignData } from "../services/canvaService";
 import { pickAssetLibraryImage } from "../storage/assetLibrary";
 
 import { getBrand, BrandProfile, BrandId } from "../config/brand";
-import { FORMATS, FormatKey } from "../config/formats";
-import { TemplateData } from "../types";
+import { FormatKey } from "../config/formats";
 import { logger } from "../utils/logger";
 
 const GCP_PROJECT = process.env.GCP_PROJECT || "wihy-ai";
@@ -33,6 +17,12 @@ const ALEX_URL = process.env.ALEX_URL || "https://wihy-alex-n4l2vldq3q-uc.a.run.
 const INTERNAL_ADMIN_TOKEN = process.env.INTERNAL_ADMIN_TOKEN || "";
 
 const vertexAI = new VertexAI({ project: GCP_PROJECT, location: GCP_LOCATION });
+const NO_ASSET_REUSE_BRANDS = new Set(
+  (process.env.SHANIA_NO_ASSET_REUSE_BRANDS || "parentingwithchrist")
+    .split(",")
+    .map((v) => v.trim().toLowerCase())
+    .filter(Boolean),
+);
 
 /** What Gemini returns for post planning. */
 export interface PostPlan {
@@ -54,6 +44,25 @@ export interface GeneratedPost {
   ragContext?: string;
   templateId: string;
   brand: string;
+}
+
+function aspectRatioForFormat(size: FormatKey): "1:1" | "9:16" | "16:9" | "3:4" {
+  if (size === "story_vertical") return "9:16";
+  if (size === "feed_portrait") return "3:4";
+  if (size === "hd_landscape" || size === "ad_landscape" || size === "blog_hero") return "16:9";
+  return "1:1";
+}
+
+async function tryDownloadImage(url: string): Promise<{ bytes: Buffer; mimeType: string } | null> {
+  try {
+    const resp = await fetch(url, { signal: AbortSignal.timeout(20000) });
+    if (!resp.ok) return null;
+    const arr = await resp.arrayBuffer();
+    const mimeType = resp.headers.get("content-type") || "image/jpeg";
+    return { bytes: Buffer.from(arr), mimeType };
+  } catch {
+    return null;
+  }
 }
 
 // ────────── Step 1+2: RAG context → Gemini plan ──────────
@@ -80,6 +89,25 @@ const POST_PLAN_SCHEMA = {
   required: ["caption", "hashtags"],
 };
 
+const BRAND_HARD_RULES: Partial<Record<BrandId, string[]>> = {
+  wihy: [
+    "Focus on app and product value. Mention features, workflows, and outcomes.",
+    "Do not drift into generic motivation content.",
+  ],
+  communitygroceries: [
+    "Focus on app and product value tied to meals, grocery lists, and planning tools.",
+    "Every caption should connect food inspiration to using the app.",
+  ],
+  parentingwithchrist: [
+    "Never mention Vowels, Vowels.Org, or any parent brand.",
+    "Never mention books, ebooks, hardcopy offers, lead magnets, or downloads.",
+  ],
+  vowels: [
+    "Position content as nutrition education and publication-style reporting.",
+    "Never mention books, ebooks, hardcopy offers, lead magnets, or downloads.",
+  ],
+};
+
 function buildSystemPrompt(brand: BrandProfile, ragFacts: string | null): string {
   let prompt = `You are a social media content creator for ${brand.name} (${brand.tagline}), a health-focused brand at ${brand.domain}.
 
@@ -103,6 +131,11 @@ CAPTION RULES:
 - Keep it under 200 words
 - Reference ${brand.name} naturally when relevant
 - Must relate to ${brand.name}'s actual mission — NO generic wellness fluff`;
+
+  const hardRules = BRAND_HARD_RULES[brand.id as BrandId] || [];
+  if (hardRules.length) {
+    prompt += `\n\nBRAND HARD RULES (mandatory):\n${hardRules.map((r) => `- ${r}`).join("\n")}`;
+  }
 
   if (ragFacts) {
     prompt += `\n\nGROUNDED KNOWLEDGE BASE (use these facts to inform your caption — cite specific data):
@@ -220,7 +253,7 @@ export async function planPostOnly(
   };
 }
 
-// ────────── Full pipeline (context generation → branded template) ──────────
+// ────────── Full pipeline (Gemini planning → Imagen image generation) ──────────
 
 export async function generatePost(
   userPrompt: string,
@@ -241,131 +274,81 @@ export async function generatePost(
   const alexSignals = await getAlexRealtimeSignals(userPrompt, brand);
   const combinedHashtags = mergeHashtags(plan.hashtags, alexSignals?.hashtags || []);
 
-  // Step 3: Gemini generates structured graphic content (headline, subtext, template)
-  //         NOW with RAG facts so the graphic contains real data
-  logger.info(`Post pipeline [${brand.id}]: generating graphic content...`);
-  const graphicContent = await generateGraphicContent(userPrompt, undefined, brand, ragFacts);
-  const isCommunityGroceries = brand.id === "communitygroceries";
+  // Step 3: optional asset-library pick (if enabled)
+  let libraryImageBytes: Buffer | undefined;
+  let libraryImageMimeType: string | undefined;
+  const libraryImageEnabled =
+    (process.env.SHANIA_USE_ASSET_LIBRARY || "true").toLowerCase() !== "false"
+    && !NO_ASSET_REUSE_BRANDS.has(brand.id.toLowerCase());
 
-  // Now using Canva templates — map old template types to design content
-  // All template selection logic simplified since Canva handles layout variations
-  let selectedBrand = brand.id;
+  if (!libraryImageEnabled && NO_ASSET_REUSE_BRANDS.has(brand.id.toLowerCase())) {
+    logger.info(`Post pipeline [${brand.id}]: asset-library reuse disabled for this brand`);
+  }
 
-  // Generate photo if needed for image-first mode
-  let photoUrl: string | undefined;
-  let mealPhotoBytes: Buffer | undefined;
-  let mealPhotoMimeType: string | undefined;
-  const libraryImageEnabled = (process.env.SHANIA_USE_ASSET_LIBRARY || "true").toLowerCase() !== "false";
-  const imageFirstEnabled = (process.env.SHANIA_IMAGE_FIRST_MODE || "true").toLowerCase() !== "false";
-  const hasPhotoQuery = Boolean(graphicContent.photoQuery && graphicContent.photoQuery.trim().length > 0);
-  const cgMealImagePriority = (process.env.SHANIA_CG_MEAL_IMAGE_PRIORITY || "true").toLowerCase() !== "false";
-
-  // Prefer image/graphic asset library first, then fallback to generated images.
   if (libraryImageEnabled) {
     const imageHint = [plan.topicHint, userPrompt].filter(Boolean).join(" ");
     const libraryPick = await pickAssetLibraryImage(brand.id, imageHint);
     if (libraryPick) {
-      photoUrl = libraryPick.url;
-      logger.info(
-        `Post pipeline [${brand.id}]: using asset-library image (${libraryPick.provider}) ${libraryPick.label}`,
-      );
+      const downloaded = await tryDownloadImage(libraryPick.url);
+      if (downloaded) {
+        // Reject non-image content (e.g. GCS objects stored with wrong content-type)
+        const isRealImage = downloaded.mimeType.startsWith("image/");
+        if (isRealImage) {
+          libraryImageBytes = downloaded.bytes;
+          libraryImageMimeType = downloaded.mimeType;
+          logger.info(
+            `Post pipeline [${brand.id}]: using asset-library image (${libraryPick.provider}) ${libraryPick.label}`,
+          );
+        } else {
+          logger.warn(
+            `Post pipeline [${brand.id}]: asset-library image rejected (mimeType=${downloaded.mimeType}) ${libraryPick.label} — falling back to Imagen`,
+          );
+        }
+      }
     }
   }
 
-  // CG must always have a meal-centric photo prompt; synthesize fallback if Gemini misses it.
-  if (isCommunityGroceries && !hasPhotoQuery) {
-    const fallbackPhotoQuery = [
-      "A warm, realistic home kitchen scene with a freshly plated healthy family meal",
-      graphicContent.headline ? `inspired by: ${graphicContent.headline}` : "",
-      graphicContent.subtext ? `${graphicContent.subtext}` : "",
-      "natural light, editorial food photography, appetizing textures, no text no signs no labels",
-    ]
-      .filter(Boolean)
-      .join(", ");
-
-    graphicContent.photoQuery = fallbackPhotoQuery;
-  }
-
-  const shouldGeneratePhoto =
-    !photoUrl &&
-    (imageFirstEnabled && isImagenAvailable() && Boolean(graphicContent.photoQuery && graphicContent.photoQuery.trim().length > 0)) ||
-    (!photoUrl && isCommunityGroceries && isImagenAvailable() && Boolean(graphicContent.photoQuery && graphicContent.photoQuery.trim().length > 0));
-
-  if (shouldGeneratePhoto) {
-    try {
-      logger.info(`Post pipeline [${brand.id}]: generating Imagen photo...`);
-      const imagenResult = await generateImage({ prompt: graphicContent.photoQuery!, aspectRatio: "1:1" });
-      photoUrl = `data:${imagenResult.mimeType};base64,${Buffer.from(imagenResult.imageBytes).toString("base64")}`;
-      mealPhotoBytes = Buffer.from(imagenResult.imageBytes);
-      mealPhotoMimeType = imagenResult.mimeType;
-      logger.info(`Post pipeline [${brand.id}]: Imagen photo generated (${imagenResult.imageBytes.length} bytes)`);
-    } catch (err: unknown) {
-      logger.warn(`Imagen photo generation failed — continuing without photo: ${err instanceof Error ? err.message : String(err)}`);
-    }
-  }
-
-  // For Community Groceries, prioritize posting actual meal images through Labat.
-  // Falls back to Canva if photo generation failed.
-  if (isCommunityGroceries && cgMealImagePriority && mealPhotoBytes && mealPhotoMimeType) {
+  if (libraryImageBytes && libraryImageMimeType) {
     const elapsed = Date.now() - startTime;
-    logger.info(
-      `Post pipeline [${brand.id}] complete (meal-image-priority) in ${elapsed}ms (${mealPhotoBytes.length} bytes)`,
-    );
-
+    logger.info(`Post pipeline [${brand.id}] complete (asset-library) in ${elapsed}ms (${libraryImageBytes.length} bytes)`);
     return {
-      imageBytes: mealPhotoBytes,
-      mimeType: mealPhotoMimeType,
+      imageBytes: libraryImageBytes,
+      mimeType: libraryImageMimeType,
       caption: plan.caption,
       hashtags: combinedHashtags,
       ragContext: ragFacts || undefined,
-      templateId: "cg_meal_photo",
+      templateId: "asset_library",
       brand: brand.id,
     };
   }
 
-  // Step 4: Create design via Canva API using brand-specific template
-  logger.info(
-    `Post pipeline [${brand.id}]: creating Canva design (templateHint=${graphicContent.template || "none"})...`,
-  );
+  if (!isImagenAvailable()) {
+    throw new Error("Imagen generation unavailable");
+  }
 
-  const designData: DesignData = {
-    headline: graphicContent.headline,
-    subtext: graphicContent.subtext,
-    cta: graphicContent.cta,
-    quote: graphicContent.quote,
-    attribution: graphicContent.attribution,
-    tip: graphicContent.tip,
-    tipLabel: graphicContent.tipLabel,
-    statNumber: graphicContent.statNumber,
-    statLabel: graphicContent.statLabel,
-    dataPoints: graphicContent.dataPoints,
-    source: graphicContent.source,
-    // photoUrl is used for future asset upload integration
-    photoUrl,
+  const aspectRatio = aspectRatioForFormat(outputSize);
+  const prompt = [
+    `${brand.name} branded health social image`,
+    `Topic: ${userPrompt}`,
+    plan.topicHint ? `Theme: ${plan.topicHint}` : "",
+    ragFacts ? `Grounding facts: ${ragFacts.substring(0, 700)}` : "",
+    "Photorealistic editorial style, high detail, no text, no logos, no watermarks, no overlays",
+  ]
+    .filter(Boolean)
+    .join(". ");
+
+  logger.info(`Post pipeline [${brand.id}]: generating Imagen image (aspect=${aspectRatio})...`);
+  const imagenResult = await generateImage({ prompt, aspectRatio });
+  const elapsed = Date.now() - startTime;
+  logger.info(`Post pipeline [${brand.id}] complete (imagen) in ${elapsed}ms (${imagenResult.imageBytes.length} bytes)`);
+
+  return {
+    imageBytes: Buffer.from(imagenResult.imageBytes),
+    mimeType: imagenResult.mimeType,
+    caption: plan.caption,
+    hashtags: combinedHashtags,
+    ragContext: ragFacts || undefined,
+    templateId: "gemini_imagen",
+    brand: brand.id,
   };
-
-  try {
-    const canvaClient = getCanvaClient();
-    const finalImage = await canvaClient.generateDesignImage(
-      selectedBrand as BrandId,
-      designData,
-      { templateHint: graphicContent.template },
-    );
-
-    const elapsed = Date.now() - startTime;
-    logger.info(`Post pipeline [${brand.id}] complete (Canva) in ${elapsed}ms (${finalImage.length} bytes)`);
-
-    return {
-      imageBytes: finalImage,
-      mimeType: "image/png",
-      caption: plan.caption,
-      hashtags: combinedHashtags,
-      ragContext: ragFacts || undefined,
-      templateId: graphicContent.template || selectedBrand,
-      brand: brand.id,
-    };
-  } catch (err: unknown) {
-    logger.error(`Canva design generation failed: ${err instanceof Error ? err.message : String(err)}`);
-    throw err;
-  }
 }

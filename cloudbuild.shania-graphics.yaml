@@ -54,7 +54,7 @@ steps:
       - '--concurrency'
       - '10'
       - '--set-env-vars'
-      - 'GCS_BUCKET=wihy-shania-graphics,GCP_PROJECT=wihy-ai,ENV=production,LOG_LEVEL=INFO,BRAND_ENFORCEMENT_MODE=warn'
+      - 'GCS_BUCKET=wihy-shania-graphics,GCP_PROJECT=wihy-ai,ENV=production,LOG_LEVEL=INFO,BRAND_ENFORCEMENT_MODE=warn,CANVA_OAUTH_ALLOW_PUBLIC_START=true,CANVA_REDIRECT_URI=https://shania.wihy.ai/oauth/callback'
       - '--set-secrets'
       - >-
         GOOGLE_API_KEY=GOOGLE_API_KEY:latest,

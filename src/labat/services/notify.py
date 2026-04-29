@@ -58,13 +58,15 @@ def _severity_badge(severity: str) -> str:
 def _format_value(val: Any, _depth: int = 0) -> str:
     """Render a detail value as styled HTML.
 
-    - Flat dicts  → mini key-value table
-    - Lists       → bullet list (or mini table if list-of-dicts)
-    - Primitives  → styled text / link
-    - Deep nests (>2) → fall back to <pre> JSON
+    - Flat dicts  -> mini key-value table
+    - Lists       -> bullet list (or mini table if list-of-dicts)
+    - Primitives  -> styled text / link
+    - Deep nests (>3) -> fall back to <pre> JSON
     """
     if isinstance(val, dict):
-        if _depth > 1 or not val:
+        # Keep nested status/service objects readable as tables.
+        # Only fall back to JSON for very deep structures.
+        if _depth > 2 or not val:
             formatted = json.dumps(val, indent=2, default=str)
             return (
                 f'<pre style="margin:0;padding:10px 12px;background:#f8fafc;'
@@ -79,7 +81,7 @@ def _format_value(val: Any, _depth: int = 0) -> str:
             rows += (
                 f'<tr>'
                 f'<td style="padding:6px 12px;color:#64748b;font-size:12px;'
-                f'font-weight:600;vertical-align:top;white-space:nowrap;width:140px;">{label}</td>'
+                f'font-weight:600;vertical-align:top;white-space:nowrap;width:150px;">{label}</td>'
                 f'<td style="padding:6px 12px;font-size:13px;">{_format_value(v, _depth + 1)}</td>'
                 f'</tr>'
             )

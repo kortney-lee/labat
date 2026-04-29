@@ -3,3 +3,6 @@ dist
 *.md
 .git
 .env
+test-canva-local.ts
+.canva-refresh-token.local
+hosting/.firebase/

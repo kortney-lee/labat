@@ -6,6 +6,7 @@ __pycache__/
 *.py[cod]
 .Python
 .env
+.venv/
 .venv
 env/
 venv/
@@ -30,13 +31,24 @@ models/
 *.parquet
 data/
 
+# Python virtual env (can be large due to compiled .so files)
+.venv/**
+venv/**
+env/**
+
 # Python Cloud Run image only copies src/ and requirements.txt
 # Exclude frontend and static assets from the build context.
-shania/
+# NOTE: shania/ is intentionally included for the shania-graphics Cloud Build
 static_whatishealthy/
 static/
 .firebase/
 email_assets/
+
+# Local-only artifacts that must never be deployed
+shania/.canva-refresh-token.local
+shania/test-canva-local.ts
+shania/hosting/.firebase/
+.tmp_caption_alex.txt
 
 # Do NOT ignore:
 # - shania/package.json, package-lock.json, tsconfig.json (needed for build)

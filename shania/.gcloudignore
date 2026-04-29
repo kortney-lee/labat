@@ -1,0 +1,15 @@
+# Keep deploy uploads small and deterministic.
+.gcloudignore
+.git
+.gitignore
+node_modules/
+dist/
+preview/
+*.log
+*.tmp
+*.bak
+*.swp
+.DS_Store
+test-canva-local.ts
+.canva-refresh-token.local
+hosting/.firebase/

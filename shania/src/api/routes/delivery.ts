@@ -105,7 +105,6 @@ router.post("/deliver", async (req: Request, res: Response): Promise<void> => {
         : {
             message: caption || "",
             image_url: assetUrl,
-            link: brandProfile.domain ? `https://${brandProfile.domain}` : undefined,
             published: !scheduledTime,
             scheduled_publish_time: scheduledTime,
             page_id: brandProfile.facebookPageId || undefined,

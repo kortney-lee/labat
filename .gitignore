@@ -28,6 +28,8 @@ Thumbs.db
 # Logs
 *.log
 logs/
+.tmp_*
+.nonexistent_refresh_token
 
 # Data
 data/
@@ -44,6 +46,8 @@ data/
 node_modules/
 shania/node_modules/
 shania/dist/
+shania/.canva-refresh-token.local
+shania/hosting/.firebase/
 
 # Cloud SQL Proxy
 cloud-sql-proxy.exe

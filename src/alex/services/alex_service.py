@@ -10,8 +10,9 @@ from __future__ import annotations
 import json
 import logging
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
+from urllib.parse import parse_qs, urlparse
 from xml.etree import ElementTree
 
 import httpx
@@ -41,6 +42,8 @@ from src.alex.config import (
     BRAND_DOMAINS,
     BRAND_DISPLAY_NAMES,
     BRAND_SITE_URLS,
+    ALEX_REPORT_LINK,
+    ALEX_REPORT_LINK_WARNING_HOURS,
 )
 from src.labat.services.notify import send_notification
 
@@ -1087,9 +1090,85 @@ class AlexService:
             "book_leads": book_leads,
         }
 
+    @staticmethod
+    def _parse_report_link_expiry(report_link: str) -> Optional[datetime]:
+        """Try to parse expiry timestamp from common query params in a signed URL."""
+        if not report_link:
+            return None
+
+        parsed = urlparse(report_link)
+        params = parse_qs(parsed.query)
+
+        for key in ("expires_at", "expires", "expiry", "exp"):
+            values = params.get(key)
+            if not values:
+                continue
+
+            raw = (values[0] or "").strip()
+            if not raw:
+                continue
+
+            # Numeric unix timestamp (seconds or milliseconds)
+            if raw.isdigit():
+                ts = int(raw)
+                if ts > 10_000_000_000:
+                    ts = ts // 1000
+                try:
+                    return datetime.utcfromtimestamp(ts)
+                except Exception:
+                    continue
+
+            # ISO date/time fallback
+            try:
+                return datetime.fromisoformat(raw.replace("Z", "+00:00")).replace(tzinfo=None)
+            except Exception:
+                continue
+
+        return None
+
+    async def _notify_report_link_expiry(self, report_link: str) -> None:
+        """Notify when configured ALEX report link is expired or nearing expiry."""
+        if not report_link:
+            return
+
+        expires_at = self._parse_report_link_expiry(report_link)
+        if not expires_at:
+            return
+
+        now = datetime.utcnow()
+        remaining = expires_at - now
+        warning_window = timedelta(hours=max(1, ALEX_REPORT_LINK_WARNING_HOURS))
+
+        if remaining <= warning_window:
+            expired = remaining.total_seconds() <= 0
+            hours_left = round(remaining.total_seconds() / 3600, 1)
+            status_text = "expired" if expired else f"expiring in {hours_left} hours"
+
+            await send_notification(
+                agent="alex",
+                severity="warning",
+                title="ALEX Report Link Needs Re-Login",
+                message=(
+                    "The configured ALEX report link is "
+                    f"{status_text}. Please open the link and log back in to refresh access."
+                ),
+                service="alex-seo",
+                details={
+                    "report_link": report_link,
+                    "expires_at_utc": expires_at.isoformat() + "Z",
+                    "warning_window_hours": ALEX_REPORT_LINK_WARNING_HOURS,
+                    "status": "expired" if expired else "expiring_soon",
+                },
+            )
+
     async def send_report(self) -> bool:
         """Send report via auth notification service."""
         report = await self.generate_report()
+        if ALEX_REPORT_LINK:
+            report["report_link"] = ALEX_REPORT_LINK
+            link_expiry = self._parse_report_link_expiry(ALEX_REPORT_LINK)
+            report["report_link_expires_at_utc"] = link_expiry.isoformat() + "Z" if link_expiry else "unknown"
+
         bl = report.get("book_leads") or {}
         engagement = bl.get("email_engagement") or {}
         book_summary = (
@@ -1099,7 +1178,7 @@ class AlexService:
             f"Email open {engagement.get('open_rate_pct', '?')}% "
             f"click {engagement.get('click_rate_pct', '?')}%"
         )
-        return await send_notification(
+        sent = await send_notification(
             agent="alex",
             severity="info",
             title="ALEX Periodic Report",
@@ -1113,6 +1192,11 @@ class AlexService:
             service="alex-seo",
             details=report,
         )
+
+        if ALEX_REPORT_LINK:
+            await self._notify_report_link_expiry(ALEX_REPORT_LINK)
+
+        return sent
 
 
 # ── Singleton ─────────────────────────────────────────────────────────────────

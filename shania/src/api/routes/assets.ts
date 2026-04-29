@@ -166,7 +166,10 @@ router.get("/asset-library/list", async (req: Request, res: Response): Promise<v
  *   dataBase64: string, // raw base64 or data URL
  *   brand?: string,
  *   folder?: string,
- *   tags?: string[]
+ *   tags?: string[],
+ *   caption?: string,
+ *   topic?: string,
+ *   metadata?: Record<string, string>
  * }
  */
 router.post("/asset-library/upload", async (req: Request, res: Response): Promise<void> => {
@@ -185,6 +188,9 @@ router.post("/asset-library/upload", async (req: Request, res: Response): Promis
       brand,
       folder,
       tags,
+      caption,
+      topic,
+      metadata,
     } = req.body as {
       fileName?: string;
       contentType?: string;
@@ -192,6 +198,9 @@ router.post("/asset-library/upload", async (req: Request, res: Response): Promis
       brand?: string;
       folder?: string;
       tags?: string[];
+      caption?: string;
+      topic?: string;
+      metadata?: Record<string, string>;
     };
 
     if (!fileName || !contentType || !dataBase64) {
@@ -215,6 +224,11 @@ router.post("/asset-library/upload", async (req: Request, res: Response): Promis
       brand,
       folder,
       tags: Array.isArray(tags) ? tags : [],
+      metadata: {
+        ...(metadata && typeof metadata === "object" ? metadata : {}),
+        ...(caption ? { caption } : {}),
+        ...(topic ? { topic } : {}),
+      },
     });
 
     res.status(201).json({ provider: "gcp", ...uploaded, bytes: buffer.length });
