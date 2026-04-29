@@ -20,6 +20,7 @@ from src.labat.services.automation_service import (
     ab_creative_rotation,
     run_full_cycle,
 )
+from src.labat.services.blog_writer import write_unwritten
 
 logger = logging.getLogger("labat.automation_routes")
 
@@ -53,6 +54,32 @@ async def automation_cron(
 
     background_tasks.add_task(_run)
     return {"status": "automation_cycle_started", "dry_run": dry_run, "brand_scope": _BRAND_SCOPE}
+
+
+@router.post("/vowels-newsroom-cron")
+async def vowels_newsroom_cron(
+    background_tasks: BackgroundTasks,
+    generate_images: bool = Query(True),
+    _=Depends(require_admin),
+):
+    """
+    Autonomous Vowels publication cycle.
+    Intended for Cloud Scheduler (no human interaction required).
+    """
+
+    async def _run_newsroom():
+        try:
+            results = await write_unwritten(brand="vowels", generate_images=generate_images)
+            logger.info("Vowels newsroom cron completed: %d items", len(results))
+        except Exception as e:
+            logger.error("Vowels newsroom cron failed: %s", e)
+
+    background_tasks.add_task(_run_newsroom)
+    return {
+        "status": "vowels_newsroom_cycle_started",
+        "brand": "vowels",
+        "generate_images": generate_images,
+    }
 
 
 @router.post("/pause")

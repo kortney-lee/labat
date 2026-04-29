@@ -1,0 +1,36 @@
+name: Vowels CI
+
+on:
+  push:
+    paths:
+      - "vowels/**"
+      - ".github/workflows/vowels-ci.yml"
+  pull_request:
+    paths:
+      - "vowels/**"
+      - ".github/workflows/vowels-ci.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: vowels
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: vowels/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build

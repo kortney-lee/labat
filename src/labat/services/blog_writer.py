@@ -47,6 +47,7 @@ WIHY_ASK = "https://ml.wihy.ai/ask"
 # GCS buckets per brand
 GCS_BUCKETS = {
     "wihy": "wihy-web-assets",
+    "vowels": os.getenv("VOWELS_GCS_BUCKET", "wihy-web-assets"),
     "communitygroceries": "cg-web-assets",
 }
 
@@ -116,6 +117,33 @@ VOICE:
 - NO food industry exposés — that's WIHY territory
 """
 
+KORTNEY_VOWELS_SYSTEM = """You are Kortney (Otaku), master editor of Vowels.org.
+Vowels is a nutrition newsroom, not a lifestyle blog.
+Your job is to publish fact-led, timely, jaw-dropping nutrition journalism that is always evidence-first.
+
+EDITORIAL IDENTITY:
+- Report with urgency, but never exaggerate data
+- Use plain language to translate study findings
+- Make every article useful for real-world food decisions
+- Distinguish findings vs interpretation clearly
+
+STRUCTURE (every article):
+- Headline with newsroom energy and factual precision
+- Opening nut graf: what happened, why it matters now
+- 4-7 H2 sections with evidence-based explanation
+- "From the Data" block with 2-4 concrete insights
+- "What To Do Next" block with practical guidance
+- "References" section with citations
+- Total: 1200-1900 words
+
+VOICE:
+- Crisp, editorial, high-clarity
+- Confident, never sensationalized
+- Use short paragraphs and concrete numbers
+- No fluff, no filler, no vague wellness claims
+- Never use "As an AI" or generic disclaimers
+"""
+
 # Voice refinement via fine-tuned model
 KORTNEY_VOICE_REFINE = """You are refining a blog article into Kortney's authentic voice.
 Keep ALL the facts, structure, and citations intact. Only adjust:
@@ -151,6 +179,14 @@ TOPIC_TAXONOMY = [
      "description": "Realistic alternatives that improve nutrition without making meals feel restrictive."},
     {"slug": "weight-management", "label": "Weight Management",
      "description": "Evidence-guided articles on calories, appetite, meal structure, and sustainable fat-loss habits."},
+]
+
+CONTENT_TYPES = [
+    "nutrition-education",
+    "news-update",
+    "data-insight",
+    "opinion-editorial",
+    "sponsored",
 ]
 
 
@@ -238,6 +274,24 @@ EDITORIAL_QUEUE: List[Dict[str, str]] = [
      "topic": "The 5 fat loss habits that actually stick — what research says about sustainable weight management."},
     {"slug": "appetite-hormones-explained", "brand": "wihy", "topic_slug": "weight-management",
      "topic": "Why you're always hungry: ghrelin, leptin, and the hormones controlling your appetite explained."},
+
+    # ── Vowels newsroom launch set ─────────────────────────────────────
+    {"slug": "ultra-processed-foods-us-intake-shift", "brand": "vowels", "topic_slug": "processed-foods", "content_type": "news-update",
+     "topic": "Ultra-processed foods now dominate U.S. calorie intake. What this shift means for families right now."},
+    {"slug": "childhood-added-sugar-trend-briefing", "brand": "vowels", "topic_slug": "sugar-and-blood-health", "content_type": "data-insight",
+     "topic": "Childhood added-sugar trends: the numbers changed, but not enough. A data briefing for parents."},
+    {"slug": "breakfast-protein-newsroom-guide", "brand": "vowels", "topic_slug": "protein-and-muscle", "content_type": "nutrition-education",
+     "topic": "Breakfast protein is still too low for most households. Here is the evidence and the practical fix."},
+    {"slug": "nutrition-label-claims-investigation", "brand": "vowels", "topic_slug": "processed-foods", "content_type": "opinion-editorial",
+        "topic": "Why 'natural' and 'healthy' claims still confuse shoppers: what labels say vs what data shows."},
+    {"slug": "snack-food-sodium-exposure-report", "brand": "vowels", "topic_slug": "nutrition", "content_type": "data-insight",
+     "topic": "Snack-food sodium exposure is higher than most families think. A practical newsroom report."},
+    {"slug": "late-night-eating-sleep-disruption-update", "brand": "vowels", "topic_slug": "alcohol-and-health", "content_type": "news-update",
+     "topic": "Late-night eating and sleep disruption: what newer evidence says about next-day appetite and energy."},
+    {"slug": "grocery-inflation-nutrition-tradeoffs", "brand": "vowels", "topic_slug": "food-swaps", "content_type": "data-insight",
+     "topic": "Grocery inflation changed nutrition choices. Which tradeoffs hurt health most and what to swap first."},
+    {"slug": "fiber-gap-america-what-to-do", "brand": "vowels", "topic_slug": "nutrition", "content_type": "nutrition-education",
+     "topic": "America's fiber gap is still massive. Why it matters and the easiest meal upgrades to close it."},
 
     # ── Community Groceries articles ────────────────────────────────────
     {"slug": "budget-meal-prep-under-75", "brand": "communitygroceries", "topic_slug": "nutrition",
@@ -394,7 +448,12 @@ async def write_article(slug: str) -> Optional[Dict[str, Any]]:
     logger.info("SEO keywords: %s", keywords[:6])
 
     # Step 3: Write article with brand-specific prompt
-    system = KORTNEY_WIHY_SYSTEM if brand == "wihy" else KORTNEY_CG_SYSTEM
+    if brand == "wihy":
+        system = KORTNEY_WIHY_SYSTEM
+    elif brand == "vowels":
+        system = KORTNEY_VOWELS_SYSTEM
+    else:
+        system = KORTNEY_CG_SYSTEM
 
     # Inject product strategy context so Kortney writes on-brand
     strategy_ctx = build_strategy_block(product=brand)
@@ -457,6 +516,7 @@ async def write_article(slug: str) -> Optional[Dict[str, Any]]:
     article = {
         "slug": slug,
         "brand": brand,
+        "content_type": entry.get("content_type", "nutrition-education"),
         "title": title,
         "topic": topic,
         "topic_slug": entry.get("topic_slug", ""),
@@ -598,6 +658,7 @@ async def publish_article(article: Dict[str, Any], hero_bytes: Optional[bytes] =
     post_data = {
         "slug": slug,
         "title": article["title"],
+        "content_type": article.get("content_type", "nutrition-education"),
         "body": article["body"],
         "meta_description": article.get("meta_description", ""),
         "topic_slug": article.get("topic_slug", ""),
@@ -644,6 +705,7 @@ def update_blog_index(brand: str):
                 posts.append({
                     "slug": post.get("slug", ""),
                     "title": post.get("title", ""),
+                    "content_type": post.get("content_type", "nutrition-education"),
                     "meta_description": post.get("meta_description", ""),
                     "topic_slug": post.get("topic_slug", ""),
                     "author": post.get("author", "Kortney"),
@@ -778,10 +840,18 @@ def patch_existing_articles_topic_slug(brand: str = "wihy") -> List[str]:
 def get_queue_status() -> Dict[str, Any]:
     """Return the editorial queue with counts per brand."""
     wihy_count = sum(1 for e in EDITORIAL_QUEUE if e["brand"] == "wihy")
+    vowels_count = sum(1 for e in EDITORIAL_QUEUE if e["brand"] == "vowels")
     cg_count = sum(1 for e in EDITORIAL_QUEUE if e["brand"] == "communitygroceries")
+    by_content_type: Dict[str, int] = {}
+    for e in EDITORIAL_QUEUE:
+        ct = e.get("content_type", "nutrition-education")
+        by_content_type[ct] = by_content_type.get(ct, 0) + 1
     return {
         "total": len(EDITORIAL_QUEUE),
         "wihy": wihy_count,
+        "vowels": vowels_count,
         "communitygroceries": cg_count,
+        "content_types": CONTENT_TYPES,
+        "by_content_type": by_content_type,
         "articles": EDITORIAL_QUEUE,
     }

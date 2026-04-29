@@ -100,6 +100,7 @@ from src.labat.routers.trending_routes import router as trending_router
 from src.labat.routers.master_agent_routes import router as master_agent_router
 from src.labat.routers.automation_routes import router as automation_router
 from src.labat.routers.rules_routes import router as rules_router
+from src.labat.routers.vowels_newsroom_routes import router as vowels_newsroom_router
 
 app.include_router(auth_router)
 app.include_router(ads_router)
@@ -114,6 +115,7 @@ app.include_router(trending_router)
 app.include_router(master_agent_router)
 app.include_router(automation_router)
 app.include_router(rules_router)
+app.include_router(vowels_newsroom_router)
 
 logger.info("All LABAT routers loaded (including master agent + automation + rules)")
 
@@ -192,6 +194,7 @@ async def root():
             "/api/labat/compliance/*",
             "/api/otaku/master/*",
             "/api/kortney/blog/*",
+            "/api/vowels/newsroom/*",
         ],
     }
 

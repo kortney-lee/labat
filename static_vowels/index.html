@@ -1,0 +1,825 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vowels.org | Nutrition Newsroom</title>
+  <meta name="description" content="Vowels.org is a data-powered nutrition newsroom translating evidence into practical action." />
+  <meta name="theme-color" content="#dff4ff" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,600;6..72,700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #eaf6ff;
+      --ink: #102235;
+      --muted: #4d6b84;
+      --card: #ffffff;
+      --line: #bfd8ea;
+      --brand: #0b6ea8;
+      --brand-2: #0098d9;
+      --ok: #0f9a6b;
+      --warn: #ffb74d;
+      --danger: #d14343;
+      --sponsored-bg: #fff6df;
+      --shadow: 0 14px 36px rgba(11, 110, 168, 0.14);
+      --radius: 18px;
+      --radius-sm: 12px;
+      --max: 1200px;
+      --gutter: 20px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background:
+        radial-gradient(circle at 84% -10%, rgba(0, 152, 217, 0.22), transparent 35%),
+        radial-gradient(circle at -8% 12%, rgba(11, 110, 168, 0.18), transparent 33%),
+        var(--bg);
+      color: var(--ink);
+      font-family: "Bricolage Grotesque", "Segoe UI", sans-serif;
+      line-height: 1.45;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .page {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 16px var(--gutter) 52px;
+    }
+
+    .top-note {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 10px 16px;
+      background: rgba(255, 255, 255, 0.76);
+      backdrop-filter: blur(6px);
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 16px;
+      animation: rise 420ms ease-out both;
+    }
+
+    .top-note .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--ok);
+      box-shadow: 0 0 0 0 rgba(15, 154, 107, 0.6);
+      animation: pulse 2s infinite;
+      margin-right: 8px;
+      display: inline-block;
+    }
+
+    .masthead {
+      background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(255,255,255,0.8));
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius) + 6px);
+      box-shadow: var(--shadow);
+      padding: 18px 20px;
+      animation: rise 480ms ease-out both;
+    }
+
+    .head-row {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      font-size: 20px;
+      text-transform: uppercase;
+    }
+
+    .logo-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 11px;
+      background: linear-gradient(145deg, var(--brand), var(--brand-2));
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      box-shadow: 0 10px 20px rgba(11, 110, 168, 0.28);
+    }
+
+    .main-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .chip {
+      font-size: 13px;
+      border: 1px solid var(--line);
+      padding: 8px 12px;
+      border-radius: 999px;
+      color: var(--muted);
+      background: #fff;
+      transition: transform 180ms ease, border-color 180ms ease;
+    }
+
+    .chip:hover {
+      transform: translateY(-1px);
+      border-color: var(--brand-2);
+      color: var(--brand);
+    }
+
+    .search {
+      min-width: 220px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .ticker {
+      margin-top: 14px;
+      border-top: 1px dashed var(--line);
+      padding-top: 12px;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 10px;
+      align-items: center;
+      font-size: 14px;
+    }
+
+    .ticker b { color: var(--brand); }
+
+    .ticker-track {
+      white-space: nowrap;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .ticker-track span {
+      display: inline-block;
+      padding-left: 100%;
+      animation: ticker 20s linear infinite;
+      color: var(--muted);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 22px;
+      margin-top: 20px;
+    }
+
+    .hero {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--card);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      animation: rise 560ms ease-out both;
+    }
+
+    .hero-content {
+      padding: 24px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .kicker {
+      color: var(--brand);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+    }
+
+    h1, h2, h3 {
+      margin: 0;
+      font-family: "Newsreader", Georgia, serif;
+      line-height: 1.1;
+    }
+
+    h1 {
+      font-size: clamp(30px, 4vw, 48px);
+      letter-spacing: -0.4px;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 17px;
+      max-width: 74ch;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: #fff;
+      box-shadow: 0 10px 20px rgba(11, 110, 168, 0.26);
+    }
+
+    .btn.ghost {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+    }
+
+    .side-stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+    }
+
+    .panel h3 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .source-list,
+    .brief-list,
+    .tag-list {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .source-list li,
+    .brief-list li {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px;
+      background: #f8fcff;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .source-list b,
+    .brief-list b { color: var(--ink); }
+
+    .ad-slot {
+      border: 1px dashed #8ec0de;
+      border-radius: 12px;
+      background: linear-gradient(180deg, #f6fbff, #eaf6ff);
+      text-align: center;
+      color: #5b89a7;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      padding: 14px;
+      font-weight: 700;
+    }
+
+    .ad-leaderboard { height: 90px; display: grid; place-items: center; }
+    .ad-sidebar { min-height: 250px; display: grid; place-items: center; }
+
+    .stream {
+      margin-top: 18px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .stream-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .stream-header h2 { font-size: 36px; }
+
+    .story-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .story-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--card);
+      padding: 14px;
+      display: grid;
+      gap: 8px;
+      transition: transform 220ms ease, box-shadow 220ms ease;
+      animation: rise 580ms ease-out both;
+    }
+
+    .story-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 24px rgba(11, 110, 168, 0.15);
+    }
+
+    .story-type {
+      font-size: 11px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      font-weight: 800;
+      color: var(--brand);
+    }
+
+    .story-card h3 { font-size: 25px; }
+
+    .story-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .story-card .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .sponsored {
+      background: var(--sponsored-bg);
+      border-color: #e4c06a;
+    }
+
+    .data-block {
+      margin-top: 12px;
+      border: 1px solid #7bc3e9;
+      background: linear-gradient(145deg, #dbf3ff, #f0f9ff);
+      border-radius: var(--radius);
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 18px;
+      animation: rise 640ms ease-out both;
+    }
+
+    .data-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .metric {
+      background: #fff;
+      border: 1px solid #b2dff6;
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .metric b {
+      display: block;
+      font-size: 26px;
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    .metric span {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .source-ledger {
+      margin-top: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .source-ledger header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 14px;
+      border-bottom: 1px solid var(--line);
+      background: #f8fcff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 12px 14px;
+      border-bottom: 1px solid #e2eef7;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      border: 1px solid;
+    }
+
+    .badge.ok {
+      color: #0f7f57;
+      background: #eafbf4;
+      border-color: #96e2c5;
+    }
+
+    .badge.warn {
+      color: #9a6a14;
+      background: #fff7e9;
+      border-color: #f1d398;
+    }
+
+    .cta-band {
+      margin-top: 20px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .email {
+      display: flex;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fff;
+      min-width: 320px;
+    }
+
+    .email input {
+      border: 0;
+      outline: none;
+      padding: 10px 12px;
+      width: 100%;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    .email button {
+      border: 0;
+      background: var(--brand);
+      color: #fff;
+      font-weight: 700;
+      padding: 10px 14px;
+      cursor: pointer;
+    }
+
+    footer {
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px dashed var(--line);
+      color: var(--muted);
+      font-size: 13px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(15, 154, 107, 0.6); }
+      70% { box-shadow: 0 0 0 8px rgba(15, 154, 107, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(15, 154, 107, 0); }
+    }
+
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to { transform: translateX(-100%); }
+    }
+
+    @media (max-width: 1100px) {
+      .layout { grid-template-columns: 1fr; }
+      .story-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .data-block { grid-template-columns: 1fr; }
+      .cta-band { grid-template-columns: 1fr; }
+      .email { min-width: 0; }
+    }
+
+    @media (max-width: 760px) {
+      .head-row { grid-template-columns: 1fr; }
+      .main-nav { justify-content: flex-start; }
+      .search { min-width: 0; width: 100%; }
+      .story-grid { grid-template-columns: 1fr; }
+      .data-metrics { grid-template-columns: 1fr; }
+      .stream-header h2 { font-size: 30px; }
+      th:nth-child(3), td:nth-child(3) { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="top-note">
+      <div><span class="pulse"></span> Newsroom status: autonomous publishing active</div>
+      <div id="nowStamp">Updated just now</div>
+    </div>
+
+    <header class="masthead">
+      <div class="head-row">
+        <a class="logo" href="#">
+          <span class="logo-mark">V</span>
+          <span>Vowels Newsroom</span>
+        </a>
+
+        <nav class="main-nav" aria-label="Main">
+          <a class="chip" href="#">Latest</a>
+          <a class="chip" href="#">Nutrition</a>
+          <a class="chip" href="#">Policy</a>
+          <a class="chip" href="#">Data Insights</a>
+          <a class="chip" href="#">Explainers</a>
+          <a class="chip" href="#">Sponsored</a>
+        </nav>
+
+        <label class="search" aria-label="Search">
+          <span>Search research, trends, and reports</span>
+        </label>
+      </div>
+
+      <div class="ticker" role="status" aria-live="polite">
+        <b>Live Desk</b>
+        <div class="ticker-track">
+          <span>Added sugar exposure among children remains elevated in latest reporting cycle | New "From the Data" dashboard now tracking top household nutrition errors | Editorial desk confirms zero-opinion policy for all fact reports | Google News feed + news sitemap refreshed</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <main>
+        <article class="hero">
+          <div class="ad-slot ad-leaderboard">Top Leaderboard Ad Slot</div>
+
+          <div class="hero-content">
+            <span class="kicker">Featured Investigation</span>
+            <h1>America's quiet nutrition crisis is not calories. It is ingredient complexity at scale.</h1>
+            <p>
+              Our newsroom analyzed current dietary trend signals and household pattern shifts. The most alarming finding is not one ingredient, but the speed at which label complexity outpaces consumer understanding.
+            </p>
+
+            <div class="hero-meta">
+              <span>By Kortney (Otaku), Master Editor</span>
+              <span>13 min read</span>
+              <span>Fact check: 3-source verified</span>
+              <span>Updated 42 minutes ago</span>
+            </div>
+
+            <div class="hero-actions">
+              <button class="btn primary">Read Full Report</button>
+              <button class="btn ghost">View Source Ledger</button>
+            </div>
+          </div>
+        </article>
+
+        <section class="stream">
+          <div class="stream-header">
+            <h2>Latest Headlines</h2>
+            <span class="chip">AdSense In-Feed Slot Ready</span>
+          </div>
+
+          <div class="story-grid">
+            <article class="story-card">
+              <span class="story-type">News Update</span>
+              <h3>Ultra-processed intake now exceeds practical awareness thresholds in family shopping patterns.</h3>
+              <p>We compared current purchase behavior proxies against nutrition literacy benchmarks and found a major interpretation gap.</p>
+              <div class="meta"><span>9 min read</span><span>Topic: Processed Foods</span></div>
+            </article>
+
+            <article class="story-card">
+              <span class="story-type">Data Insight</span>
+              <h3>Breakfast protein remains under-target in most household routines despite stronger public awareness.</h3>
+              <p>Intent has improved. Execution has not. We break down the behavior mismatch and the easiest corrective patterns.</p>
+              <div class="meta"><span>11 min read</span><span>From the Data</span></div>
+            </article>
+
+            <article class="story-card sponsored">
+              <span class="story-type">Sponsored</span>
+              <h3>How to build a practical anti-inflammatory pantry without doubling your grocery spend.</h3>
+              <p>Sponsored educational feature. Clearly labeled, editorially reviewed, and separated from independent reporting.</p>
+              <div class="meta"><span>Sponsored Content</span><span>Label compliance: enabled</span></div>
+            </article>
+
+            <article class="story-card">
+              <span class="story-type">Explainer</span>
+              <h3>Is rice bad? The evidence says context matters more than category panic.</h3>
+              <p>An evidence translation for one of the most searched nutrition questions this month.</p>
+              <div class="meta"><span>8 min read</span><span>High Search Intent</span></div>
+            </article>
+
+            <article class="story-card">
+              <span class="story-type">Opinion Editorial</span>
+              <h3>Nutrition labels are not broken by law alone. They are broken by design language.</h3>
+              <p>A newsroom editorial anchored to observed confusion patterns in consumer decision moments.</p>
+              <div class="meta"><span>7 min read</span><span>Editorial Desk</span></div>
+            </article>
+
+            <article class="story-card">
+              <span class="story-type">News Update</span>
+              <h3>Late-night eating correlates with next-day appetite destabilization in practical diet settings.</h3>
+              <p>We translate recent evidence into a household timing strategy that does not require strict fasting windows.</p>
+              <div class="meta"><span>10 min read</span><span>Sleep + Metabolism</span></div>
+            </article>
+          </div>
+
+          <div class="ad-slot">In-Feed Ad Slot</div>
+
+          <section class="data-block">
+            <div>
+              <span class="kicker">From The Data</span>
+              <h3 style="margin-top: 6px; font-size: 34px;">This Week's Nutrition Pattern Signals</h3>
+              <p style="margin: 8px 0 0; color: var(--muted);">
+                Vowels surfaces trend shifts, interpretation gaps, and behavior risks so readers can act before habits become outcomes.
+              </p>
+            </div>
+
+            <div class="data-metrics">
+              <article class="metric">
+                <b>+28%</b>
+                <span>Higher ultra-processed exposure in top low-cost carts</span>
+              </article>
+              <article class="metric">
+                <b>41%</b>
+                <span>Readers misread at least one front-label health claim</span>
+              </article>
+              <article class="metric">
+                <b>3.7x</b>
+                <span>Engagement lift on evidence-backed explainers vs opinion-only posts</span>
+              </article>
+            </div>
+          </section>
+
+          <section class="source-ledger" id="sources">
+            <header>
+              <h3 style="font-size: 30px;">Source Ledger</h3>
+              <span class="chip">Fact-first newsroom protocol</span>
+            </header>
+            <table>
+              <thead>
+                <tr>
+                  <th>Claim</th>
+                  <th>Evidence Source</th>
+                  <th>Why It Matters</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Label interpretation errors remain high in family shoppers.</td>
+                  <td>Household behavior trend report + nutrition literacy benchmark synthesis.</td>
+                  <td>Explains why "healthy" purchase intent still yields weak meal outcomes.</td>
+                  <td><span class="badge ok">verified</span></td>
+                </tr>
+                <tr>
+                  <td>Meal timing influences next-day appetite and snack load.</td>
+                  <td>Meta-analysis review + practical habit signal tracking.</td>
+                  <td>Turns abstract chrononutrition into actionable household planning.</td>
+                  <td><span class="badge ok">verified</span></td>
+                </tr>
+                <tr>
+                  <td>Sponsored feature claims align with newsroom standards.</td>
+                  <td>Editorial review checklist and source validation policy.</td>
+                  <td>Maintains trust while enabling monetization.</td>
+                  <td><span class="badge warn">reviewed</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </section>
+      </main>
+
+      <aside class="side-stack">
+        <section class="panel">
+          <h3>Editor Desk</h3>
+          <p style="margin: 0; color: var(--muted); font-size: 14px;">
+            Kortney (Otaku) leads Vowels with autonomous publishing and hard editorial controls: evidence, clarity, and practical action.
+          </p>
+        </section>
+
+        <div class="ad-slot ad-sidebar">Sidebar Ad Slot</div>
+
+        <section class="panel">
+          <h3>Quick Briefs</h3>
+          <ul class="brief-list">
+            <li><b>Policy watch:</b> Front-label update proposals expected this quarter.</li>
+            <li><b>Reader trend:</b> "Is rice bad" remains top search query this week.</li>
+            <li><b>News desk:</b> News sitemap and RSS cycle healthy.</li>
+          </ul>
+        </section>
+
+        <section class="panel">
+          <h3>Topics</h3>
+          <ul class="tag-list">
+            <li><span class="chip">Protein and Muscle</span></li>
+            <li><span class="chip">Sugar and Blood Health</span></li>
+            <li><span class="chip">Processed Foods</span></li>
+            <li><span class="chip">Food Swaps</span></li>
+            <li><span class="chip">Weight Management</span></li>
+          </ul>
+        </section>
+
+        <section class="panel">
+          <h3>Source Promise</h3>
+          <ul class="source-list">
+            <li><b>No opinion-only claims.</b><br />Every major claim must map to data.</li>
+            <li><b>Clear source status.</b><br />Verified, reviewed, or flagged.</li>
+            <li><b>Reader-first translation.</b><br />Evidence rewritten for practical action.</li>
+          </ul>
+        </section>
+      </aside>
+    </div>
+
+    <section class="cta-band">
+      <div>
+        <span class="kicker">Newsletter</span>
+        <h3 style="font-size: 32px; margin-top: 6px;">Get data-backed headlines before they hit social</h3>
+        <p style="margin: 6px 0 0; color: var(--muted);">Weekly briefing with fact-first explainers, new reports, and practical nutrition actions.</p>
+      </div>
+
+      <form class="email" onsubmit="return false">
+        <input type="email" placeholder="Enter email" aria-label="Email" />
+        <button type="submit">Subscribe</button>
+      </form>
+    </section>
+
+    <div class="ad-slot" style="margin-top: 14px;">Sticky Mobile Bottom Banner Placeholder</div>
+
+    <footer>
+      <div>Vowels.org - Nutrition newsroom powered by data.</div>
+      <div>Privacy | Terms | Editorial Policy | Health Disclaimer</div>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      var stamp = document.getElementById("nowStamp");
+      if (!stamp) return;
+      var now = new Date();
+      stamp.textContent = "Updated " + now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    })();
+  </script>
+</body>
+</html>

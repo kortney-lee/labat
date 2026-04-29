@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-skywash text-ink antialiased;
+  background-image: radial-gradient(circle at 90% -10%, rgba(0, 152, 217, 0.2), transparent 35%), radial-gradient(circle at -10% 10%, rgba(11, 110, 168, 0.15), transparent 40%);
+}
+
+.news-card {
+  @apply rounded-2xl border border-sky-200 bg-white shadow-news;
+}
