@@ -12,6 +12,8 @@ interface CategoryPageProps {
   };
 }
 
+export const dynamicParams = false;
+
 const validCategories = new Set<string>([
   "nutrition-education",
   "health-explained",

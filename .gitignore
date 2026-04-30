@@ -36,6 +36,7 @@ data/
 *.csv
 *.json
 !data/*.json
+!/firebase.vowels.json
 !shania/package.json
 !shania/package-lock.json
 !shania/tsconfig.json
@@ -48,6 +49,7 @@ shania/node_modules/
 shania/dist/
 shania/.canva-refresh-token.local
 shania/hosting/.firebase/
+.firebase/
 
 # Cloud SQL Proxy
 cloud-sql-proxy.exe

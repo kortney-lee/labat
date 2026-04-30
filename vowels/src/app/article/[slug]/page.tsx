@@ -17,6 +17,8 @@ interface ArticlePageProps {
   };
 }
 
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return getAllArticles().map((article) => ({ slug: article.slug }));
 }

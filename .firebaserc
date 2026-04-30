@@ -3,6 +3,9 @@
   "targets": {
     "wihy-ai": {
       "hosting": {
+        "vowels": [
+          "vowels-org"
+        ],
         "whatishealthy": [
           "whatishealthy"
         ]

@@ -5,19 +5,14 @@ import { ArticleCard } from "@/components/ArticleCard";
 import { DataInsightCard } from "@/components/DataInsightCard";
 import { FeaturedArticle } from "@/components/FeaturedArticle";
 import { SwgCta } from "@/components/SwgCta";
-import { getAllArticles, searchArticles } from "@/lib/articles";
+import { getAllArticles } from "@/lib/articles";
 import { weeklyInsights } from "@/lib/wihyData";
 
-interface HomePageProps {
-  searchParams?: {
-    q?: string;
-  };
-}
+export const dynamic = "force-static";
 
-export default function HomePage({ searchParams }: HomePageProps) {
+export default function HomePage() {
   const all = getAllArticles();
-  const query = searchParams?.q || "";
-  const filtered = query ? searchArticles(query) : all;
+  const filtered = all;
   const featured = filtered[0] || all[0];
   const feed = filtered.slice(1, 7);
   const highlight = filtered[1] || all[1];
@@ -90,7 +85,6 @@ export default function HomePage({ searchParams }: HomePageProps) {
         <div className="space-y-5">
           <div className="flex items-center justify-between gap-3">
             <h2 className="font-serif text-4xl leading-none text-slate-950">Latest Insights</h2>
-            {query ? <span className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-500">Search: {query}</span> : null}
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
