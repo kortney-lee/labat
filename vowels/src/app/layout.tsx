@@ -9,6 +9,8 @@ import { Header } from "@/components/Header";
 import { baseMetadata } from "@/lib/seo";
 import { GA_MEASUREMENT_ID } from "@/lib/analytics";
 
+const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "";
+
 const sans = Manrope({
   subsets: ["latin"],
   variable: "--font-sans",
@@ -32,6 +34,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('js',new Date());gtag('config','${GA_MEASUREMENT_ID}');`}
             </Script>
           </>
+        ) : null}
+
+        {ADSENSE_CLIENT ? (
+          <Script
+            id="adsense-lib"
+            async
+            strategy="afterInteractive"
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+            crossOrigin="anonymous"
+          />
         ) : null}
 
         {/* Subscribe with Google — newsletter/reader revenue */}
