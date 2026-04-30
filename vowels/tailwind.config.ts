@@ -5,16 +5,21 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        skywash: "#eaf6ff",
-        newsroom: "#0b6ea8",
-        ink: "#102235",
+        paper: "#f5f1e8",
+        brand: "#ff6a00",
+        newsroom: "#ff6a00",
+        ink: "#131313",
+        coal: "#111319",
+        sand: "#ece6da",
+        sage: "#edf4ef",
+        mist: "#f2f5f7",
       },
       fontFamily: {
-        sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
-        serif: ["Georgia", "Times New Roman", "serif"],
+        sans: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
+        serif: ["var(--font-display)", "ui-sans-serif", "system-ui", "sans-serif"],
       },
       boxShadow: {
-        news: "0 14px 36px rgba(11,110,168,0.14)",
+        news: "0 10px 40px rgba(17, 19, 25, 0.12)",
       },
     },
   },

@@ -6,8 +6,8 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://vowels.org";
 export function baseMetadata() {
   return {
     metadataBase: new URL(siteUrl),
-    title: `${siteName} | Nutrition Newsroom`,
-    description: "Fact-first nutrition journalism powered by WIHY data.",
+    title: `${siteName} | Nutrition Education`,
+    description: "Evidence-based nutrition education powered by WIHY data.",
   };
 }
 

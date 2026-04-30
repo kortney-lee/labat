@@ -7,6 +7,7 @@ import { AdSlot } from "@/components/AdSlot";
 import { ArticleCard } from "@/components/ArticleCard";
 import { ArticleViewTracker } from "@/components/ArticleViewTracker";
 import { SponsoredContentLabel } from "@/components/SponsoredContentLabel";
+import { SwgCta } from "@/components/SwgCta";
 import { getAllArticles, getArticleBySlug, getRelatedArticles } from "@/lib/articles";
 import { articleJsonLd, articleMetadata } from "@/lib/seo";
 
@@ -38,28 +39,30 @@ export default function ArticlePage({ params }: ArticlePageProps) {
     <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
       <article className="news-card p-6">
         <ArticleViewTracker slug={article.slug} category={article.category} />
-        <p className="text-xs font-semibold uppercase tracking-wide text-newsroom">{article.category}</p>
-        <h1 className="mt-3 font-serif text-4xl leading-tight text-slate-900">{article.title}</h1>
-        <p className="mt-3 text-base text-slate-600">{article.description}</p>
-        <div className="mt-4 flex flex-wrap gap-3 text-sm text-slate-600">
+        <p className="text-xs font-bold uppercase tracking-[0.22em] text-newsroom">{article.category}</p>
+        <h1 className="mt-3 font-serif text-5xl leading-[0.95] text-slate-950">{article.title}</h1>
+        <p className="mt-4 max-w-3xl text-base leading-8 text-slate-700">{article.description}</p>
+        <div className="mt-4 flex flex-wrap gap-3 text-sm uppercase tracking-[0.08em] text-slate-500">
           <span>{article.author}</span>
           <span>{new Date(article.publishedAt).toLocaleDateString()}</span>
           <span>{article.readingTime} min read</span>
           {article.isSponsored ? <SponsoredContentLabel /> : null}
         </div>
 
-        <AdSlot slotName="Article Top Banner Ad" className="mt-6" />
+        <AdSlot slotName="Article Top Leaderboard" size="leaderboard" className="mt-6" />
 
         <div
-          className="prose prose-slate mt-6 max-w-none prose-headings:font-serif prose-a:text-newsroom"
+          className="prose prose-lg mt-6 max-w-none prose-headings:font-serif prose-headings:text-slate-950 prose-p:text-slate-800 prose-a:text-newsroom"
           dangerouslySetInnerHTML={{ __html: html }}
         />
 
-        <AdSlot slotName="Article Mid-Article Ad" className="mt-6" />
+        <AdSlot slotName="Article Mid-Content Rectangle" size="largerect" className="mt-6" />
+
+        <AdSlot slotName="Article Pre-Source Native" size="infeed" className="mt-6" />
 
         {article.sourceLinks?.length ? (
-          <section className="mt-8 rounded-xl border border-sky-200 bg-sky-50 p-4">
-            <h3 className="font-serif text-2xl text-slate-900">Sources</h3>
+          <section className="mt-8 rounded-[1.75rem] border-2 border-black bg-sand p-5">
+            <h3 className="font-serif text-3xl text-slate-950">Sources</h3>
             <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-700">
               {article.sourceLinks.map((link) => (
                 <li key={link}>
@@ -72,10 +75,12 @@ export default function ArticlePage({ params }: ArticlePageProps) {
           </section>
         ) : null}
 
-        <AdSlot slotName="Article Bottom Native Ad" className="mt-8" />
+        <SwgCta variant="inline" />
+
+        <AdSlot slotName="Article Exit Zone Native" size="infeed" className="mt-8" />
 
         <section className="mt-8">
-          <h3 className="font-serif text-3xl text-slate-900">Related Articles</h3>
+          <h3 className="font-serif text-4xl uppercase leading-none text-slate-950">Related Articles</h3>
           <div className="mt-4 grid gap-3 md:grid-cols-2">
             {related.slice(0, 4).map((item) => (
               <ArticleCard key={item.slug} article={item} />
@@ -86,12 +91,15 @@ export default function ArticlePage({ params }: ArticlePageProps) {
           </Link>
         </section>
 
+        <AdSlot slotName="Article Post-Read Leaderboard" size="leaderboard" className="mt-8" />
+
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       </article>
 
       <aside className="space-y-4">
-        <AdSlot slotName="Homepage Sidebar Ad" className="min-h-52" />
-        <AdSlot slotName="Mobile Sticky Banner Ad" />
+        <SwgCta variant="sidebar" />
+        <AdSlot slotName="Article Sidebar Rectangle" size="rectangle" sticky />
+        <AdSlot slotName="Article Sidebar Half Page" size="halfpage" className="mt-4" />
       </aside>
     </div>
   );

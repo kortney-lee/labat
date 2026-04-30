@@ -3,7 +3,9 @@ export type AnalyticsEventName =
   | "cta_click"
   | "newsletter_signup"
   | "ad_impression"
-  | "search_usage";
+  | "search_usage"
+  | "swg_cta_click"
+  | "swg_cta_impression";
 
 export interface AnalyticsEvent {
   name: AnalyticsEventName;

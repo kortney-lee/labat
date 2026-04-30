@@ -18,15 +18,15 @@ export function SearchBar() {
   };
 
   return (
-    <form onSubmit={onSubmit} className="flex w-full max-w-sm items-center gap-2 rounded-full border border-sky-200 bg-white px-3 py-2">
+    <form onSubmit={onSubmit} className="search-sweep flex w-full items-center gap-2 px-4 py-2.5 shadow-sm">
       <input
         type="search"
         value={q}
         onChange={(e) => setQ(e.target.value)}
-        placeholder="Search headlines"
-        className="w-full bg-transparent text-sm text-slate-700 outline-none"
+        placeholder="Search nutrition topics"
+        className="w-full bg-transparent text-sm font-medium text-slate-900 outline-none placeholder:text-slate-500"
       />
-      <button type="submit" className="text-xs font-semibold uppercase tracking-wide text-newsroom">
+      <button type="submit" className="rounded-full bg-brand px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-white transition hover:-translate-y-0.5 hover:bg-black">
         Search
       </button>
     </form>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { AdSlot } from "@/components/AdSlot";
 import { ArticleCard } from "@/components/ArticleCard";
 import { getAllArticles, getArticlesByCategory } from "@/lib/articles";
 import type { ArticleCategory } from "@/types/article";
@@ -43,11 +44,22 @@ export default function CategoryPage({ params }: CategoryPageProps) {
         <h1 className="mt-2 font-serif text-4xl text-slate-900">{params.slug.replace(/-/g, " ")}</h1>
         <p className="mt-2 text-sm text-slate-600">{articles.length} published articles</p>
       </header>
+      <AdSlot slotName="Category Leaderboard" size="leaderboard" />
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {articles.map((article) => (
-          <ArticleCard key={article.slug} article={article} />
+        {articles.map((article, idx) => (
+          <>
+            <ArticleCard key={article.slug} article={article} />
+            {(idx + 1) % 6 === 0 && idx + 1 < articles.length ? (
+              <div key={`ad-${idx}`} className="md:col-span-2 lg:col-span-3">
+                <AdSlot slotName="Category In-Grid Ad" size="leaderboard" />
+              </div>
+            ) : null}
+          </>
         ))}
       </div>
+
+      <AdSlot slotName="Category Bottom Leaderboard" size="leaderboard" className="mt-4" />
     </section>
   );
 }

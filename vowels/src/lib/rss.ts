@@ -28,7 +28,7 @@ export function buildRss(articles: Article[]): string {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
 <channel>
-  <title>Vowels.org Newsroom</title>
+  <title>Vowels.org | Nutrition Education</title>
   <link>${siteUrl}</link>
   <description>Evidence-first nutrition journalism.</description>
   ${items}

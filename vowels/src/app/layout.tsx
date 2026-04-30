@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Lora, Manrope } from "next/font/google";
 import Script from "next/script";
 import type { ReactNode } from "react";
 
@@ -8,11 +9,21 @@ import { Header } from "@/components/Header";
 import { baseMetadata } from "@/lib/seo";
 import { GA_MEASUREMENT_ID } from "@/lib/analytics";
 
+const sans = Manrope({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
+
+const display = Lora({
+  subsets: ["latin"],
+  variable: "--font-display",
+});
+
 export const metadata: Metadata = baseMetadata();
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${sans.variable} ${display.variable}`}>
       <body>
         {GA_MEASUREMENT_ID ? (
           <>
@@ -22,12 +33,26 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </Script>
           </>
         ) : null}
-        <div className="mx-auto min-h-screen max-w-6xl px-4 py-5">
-          <div className="mb-4 rounded-full border border-sky-200 bg-white/80 px-4 py-2 text-xs text-slate-600">
-            Newsroom status: autonomous publishing active
+
+        {/* Subscribe with Google — newsletter/reader revenue */}
+        <Script src="https://news.google.com/swg/js/v1/swg-basic.js" strategy="afterInteractive" />
+        <Script id="swg-basic-init" strategy="afterInteractive">
+          {`(self.SWG_BASIC = self.SWG_BASIC || []).push(basicSubscriptions => {
+  basicSubscriptions.init({
+    type: "NewsArticle",
+    isPartOfType: ["Product"],
+    isPartOfProductId: "CAow9bDGDA:openaccess",
+    clientOptions: { theme: "light", lang: "en" },
+  });
+});`}
+        </Script>
+        <div className="min-h-screen">
+          <div className="sticky top-0 z-20 border-b border-black/10 bg-white/90 backdrop-blur">
+            <div className="mx-auto max-w-[1480px] px-4 py-3 md:px-8 md:py-4">
+              <Header />
+            </div>
           </div>
-          <Header />
-          <main className="mt-5">{children}</main>
+          <main className="mx-auto mt-8 max-w-[1480px] px-4 pb-10 md:px-8">{children}</main>
           <Footer />
         </div>
       </body>

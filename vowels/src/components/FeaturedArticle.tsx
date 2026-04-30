@@ -10,19 +10,41 @@ interface FeaturedArticleProps {
 
 export function FeaturedArticle({ article }: FeaturedArticleProps) {
   return (
-    <section className="news-card p-6">
-      <span className="text-xs font-bold uppercase tracking-wide text-newsroom">Featured Report</span>
-      <h1 className="mt-3 font-serif text-4xl leading-tight text-slate-900">
-        <Link href={`/article/${article.slug}`}>{article.title}</Link>
-      </h1>
-      <p className="mt-3 max-w-3xl text-base text-slate-600">{article.description}</p>
-      <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-600">
-        <span>{article.author}</span>
-        <span>{article.readingTime} min read</span>
-        {article.isSponsored ? <SponsoredContentLabel /> : null}
-      </div>
-      <div className="mt-5">
-        <CTAButton label="Read Full Report" href={`/article/${article.slug}`} eventLabel="featured_article_cta" />
+    <section className="relative overflow-hidden rounded-[2rem] border border-black/10 bg-gradient-to-br from-coal via-slate-900 to-black text-white shadow-news">
+      <div className="absolute -right-24 -top-20 h-64 w-64 rounded-full bg-brand/30 blur-3xl" />
+      <div className="absolute -left-12 bottom-0 h-52 w-52 rounded-full bg-white/10 blur-3xl" />
+
+      <div className="relative grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
+        <div className="px-6 py-8 md:px-10 md:py-11">
+          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-orange-300">Cover Story</span>
+          <h1 className="mt-5 max-w-4xl font-serif text-5xl leading-[0.9] md:text-7xl [text-wrap:balance]">
+            <Link href={`/article/${article.slug}`}>{article.title}</Link>
+          </h1>
+          <p className="mt-7 max-w-2xl text-base leading-8 text-white/82 md:text-lg">{article.description}</p>
+
+          <div className="mt-6 flex flex-wrap items-center gap-3 text-xs font-semibold uppercase tracking-[0.12em] text-white/70">
+            <span>{article.author}</span>
+            <span className="h-1 w-1 rounded-full bg-white/40" />
+            <span>{article.readingTime} min read</span>
+          </div>
+        </div>
+
+        <div className="m-4 rounded-[1.5rem] bg-white/95 p-6 text-black backdrop-blur md:m-6 md:p-8">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Featured Report</p>
+          <div className="mt-4 text-sm text-slate-700">
+            <p className="font-semibold">{article.takeaway}</p>
+          </div>
+
+          <div className="mt-4 space-y-2 text-xs uppercase tracking-[0.1em] text-slate-500">
+            <p>Category: {article.category.replace(/-/g, " ")}</p>
+            {article.isSponsored ? <SponsoredContentLabel /> : null}
+          </div>
+
+          <p className="mt-6 text-sm leading-7 text-slate-700">Research-backed reporting on food systems, nutrition literacy, and what healthy actually means in practice.</p>
+          <div className="mt-8">
+            <CTAButton label="Read Full Report" href={`/article/${article.slug}`} eventLabel="featured_article_cta" />
+          </div>
+        </div>
       </div>
     </section>
   );

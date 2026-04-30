@@ -9,16 +9,16 @@ interface ArticleCardProps {
 
 export function ArticleCard({ article }: ArticleCardProps) {
   return (
-    <article className="news-card p-4">
+    <article className="group news-card p-5 transition hover:-translate-y-1 hover:shadow-[0_16px_42px_rgba(17,19,25,0.16)]">
       <div className="mb-3 flex items-center justify-between gap-2">
-        <span className="text-xs font-semibold uppercase tracking-wide text-newsroom">{article.category}</span>
+        <span className="rounded-full bg-mist px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600">{article.category}</span>
         {article.isSponsored ? <SponsoredContentLabel /> : null}
       </div>
-      <h3 className="font-serif text-2xl leading-tight text-slate-900">
-        <Link href={`/article/${article.slug}`}>{article.title}</Link>
+      <h3 className="font-serif text-3xl leading-[0.95] text-slate-950 transition group-hover:text-brand">
+        <Link href={`/article/${article.slug}`} className="[text-wrap:balance]">{article.title}</Link>
       </h3>
-      <p className="mt-2 text-sm text-slate-600">{article.description}</p>
-      <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-500">
+      <p className="mt-3 text-sm leading-6 text-slate-700">{article.description}</p>
+      <div className="mt-4 flex flex-wrap gap-2 text-xs font-medium uppercase tracking-[0.06em] text-slate-500">
         <span>{article.author}</span>
         <span>-</span>
         <span>{new Date(article.publishedAt).toLocaleDateString()}</span>
