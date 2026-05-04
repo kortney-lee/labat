@@ -124,3 +124,55 @@ jobs:
       - name: Skip Alex trigger (no token configured)
         if: ${{ secrets.INTERNAL_ADMIN_TOKEN == '' }}
         run: echo "INTERNAL_ADMIN_TOKEN secret is not configured; skipping Alex /trigger/all"
+
+      - name: Fetch Alex SEO report
+        if: ${{ secrets.INTERNAL_ADMIN_TOKEN != '' }}
+        working-directory: .
+        env:
+          INTERNAL_ADMIN_TOKEN: ${{ secrets.INTERNAL_ADMIN_TOKEN }}
+        run: |
+          mkdir -p .artifacts
+          curl -fsSL "${{ steps.alex.outputs.url }}/api/astra/report" \
+            -H "x-admin-token: ${INTERNAL_ADMIN_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -o .artifacts/alex-report.json
+
+      - name: Upload Alex report artifact
+        if: ${{ secrets.INTERNAL_ADMIN_TOKEN != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: alex-seo-report
+          path: .artifacts/alex-report.json
+          if-no-files-found: error
+
+      - name: Publish Alex report summary
+        if: ${{ secrets.INTERNAL_ADMIN_TOKEN != '' }}
+        working-directory: .
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report_path = Path('.artifacts/alex-report.json')
+          report = json.loads(report_path.read_text(encoding='utf-8'))
+
+          lines = [
+              '## Alex SEO Report',
+              f"- Agent: {report.get('agent', 'alex')}",
+              f"- Generated at: {report.get('generated_at', report.get('timestamp', 'n/a'))}",
+          ]
+
+          keys = report.get('keywords', {})
+          pages = report.get('pages', {})
+          opportunities = report.get('opportunities', {})
+
+          if isinstance(keys, dict):
+              lines.append(f"- Keywords discovered/saved: {keys.get('discovered', 'n/a')}/{keys.get('saved', 'n/a')}")
+          if isinstance(pages, dict):
+              lines.append(f"- Pages generated/refreshed: {pages.get('generated', 'n/a')}/{pages.get('refreshed', 'n/a')}")
+          if isinstance(opportunities, dict):
+              lines.append(f"- Opportunities found/saved: {opportunities.get('found', 'n/a')}/{opportunities.get('saved', 'n/a')}")
+
+          with open(Path(__import__('os').environ['GITHUB_STEP_SUMMARY']), 'a', encoding='utf-8') as fh:
+              fh.write('\n'.join(lines) + '\n')
+          PY
