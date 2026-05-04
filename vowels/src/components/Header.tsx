@@ -5,6 +5,7 @@ import { SearchBar } from "@/components/SearchBar";
 
 const navLinks = [
   { href: "/", label: "Home" },
+  { href: "/subjects", label: "Subjects" },
   { href: "/category/nutrition-education", label: "Coverage" },
   { href: "/editorial-policy", label: "Editorial Policy" },
   { href: "/about", label: "About" },

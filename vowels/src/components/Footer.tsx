@@ -10,6 +10,7 @@ export function Footer() {
           <p className="text-slate-600">Evidence-based nutrition education powered by data.</p>
         </div>
         <div className="flex flex-wrap items-center gap-4">
+          <Link href="/subjects" className="hover:text-brand">Subjects</Link>
           <Link href="/privacy" className="hover:text-brand">Privacy</Link>
           <Link href="/terms" className="hover:text-brand">Terms</Link>
           <Link href="/editorial-policy" className="hover:text-brand">Editorial Policy</Link>

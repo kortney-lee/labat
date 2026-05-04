@@ -5,6 +5,7 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://vowels.org";
 export function allStaticRoutes(): string[] {
   return [
     "/",
+    "/subjects",
     "/about",
     "/contact",
     "/privacy",

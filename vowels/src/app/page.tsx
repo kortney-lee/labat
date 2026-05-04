@@ -5,14 +5,32 @@ import { ArticleCard } from "@/components/ArticleCard";
 import { DataInsightCard } from "@/components/DataInsightCard";
 import { FeaturedArticle } from "@/components/FeaturedArticle";
 import { SwgCta } from "@/components/SwgCta";
-import { getAllArticles } from "@/lib/articles";
+import { getAllArticles, searchArticles } from "@/lib/articles";
 import { weeklyInsights } from "@/lib/wihyData";
 
 export const dynamic = "force-static";
 
-export default function HomePage() {
+interface HomePageProps {
+  searchParams?: {
+    q?: string;
+  };
+}
+
+const subjectSeeds = [
+  "high protein",
+  "meal prep",
+  "blood sugar",
+  "fiber",
+  "processed food",
+  "sodium",
+  "kids nutrition",
+  "weight management",
+];
+
+export default function HomePage({ searchParams }: HomePageProps) {
+  const query = searchParams?.q?.trim() || "";
   const all = getAllArticles();
-  const filtered = all;
+  const filtered = query ? searchArticles(query) : all;
   const featured = filtered[0] || all[0];
   const feed = filtered.slice(1, 7);
   const highlight = filtered[1] || all[1];
@@ -28,6 +46,39 @@ export default function HomePage() {
             <h1 className="mt-3 font-serif text-4xl leading-tight text-slate-950 md:text-5xl">The new standard for understanding nutrition.</h1>
             <p className="mt-4 text-base leading-8 text-slate-700">Clear, evidence-based insights to help you make better decisions about food, health, and daily habits.</p>
           </div>
+        </div>
+      </section>
+
+      {query ? (
+        <section className="news-card px-5 py-4 md:px-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-slate-700">
+              Search results for <span className="font-semibold text-slate-900">&quot;{query}&quot;</span>: {filtered.length}
+            </p>
+            <Link href="/" className="text-xs font-semibold uppercase tracking-[0.12em] text-brand hover:underline">
+              Clear search
+            </Link>
+          </div>
+        </section>
+      ) : null}
+
+      <section className="news-card p-5 md:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-serif text-3xl text-slate-950">High-Intent Subjects</h2>
+          <Link href="/subjects" className="text-xs font-semibold uppercase tracking-[0.12em] text-brand hover:underline">
+            View all subjects
+          </Link>
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {subjectSeeds.map((seed) => (
+            <Link
+              key={seed}
+              href={`/?q=${encodeURIComponent(seed)}`}
+              className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.1em] text-slate-700 transition hover:border-brand/40 hover:text-brand"
+            >
+              {seed}
+            </Link>
+          ))}
         </div>
       </section>
 
@@ -87,17 +138,24 @@ export default function HomePage() {
             <h2 className="font-serif text-4xl leading-none text-slate-950">Latest Insights</h2>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            {feed.slice(0, 2).map((article) => (
-              <ArticleCard key={article.slug} article={article} />
-            ))}
-            <div className="md:col-span-2">
-              <AdSlot slotName="In-Feed Content Ad" size="infeed" />
+          {filtered.length ? (
+            <div className="grid gap-4 md:grid-cols-2">
+              {feed.slice(0, 2).map((article) => (
+                <ArticleCard key={article.slug} article={article} />
+              ))}
+              <div className="md:col-span-2">
+                <AdSlot slotName="In-Feed Content Ad" size="infeed" />
+              </div>
+              {feed.slice(2).map((article) => (
+                <ArticleCard key={article.slug} article={article} />
+              ))}
             </div>
-            {feed.slice(2).map((article) => (
-              <ArticleCard key={article.slug} article={article} />
-            ))}
-          </div>
+          ) : (
+            <section className="news-card p-6">
+              <h3 className="font-serif text-2xl text-slate-950">No matching stories yet</h3>
+              <p className="mt-2 text-sm text-slate-700">Try a broader term like protein, fiber, blood sugar, or meal prep.</p>
+            </section>
+          )}
 
           <section className="news-card p-6">
             <div className="flex flex-wrap items-center justify-between gap-2">
