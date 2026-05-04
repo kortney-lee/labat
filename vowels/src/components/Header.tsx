@@ -15,9 +15,8 @@ export function Header() {
   return (
     <header className="space-y-3">
       <div className="flex items-center justify-between gap-3">
-        <Link href="/" className="inline-flex items-center gap-2">
-          <Image src="/vowels-logo.svg" alt="Vowels" width={36} height={36} priority />
-          <span className="font-serif text-2xl leading-none text-brand">Vowels</span>
+        <Link href="/" className="inline-flex items-center">
+          <Image src="/vowels-lockup.png" alt="Vowels" width={180} height={48} priority />
         </Link>
       </div>
 

@@ -6,7 +6,7 @@ export function Footer() {
     <footer className="mt-16 border-t border-black/10 bg-white/75 py-10 backdrop-blur">
       <div className="mx-auto flex max-w-[1480px] flex-wrap items-center justify-between gap-4 px-4 text-sm text-slate-600 md:px-8">
         <div className="flex items-center gap-3">
-          <Image src="/vowels-brand.png" alt="Vowels" width={120} height={40} />
+          <Image src="/vowels-lockup.png" alt="Vowels" width={140} height={38} />
           <p className="text-slate-600">Evidence-based nutrition education powered by data.</p>
         </div>
         <div className="flex flex-wrap items-center gap-4">
