@@ -1,0 +1,54 @@
+name: Vowels Weekly Content Growth
+
+on:
+  schedule:
+    - cron: "15 12 * * 1"
+  workflow_dispatch:
+
+jobs:
+  seed-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        working-directory: vowels
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Seed weekly growth articles
+        working-directory: vowels
+        run: node scripts/seed-weekly-growth.mjs --count=8
+
+      - name: Build check
+        working-directory: vowels
+        run: npm run build
+
+      - name: Commit and push content updates
+        run: |
+          if [[ -z "$(git status --porcelain)" ]]; then
+            echo "No content updates to commit"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add vowels/src/content/articles/*.mdx
+          git add vowels/scripts/seed-weekly-growth.mjs
+          git commit -m "content(vowels): weekly growth seed update"
+          git push
