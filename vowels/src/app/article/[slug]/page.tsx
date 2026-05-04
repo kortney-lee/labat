@@ -9,6 +9,7 @@ import { ArticleViewTracker } from "@/components/ArticleViewTracker";
 import { SponsoredContentLabel } from "@/components/SponsoredContentLabel";
 import { SwgCta } from "@/components/SwgCta";
 import { getAllArticles, getArticleBySlug, getRelatedArticles } from "@/lib/articles";
+import { getArticleHeroImage } from "@/lib/article-images";
 import { articleJsonLd, articleMetadata } from "@/lib/seo";
 
 interface ArticlePageProps {
@@ -36,6 +37,7 @@ export default function ArticlePage({ params }: ArticlePageProps) {
   const related = getRelatedArticles(article.slug, 5);
   const html = marked.parse(article.body, { async: false }) as string;
   const jsonLd = articleJsonLd(article);
+  const hero = getArticleHeroImage(article);
 
   return (
     <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
@@ -50,6 +52,26 @@ export default function ArticlePage({ params }: ArticlePageProps) {
           <span>{article.readingTime} min read</span>
           {article.isSponsored ? <SponsoredContentLabel /> : null}
         </div>
+
+        {/* Hero image */}
+        <figure className="mt-6 overflow-hidden rounded-2xl">
+          <img
+            src={hero.src}
+            alt={article.imageAlt ?? article.title}
+            width={1200}
+            height={630}
+            className="h-64 w-full object-cover sm:h-80 lg:h-96"
+            loading="eager"
+          />
+          {(article.imageCaption || hero.credit) && (
+            <figcaption className="mt-2 px-1 text-xs text-slate-400">
+              {article.imageCaption ?? ""}
+              {hero.credit && (
+                <span className="ml-1">Photo: {hero.credit}</span>
+              )}
+            </figcaption>
+          )}
+        </figure>
 
         <AdSlot slotName="Article Top Leaderboard" size="leaderboard" className="mt-6" />
 

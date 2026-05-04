@@ -30,6 +30,8 @@ function parseArticleFile(filePath: string): ArticleWithContent {
     publishedAt: String(data.publishedAt || new Date().toISOString()),
     updatedAt: data.updatedAt ? String(data.updatedAt) : undefined,
     image: data.image ? String(data.image) : undefined,
+    imageAlt: data.imageAlt ? String(data.imageAlt) : undefined,
+    imageCaption: data.imageCaption ? String(data.imageCaption) : undefined,
     readingTime: Number(data.readingTime || readingTimeMinutes(content)),
     takeaway: String(data.takeaway || "Use data to make practical nutrition decisions."),
     tags: toArray(data.tags),

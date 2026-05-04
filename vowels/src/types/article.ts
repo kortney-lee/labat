@@ -18,6 +18,8 @@ export interface Article {
   publishedAt: string;
   updatedAt?: string;
   image?: string;
+  imageAlt?: string;
+  imageCaption?: string;
   readingTime: number;
   takeaway: string;
   tags: string[];
