@@ -1,14 +1,22 @@
-name: Vowels CI
+name: Vowels CI/CD
 
 on:
   push:
+    branches:
+      - main
     paths:
       - "vowels/**"
+      - "firebase.vowels.json"
       - ".github/workflows/vowels-ci.yml"
   pull_request:
     paths:
       - "vowels/**"
       - ".github/workflows/vowels-ci.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: vowels-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -26,11 +34,67 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "npm"
-          cache-dependency-path: vowels/package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
 
       - name: Build
         run: npm run build
+
+  deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: read
+      id-token: write
+
+    defaults:
+      run:
+        working-directory: vowels
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_WIHY_AI_SA_KEY }}
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools@15.12.0
+
+      - name: Enable Firebase webframeworks experiment
+        working-directory: .
+        run: firebase experiments:enable webframeworks
+
+      - name: Deploy to Firebase Hosting (vowels)
+        working-directory: .
+        run: firebase deploy --only hosting:vowels --project wihy-ai --config firebase.vowels.json
+
+      - name: Smoke test live endpoints
+        working-directory: .
+        run: |
+          curl -fsSL "https://vowels-org.web.app" > /dev/null
+          curl -fsSL "https://vowels-org.web.app/rss.xml" > /dev/null
+          curl -fsSL "https://vowels-org.web.app/feed" > /dev/null
+          curl -fsSL "https://vowels-org.web.app/news-sitemap.xml" > /dev/null
