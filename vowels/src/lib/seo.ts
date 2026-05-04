@@ -8,6 +8,26 @@ export function baseMetadata() {
     metadataBase: new URL(siteUrl),
     title: `${siteName} | Nutrition Education`,
     description: "Evidence-based nutrition education powered by WIHY data.",
+    alternates: {
+      canonical: "/",
+      types: {
+        "application/rss+xml": "/rss.xml",
+        "application/feed+json": "/feed",
+      },
+    },
+    openGraph: {
+      type: "website",
+      url: siteUrl,
+      siteName,
+      title: `${siteName} | Nutrition Education`,
+      description: "Evidence-based nutrition education powered by WIHY data.",
+      locale: "en_US",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${siteName} | Nutrition Education`,
+      description: "Evidence-based nutrition education powered by WIHY data.",
+    },
   };
 }
 
