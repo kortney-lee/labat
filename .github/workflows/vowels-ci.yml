@@ -98,3 +98,29 @@ jobs:
           curl -fsSL "https://vowels-org.web.app/rss.xml" > /dev/null
           curl -fsSL "https://vowels-org.web.app/feed" > /dev/null
           curl -fsSL "https://vowels-org.web.app/news-sitemap.xml" > /dev/null
+
+      - name: Resolve Alex (SEO) service URL
+        id: alex
+        working-directory: .
+        run: |
+          ALEX_URL=$(gcloud run services describe wihy-alex-vowels --region us-central1 --project wihy-ai --format='value(status.url)')
+          echo "url=$ALEX_URL" >> "$GITHUB_OUTPUT"
+          echo "Resolved Alex URL: $ALEX_URL"
+
+      - name: Alex SEO health check
+        working-directory: .
+        run: curl -fsSL "${{ steps.alex.outputs.url }}/api/astra/health" > /dev/null
+
+      - name: Trigger Alex SEO cycles
+        if: ${{ secrets.INTERNAL_ADMIN_TOKEN != '' }}
+        working-directory: .
+        env:
+          INTERNAL_ADMIN_TOKEN: ${{ secrets.INTERNAL_ADMIN_TOKEN }}
+        run: |
+          curl -fsSL -X POST "${{ steps.alex.outputs.url }}/api/astra/trigger/all" \
+            -H "x-admin-token: ${INTERNAL_ADMIN_TOKEN}" \
+            -H "Content-Type: application/json" > /dev/null
+
+      - name: Skip Alex trigger (no token configured)
+        if: ${{ secrets.INTERNAL_ADMIN_TOKEN == '' }}
+        run: echo "INTERNAL_ADMIN_TOKEN secret is not configured; skipping Alex /trigger/all"
