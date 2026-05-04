@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 
 export function Footer() {
@@ -6,7 +5,7 @@ export function Footer() {
     <footer className="mt-16 border-t border-black/10 bg-white/75 py-10 backdrop-blur">
       <div className="mx-auto flex max-w-[1480px] flex-wrap items-center justify-between gap-4 px-4 text-sm text-slate-600 md:px-8">
         <div className="flex items-center gap-3">
-          <Image src="/vowels-brand.png" alt="Vowels cap mark" width={28} height={28} className="h-7 w-7 object-contain" />
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-brand/30 bg-brand/10 font-serif text-sm font-bold leading-none text-brand">V</span>
           <p>
             <span className="font-serif text-2xl leading-none text-brand">Vowels</span> Evidence-based nutrition education powered by data.
           </p>

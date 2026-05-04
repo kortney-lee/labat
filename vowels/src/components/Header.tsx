@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import { SearchBar } from "@/components/SearchBar";
@@ -16,7 +15,7 @@ export function Header() {
     <header className="space-y-3">
       <div className="flex items-center justify-between gap-3">
         <Link href="/" className="inline-flex items-center gap-3">
-          <Image src="/vowels-brand.png" alt="Vowels cap mark" width={28} height={28} className="h-7 w-7 object-contain" />
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-brand/30 bg-brand/10 font-serif text-sm font-bold leading-none text-brand">V</span>
           <span className="font-serif text-2xl leading-none text-brand">Vowels</span>
         </Link>
       </div>
