@@ -47,7 +47,7 @@ BRAND_CONFIG = {
 }
 _DEFAULT_BRAND = "vowels"
 
-BOOK_PDF_URL = "https://whatishealthy.org/WhatisHealthy_eBook.pdf"
+BOOK_PDF_URL = "https://whatishealthy.org/WhatisHealthy_FreeIntroduction.pdf"
 CONFIRM_DOWNLOAD_URL = "https://whatishealthy.org/confirm-download.html"
 BOOK_IMAGE_URL = "https://storage.googleapis.com/wihy-web-assets/images/book/BookGreen.jpg"
 WIHY_URL = "https://wihy.ai"
@@ -58,6 +58,10 @@ CG_URL = "https://communitygroceries.com"
 
 PAPERBACK_URL_FEMALE = "https://buy.stripe.com/dRmbJ13cu4dYcdz5t0ejK0i"
 PAPERBACK_URL_MALE = "https://buy.stripe.com/aFafZheVc7qacdzg7EejK0j"
+AMAZON_PAPERBACK_URL = "https://www.amazon.com/dp/B0FJ2494LH"
+AMAZON_HARDCOVER_URL = "https://www.amazon.com/dp/B0FJ23J6JQ"
+AMAZON_KINDLE_URL = "https://www.amazon.com/dp/B0DL7Z7NFL"
+AMAZON_AUDIBLE_URL = "https://www.amazon.com/dp/B0GVWM74FR"
 
 # ── Variant copy — dynamic keyword inserts per ad variant ─────────────────
 
@@ -300,35 +304,55 @@ def _paperback_buttons() -> str:
 </div>"""
 
 
+def _all_format_buttons() -> str:
+    """Full grid of purchase options: Stripe paperback + all Amazon formats."""
+    def btn(label: str, url: str, color: str) -> str:
+        return (
+            f'<div style="text-align:center;margin-bottom:10px;">'
+            f'<a href="{url}" style="display:inline-block;background:{color};color:#ffffff;'
+            f'font-size:15px;font-weight:600;text-decoration:none;padding:12px 24px;'
+            f'border-radius:6px;width:100%;max-width:320px;box-sizing:border-box;">{label}</a>'
+            f'</div>'
+        )
+    return (
+        btn("📦 Ship Paperback — Female Cover", PAPERBACK_URL_FEMALE, "#16a34a") +
+        btn("📦 Ship Paperback — Male Cover", PAPERBACK_URL_MALE, "#16a34a") +
+        btn("🛒 Amazon Paperback", AMAZON_PAPERBACK_URL, "#FF9900") +
+        btn("📘 Amazon Hardcover", AMAZON_HARDCOVER_URL, "#232f3e") +
+        btn("📱 Kindle Edition", AMAZON_KINDLE_URL, "#1A6B9A") +
+        btn("🎧 Audible Audiobook", AMAZON_AUDIBLE_URL, "#F38B00")
+    )
+
+
 # ── Template builders ─────────────────────────────────────────────────────────
 
 def _render_book_delivery(first_name: str, variant: str = "", **kw) -> str:
-    """Day 0 — warm welcome + download link."""
+    """Day 0 — warm welcome + free introduction download + full book upsell."""
     c = _get_copy(variant)
     return _email_wrap(f"""
 <tr><td style="padding:40px 32px 16px;">
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
 Hey {first_name},</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-Thanks for grabbing a copy of <strong>What Is Healthy</strong>. I wrote this book because I got tired of seeing people get misled by food labels and marketing. I wanted to put the real research in one place — no fluff, no agenda.</p>
+Thanks for signing up — your free introduction to <strong>What Is Healthy?</strong> is ready below. I wrote this book because I got tired of watching people get misled by food labels and marketing. I wanted to put the real research in one place — no fluff, no agenda.</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-This book is a great first step towards {c['goal']}. And I'm sure you're going to get a lot out of it.</p>
+Your free introduction (the first 27 pages) is a great first look at what's inside — and I think you're going to find it eye-opening.</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-Your free digital copy is ready right now:</p>
+Here's your free introduction:</p>
 </td></tr>
 <tr><td style="padding:0 32px 16px;text-align:center;">
-{_cta_button(c['download_cta'], CONFIRM_DOWNLOAD_URL)}
+{_cta_button("Download My Free Introduction", CONFIRM_DOWNLOAD_URL)}
 </td></tr>
 <tr><td style="padding:16px 32px 12px;">
-<p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-I hope you enjoy it. And if you're the kind of person who likes to highlight, dog-ear, and keep a book on the kitchen counter — a lot of our readers prefer the physical copy. You can see what's inside and grab one here:</p>
+<p style="margin:0 0 12px;font-size:17px;line-height:1.8;color:#374151;">
+The introduction ends right as things get interesting. The full 264-page book is where the real answers live — available in every format:</p>
 </td></tr>
-<tr><td style="padding:0 32px 16px;text-align:center;">
-{_cta_button("See What's Inside", BOOK_URL)}
+<tr><td style="padding:0 32px 16px;">
+{_all_format_buttons()}
 </td></tr>
 <tr><td style="padding:8px 32px 32px;">
 <p style="margin:0;font-size:17px;line-height:1.8;color:#374151;">
-I'll check in with you tomorrow.</p>
+I'll check in tomorrow.</p>
 <p style="margin:20px 0 0;font-size:17px;line-height:1.8;color:#374151;">
 Talk soon,<br/>{_team(variant)}</p>
 </td></tr>""", variant=variant)
@@ -342,16 +366,12 @@ def _render_did_you_get_this(first_name: str, variant: str = "", **kw) -> str:
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
 Hey {first_name},</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-Yesterday you requested a copy of my free book, <strong>What Is Healthy?</strong>, and I just wanted to check in and see if you had a chance to read it yet.</p>
+Yesterday you grabbed the free introduction to <strong>What Is Healthy?</strong> — just wanted to check in and see how it landed.</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-This book is a great first step towards {c['goal']}. And I'm sure you're going to get a lot out of it.</p>
+That introduction is just the first 27 pages. The full 264-page book is where all the answers actually live — the part that explains how we got here and what to do about it.</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-But I also wanted to make sure you saw this — if you're really serious about {c['desired_result']}, a lot of our readers have found that having the physical copy on their kitchen counter changes everything.</p>
-<p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-There's something about reaching for it right before a grocery trip that makes the information stick. It's $24.99 and we cover shipping. Same content you already have, just in a format you can highlight, dog-ear, and share with family.</p>
-<p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-No pressure — the free digital copy is yours to keep either way.</p>
-{_paperback_buttons()}
+A lot of our readers grab the paperback or hardcover so they can highlight it and keep it on the kitchen counter before grocery runs. Others prefer Kindle or Audible. Every format is $24.99 or under:</p>
+{_all_format_buttons()}
 <p style="margin:24px 0 0;font-size:17px;line-height:1.8;color:#374151;">
 Hope to talk to you soon,<br/>{_team(variant)}</p>
 </td></tr>""", variant=variant)
@@ -365,19 +385,17 @@ def _render_big_benefit(first_name: str, variant: str = "", **kw) -> str:
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
 Hey {first_name},</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-You recently grabbed a free copy of <strong>What Is Healthy?</strong></p>
+A few days ago you grabbed the free introduction to <strong>What Is Healthy?</strong></p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-And I'm glad you did. Because I'm always happy to connect with someone who wants to {c['topic_benefit']}.</p>
+Good. Because I'm always glad to connect with someone who wants to {c['topic_benefit']}.</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-If you haven't started reading yet, here's what's waiting for you inside:</p>
+If you haven't opened it yet, here's a taste of what's waiting in the full 264-page book:</p>
 {_bullets(c)}
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
 And that's just the beginning. {c['chapter_hook']}</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-And whatever else we could pack into 200+ pages of real research — no filler.</p>
-<p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-If you want the full experience, a lot of readers tell us the physical copy makes it easier to highlight, flip through before grocery runs, and keep handy in the kitchen. It's $24.99 with free shipping.</p>
-{_paperback_buttons()}
+That's 264 pages of real research — no filler, no agenda. Available in paperback, hardcover, Kindle, and Audible:</p>
+{_all_format_buttons()}
 <p style="margin:24px 0 0;font-size:17px;line-height:1.8;color:#374151;">
 Talk soon,<br/>{_team(variant)}</p>
 </td></tr>""", variant=variant)

@@ -336,12 +336,13 @@
       flex: 1; min-width: 200px; display: inline-flex; justify-content: center;
       align-items: center; background: var(--orange); color: #fff;
       text-decoration: none; border-radius: 12px; padding: 15px 18px;
-      font-size: 0.94rem; font-weight: 800; transition: all 180ms ease;
-      box-shadow: 0 6px 22px rgba(249,115,22,0.3);
+      font-size: 0.94rem; font-weight: 800; transition: transform 180ms ease, box-shadow 180ms ease;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.22);
     }
     .upsell-btns a:hover {
-      background: var(--orange-hover); transform: translateY(-2px);
-      box-shadow: 0 8px 28px rgba(249,115,22,0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.30);
+      opacity: 0.93;
     }
     .upsell .guarantee {
       margin-top: 4px;
@@ -456,10 +457,10 @@
       <div class="unlocked">
         <div class="check">&#10003;</div>
         <h2 id="welcome-msg">You're confirmed!</h2>
-        <p class="sub">Your PDF is starting now. If it does not open automatically, use the button below.</p>
+        <p class="sub">Your free introduction is starting now. If it does not open automatically, use the button below.</p>
         <div class="download-btn">
-          <a id="download-btn" class="btn btn-green" href="/WhatisHealthy_eBook.pdf" download>
-            Download My Free Book Again
+          <a id="download-btn" class="btn btn-green" href="/WhatisHealthy_FreeIntroduction.pdf" download>
+            Download My Free Introduction Again
           </a>
         </div>
         <p class="download-note">Tip: on iPhone or Android, your PDF may open in a new tab before you save it.</p>
@@ -478,9 +479,9 @@
     <div class="upsell-dialog" role="dialog" aria-modal="true" aria-labelledby="upsell-title">
       <button id="upsell-close" class="upsell-close" type="button" aria-label="Close offer">&times;</button>
       <div class="upsell-top">
-        <span class="badge">Most Popular</span>
-        <h2 id="upsell-title">Wait &mdash; Before You Go, Get the Physical Copy</h2>
-        <p class="urgency">One-time offer on this page only &mdash; free shipping while inventory lasts.</p>
+        <span class="badge">You only got the introduction</span>
+        <h2 id="upsell-title">Get the Full Book &mdash; 264 Pages of Real Research</h2>
+        <p class="urgency">You just read the first 27 pages. The answers to "How did we get here?" are waiting inside the full book.</p>
       </div>
 
       <div class="upsell-shell">
@@ -493,7 +494,7 @@
           </div>
           <div class="upsell-price">
             <span class="old-price">$39.99</span><span class="real-price">$24.99</span>
-            <p class="shipping">Free shipping &bull; Estimated shipping: 7-14 days &bull; current demand may extend delivery</p>
+            <p class="shipping">Free shipping on paperback &bull; Also on Kindle, Audible &amp; Hardcover</p>
           </div>
         </div>
 
@@ -504,23 +505,39 @@
           </div>
 
           <ul class="benefits">
-            <li>Full-color paperback shipped free to your door</li>
+            <li>Full 264-page book &mdash; 237 more pages than your free intro</li>
             <li>Quick-reference grocery guide inside the back cover</li>
             <li>No screen needed &mdash; use it in the store with your family</li>
-            <li>Fast checkout and immediate confirmation</li>
+            <li>Also available on Kindle, Audible, and Hardcover</li>
           </ul>
 
-          <p class="upsell-note">Choose your cover and finish checkout in under a minute.</p>
+          <p class="upsell-note">Choose your format below:</p>
           <div class="upsell-btns">
             <a id="buy-female" href="https://buy.stripe.com/dRmbJ13cu4dYcdz5t0ejK0i">
-              Ship Me the Paperback &mdash; Female&nbsp;Cover
+              &#128666; Ship Paperback &mdash; Female&nbsp;Cover
             </a>
             <a id="buy-male" href="https://buy.stripe.com/aFafZheVc7qacdzg7EejK0j">
-              Ship Me the Paperback &mdash; Male&nbsp;Cover
+              &#128666; Ship Paperback &mdash; Male&nbsp;Cover
+            </a>
+            <a id="buy-amazon-pb" href="https://www.amazon.com/dp/B0FJ2494LH" target="_blank" rel="noopener"
+               style="background:#FF9900;border-color:#FF9900;">
+              &#128722; Amazon Paperback
+            </a>
+            <a id="buy-hardcover" href="https://www.amazon.com/dp/B0FJ23J6JQ" target="_blank" rel="noopener"
+               style="background:#232f3e;border-color:#232f3e;">
+              &#128218; Amazon Hardcover
+            </a>
+            <a id="buy-kindle" href="https://www.amazon.com/dp/B0DL7Z7NFL" target="_blank" rel="noopener"
+               style="background:#1A6B9A;border-color:#1A6B9A;">
+              &#128241; Kindle Edition
+            </a>
+            <a id="buy-audible" href="https://www.amazon.com/dp/B0GVWM74FR" target="_blank" rel="noopener"
+               style="background:#F38B00;border-color:#F38B00;">
+              &#127911; Audible Audiobook
             </a>
           </div>
           <p class="guarantee">100% satisfaction guaranteed &bull; Real research, no filler</p>
-          <p class="stripe-note">Secure checkout powered by Stripe</p>
+          <p class="stripe-note">Stripe-secured checkout &bull; Amazon links open in a new tab</p>
         </div>
       </div>
     </div>
@@ -544,7 +561,7 @@
     function triggerBookDownload() {
       var tempLink = document.createElement('a');
       tempLink.href = downloadBtn.getAttribute('href');
-      tempLink.setAttribute('download', 'WhatisHealthy_eBook.pdf');
+      tempLink.setAttribute('download', 'WhatisHealthy_FreeIntroduction.pdf');
       tempLink.style.display = 'none';
       document.body.appendChild(tempLink);
       tempLink.click();
