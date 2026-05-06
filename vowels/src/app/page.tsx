@@ -4,6 +4,7 @@ import { AdSlot } from "@/components/AdSlot";
 import { ArticleCard } from "@/components/ArticleCard";
 import { DataInsightCard } from "@/components/DataInsightCard";
 import { FeaturedArticle } from "@/components/FeaturedArticle";
+import { NewsletterSignup } from "@/components/NewsletterSignup";
 import { SwgCta } from "@/components/SwgCta";
 import { getAllArticles, searchArticles } from "@/lib/articles";
 import { weeklyInsights } from "@/lib/wihyData";
@@ -171,6 +172,7 @@ export default function HomePage({ searchParams }: HomePageProps) {
         </div>
 
         <div className="space-y-4">
+          <NewsletterSignup />
           <SwgCta variant="sidebar" />
           <AdSlot slotName="Content Partner Rectangle" size="rectangle" />
           <section className="news-card p-5">

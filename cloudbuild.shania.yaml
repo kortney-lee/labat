@@ -83,7 +83,7 @@ steps:
       - '--concurrency'
       - '20'
       - '--set-env-vars'
-      - 'APP_MODULE=src.apps.shania_app:app,ENV=production,LOG_LEVEL=INFO,WIHY_ML_CLIENT_ID=wihy_ml_mk1waylw,META_GRAPH_API_VERSION=v21.0,INSTAGRAM_GRAPH_VERSION=v19.0,LINKEDIN_ORG_ID=111401973,BRAND_ENFORCEMENT_MODE=warn'
+      - 'APP_MODULE=src.apps.shania_app:app,ENV=production,LOG_LEVEL=INFO,WIHY_ML_CLIENT_ID=wihy_ml_mk1waylw,META_GRAPH_API_VERSION=v21.0,INSTAGRAM_GRAPH_VERSION=v19.0,LINKEDIN_ORG_ID=111401973,BRAND_ENFORCEMENT_MODE=warn,SOCIAL_POSTING_DISABLED=false'
       - '--set-secrets'
       - >-
         INTERNAL_ADMIN_TOKEN=internal-admin-token:latest,

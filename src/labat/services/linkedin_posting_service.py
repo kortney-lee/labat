@@ -28,7 +28,7 @@ from src.labat.linkedin_client import (
 
 logger = logging.getLogger("labat.linkedin_posting_service")
 _SOCIAL_POSTING_DISABLED = (
-    (os.getenv("SOCIAL_POSTING_DISABLED", "true") or "true").strip().lower()
+    (os.getenv("SOCIAL_POSTING_DISABLED", "false") or "false").strip().lower()
     in ("1", "true", "yes", "on")
 )
 

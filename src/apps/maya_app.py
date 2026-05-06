@@ -16,6 +16,7 @@ Routes:
 Auth: X-Admin-Token (INTERNAL_ADMIN_TOKEN secret)
 """
 
+import asyncio
 import logging
 import os
 from contextlib import asynccontextmanager
@@ -32,10 +33,26 @@ logging.basicConfig(
 logger = logging.getLogger("maya_app")
 
 
+async def _run_loop(fn, interval: int, label: str, initial_delay: int = 0) -> None:
+    """Generic background loop: run fn() every interval seconds, log errors but keep running."""
+    if initial_delay:
+        logger.info("maya_app loop [%s] waiting %ds before first run", label, initial_delay)
+        await asyncio.sleep(initial_delay)
+    while True:
+        try:
+            result = await fn()
+            logger.info("maya_app loop [%s] complete: %s", label, result)
+        except Exception as e:
+            logger.error("maya_app loop [%s] error: %s", label, e)
+        await asyncio.sleep(interval)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Start engagement thread monitor on boot."""
-    # Thread monitor (replies to engagement threads)
+    """Start all Maya background services on boot."""
+    import asyncio
+
+    # Thread monitor (replies to engagement threads on Twitter + Threads)
     try:
         from src.maya.services.engagement_poster_service import thread_monitor
         logger.info("maya_app: starting thread monitor")
@@ -67,6 +84,60 @@ async def lifespan(app: FastAPI):
         logger.warning("Social posting service unavailable: %s", e)
         app.state.social_posting = None
 
+    # Audience discovery — find target users via hashtags every 6 hours
+    try:
+        from src.maya.services.audience_discovery_service import run_once as _discovery_run
+        app.state.discovery_task = asyncio.create_task(
+            _run_loop(_discovery_run, interval=86400, label="audience-discovery", initial_delay=3600)
+        )
+        logger.info("maya_app: audience discovery loop started (every 24h, first run in 1h)")
+    except Exception as e:
+        logger.warning("Audience discovery unavailable: %s", e)
+        app.state.discovery_task = None
+
+    # Collaborator finder — find creator partners every 24 hours
+    try:
+        from src.maya.services.collaborator_finder_service import run_once as _collab_run
+        app.state.collaborator_task = asyncio.create_task(
+            _run_loop(_collab_run, interval=86400, label="collaborator-finder", initial_delay=7200)
+        )
+        logger.info("maya_app: collaborator finder loop started (every 24h, first run in 2h)")
+    except Exception as e:
+        logger.warning("Collaborator finder unavailable: %s", e)
+        app.state.collaborator_task = None
+
+    # Auto-engage — like and follow discovered users every 2 hours
+    try:
+        from src.maya.services.auto_engage_service import run_once as _engage_run
+        app.state.auto_engage_task = asyncio.create_task(
+            _run_loop(_engage_run, interval=7200, label="auto-engage")
+        )
+        logger.info("maya_app: auto-engage loop started (every 2h)")
+    except Exception as e:
+        logger.warning("Auto-engage unavailable: %s", e)
+        app.state.auto_engage_task = None
+
+    # Twitter Filtered Stream — real-time tweet listener (Bearer token)
+    try:
+        from src.maya.services.twitter_stream_service import twitter_stream_service
+        await twitter_stream_service.start()
+        app.state.twitter_stream = twitter_stream_service
+        logger.info("maya_app: Twitter Filtered Stream started")
+    except Exception as e:
+        logger.warning("Twitter stream unavailable: %s", e)
+        app.state.twitter_stream = None
+
+    # Twitter Trends — poll every 1 hour
+    try:
+        from src.maya.services.twitter_trends_service import run_once as _trends_run
+        app.state.trends_task = asyncio.create_task(
+            _run_loop(_trends_run, interval=3600, label="twitter-trends")
+        )
+        logger.info("maya_app: Twitter trends loop started (every 1h)")
+    except Exception as e:
+        logger.warning("Twitter trends unavailable: %s", e)
+        app.state.trends_task = None
+
     status = validate_config()
     logger.info("Maya Facebook config: %s", {
         k: v for k, v in status.items() if k.startswith("shania") or k.startswith("webhook")
@@ -80,6 +151,19 @@ async def lifespan(app: FastAPI):
     if getattr(app.state, "social_posting", None):
         logger.info("maya_app: stopping social posting service")
         await app.state.social_posting.stop()
+
+    stream = getattr(app.state, "twitter_stream", None)
+    if stream:
+        await stream.stop()
+
+    for attr in ("discovery_task", "collaborator_task", "auto_engage_task", "trends_task"):
+        task = getattr(app.state, attr, None)
+        if task:
+            task.cancel()
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
 
 
 
@@ -132,6 +216,24 @@ try:
 except Exception as e:
     logger.warning("Social engagement router unavailable: %s", e)
 
+# ── Audience Discovery / Collaborator Finder / Auto-Engage ───────────────────
+
+try:
+    from src.maya.routers.discovery_routes import router as discovery_router
+    app.include_router(discovery_router)
+    logger.info("Discovery routes loaded (audience discovery, collaborators, auto-engage)")
+except Exception as e:
+    logger.warning("Discovery routes unavailable: %s", e)
+
+# ── Twitter Webhook (Account Activity API — Pro tier) ────────────────────────
+
+try:
+    from src.maya.routers.twitter_webhook_routes import router as twitter_webhook_router
+    app.include_router(twitter_webhook_router)
+    logger.info("Twitter webhook routes loaded (CRC + event ingestion)")
+except Exception as e:
+    logger.warning("Twitter webhook routes unavailable: %s", e)
+
 
 # ── Facebook Engagement (comments, Messenger, webhooks, compliance) ──────────
 
@@ -161,6 +263,11 @@ async def health():
         "role": "engagement",
         "monitor": tm.status() if tm else "unavailable",
         "social_posting": sp.status() if sp else "unavailable",
+        "audience_discovery": "running" if getattr(app.state, "discovery_task", None) and not app.state.discovery_task.done() else "stopped",
+        "collaborator_finder": "running" if getattr(app.state, "collaborator_task", None) and not app.state.collaborator_task.done() else "stopped",
+        "auto_engage": "running" if getattr(app.state, "auto_engage_task", None) and not app.state.auto_engage_task.done() else "stopped",
+        "twitter_stream": getattr(app.state, "twitter_stream", None) and app.state.twitter_stream.status() or "unavailable",
+        "twitter_trends": "running" if getattr(app.state, "trends_task", None) and not app.state.trends_task.done() else "stopped",
     }
 
 

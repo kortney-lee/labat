@@ -7,13 +7,36 @@ import { trackEvent } from "@/lib/analytics";
 export function NewsletterSignup() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
 
-  const onSubmit = (e: FormEvent) => {
+  const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) return;
-    trackEvent({ name: "newsletter_signup", params: { location: "homepage" } });
-    setSent(true);
-    setEmail("");
+    const value = email.trim();
+    if (!value || sending) return;
+
+    setSending(true);
+    setError("");
+
+    try {
+      const resp = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: value, source: "vowels" }),
+      });
+
+      if (!resp.ok) {
+        throw new Error(`Signup failed: ${resp.status}`);
+      }
+
+      trackEvent({ name: "newsletter_signup", params: { location: "homepage" } });
+      setSent(true);
+      setEmail("");
+    } catch {
+      setError("We could not subscribe you right now. Please try again.");
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -30,11 +53,16 @@ export function NewsletterSignup() {
           placeholder="you@example.com"
           className="w-full rounded-full border border-black/15 bg-mist px-4 py-3 text-sm text-black outline-none focus:border-brand"
         />
-        <button className="rounded-full bg-brand px-5 py-3 text-sm font-bold uppercase tracking-[0.12em] text-white transition hover:bg-black" type="submit">
-          Subscribe
+        <button
+          className="rounded-full bg-brand px-5 py-3 text-sm font-bold uppercase tracking-[0.12em] text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
+          type="submit"
+          disabled={sending}
+        >
+          {sending ? "Sending..." : "Subscribe"}
         </button>
       </form>
       {sent ? <p className="mt-3 text-xs text-emerald-700">Thanks. You are subscribed.</p> : null}
+      {error ? <p className="mt-3 text-xs text-red-600">{error}</p> : null}
     </section>
   );
 }

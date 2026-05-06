@@ -29,9 +29,19 @@ export function generateStaticParams() {
 }
 
 export function generateMetadata({ params }: CategoryPageProps): Metadata {
+  const categoryName = params.slug.replace(/-/g, " ");
   return {
-    title: `Category: ${params.slug.replace(/-/g, " ")} | Vowels.org`,
-    description: `Evidence-based nutrition stories in ${params.slug.replace(/-/g, " ")}.`,
+    title: `Category: ${categoryName} | Vowels.org`,
+    description: `Evidence-based nutrition stories in ${categoryName}.`,
+    alternates: {
+      canonical: `/category/${params.slug}`,
+    },
+    openGraph: {
+      title: `Category: ${categoryName} | Vowels.org`,
+      description: `Evidence-based nutrition stories in ${categoryName}.`,
+      url: `/category/${params.slug}`,
+      type: "website",
+    },
   };
 }
 

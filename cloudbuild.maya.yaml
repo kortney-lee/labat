@@ -47,7 +47,7 @@ steps:
       - '--concurrency'
       - '20'
       - '--set-env-vars'
-      - 'APP_MODULE=src.apps.maya_app:app,ENV=production,LOG_LEVEL=INFO,WIHY_ML_CLIENT_ID=wihy_ml_mk1waylw,META_GRAPH_API_VERSION=v21.0,INSTAGRAM_GRAPH_VERSION=v19.0,SOCIAL_POSTING_LAUNCH_MODE=false,SHANIA_SOCIAL_POSTING_INTERVAL=21600,SHANIA_MAX_POSTS_PER_CYCLE=1,SHANIA_SOCIAL_MIN_RUN_GAP_SECONDS=10800'
+      - 'APP_MODULE=src.apps.maya_app:app,ENV=production,LOG_LEVEL=INFO,WIHY_ML_CLIENT_ID=wihy_ml_mk1waylw,META_GRAPH_API_VERSION=v21.0,INSTAGRAM_GRAPH_VERSION=v19.0,SOCIAL_POSTING_DISABLED=false,SOCIAL_POSTING_LAUNCH_MODE=false,SHANIA_SOCIAL_POSTING_INTERVAL=21600,SHANIA_MAX_POSTS_PER_CYCLE=1,SHANIA_SOCIAL_MIN_RUN_GAP_SECONDS=10800,TWITTER_BOT_USERNAME=wihyhealthbot,TWITTER_MY_USER_ID=1978344427342249984'
       - '--set-secrets'
       - >-
         INTERNAL_ADMIN_TOKEN=internal-admin-token:latest,
@@ -61,6 +61,11 @@ steps:
         SHANIA_LONG_LIVED_USER_TOKEN=wihy-shania-long-user-token:latest,
         SHANIA_PAGE_ACCESS_TOKEN=wihy-shania-page-access-token:latest,
         META_WEBHOOK_VERIFY_TOKEN=wihy-agent-meta-webhook-verify-token:latest,
+        TWITTER_BEARER_TOKEN=twitter-bearer-token:latest,
+        TWITTER_API_KEY=twitter-api-key:latest,
+        TWITTER_API_SECRET=twitter-api-secret:latest,
+        TWITTER_ACCESS_TOKEN=twitter-access-token:latest,
+        TWITTER_ACCESS_TOKEN_SECRET=twitter-access-token-secret:latest,
         META_PAGE_ID_WIHY=meta-page-id-wihy:latest,
         META_PAGE_ID_VOWELS=meta-page-id-vowels:latest,
         META_PAGE_ID_COMMUNITYGROCERIES=meta-page-id-communitygroceries:latest,

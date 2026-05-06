@@ -24,6 +24,13 @@ from typing import Any, Dict, List, Optional
 
 import httpx
 
+# X (Twitter) posting credentials — same keys used by engagement service
+_TWITTER_API_KEY             = (os.getenv("TWITTER_API_KEY", "") or "").strip()
+_TWITTER_API_SECRET          = (os.getenv("TWITTER_API_SECRET", "") or "").strip()
+_TWITTER_ACCESS_TOKEN        = (os.getenv("TWITTER_ACCESS_TOKEN", "") or "").strip()
+_TWITTER_ACCESS_TOKEN_SECRET = (os.getenv("TWITTER_ACCESS_TOKEN_SECRET", "") or "").strip()
+X_POSTING_ENABLED = os.getenv("X_POSTING_ENABLED", "true").strip().lower() not in ("0", "false", "no", "off")
+
 from src.maya.services.social_template_registry import (
     get_template_driven_brands,
     pick_structured_social_topics,
@@ -86,65 +93,63 @@ def _platforms_for_brand(brand: str) -> List[str]:
 
 # ── LAUNCH HYPE topics — higher priority during launch mode ──────────────
 LAUNCH_TOPICS: List[Dict[str, str]] = [
-    # ── WIHY AI launch hype ──
-    {"prompt": "Coming soon: an AI that actually understands YOUR health. WIHY AI analyzes 48 million research articles so you don't have to. Sign up for early access at wihy.ai", "brand": "wihy"},
-    {"prompt": "Tired of generic health advice? WIHY AI builds meal plans, workout routines, and nutrition guidance personalized to YOUR body and goals. Launching soon — join the waitlist at wihy.ai", "brand": "wihy"},
-    {"prompt": "What if you had a personal nutritionist, fitness coach, and health researcher in your pocket — powered by AI? That's WIHY. Early access opening soon at wihy.ai", "brand": "wihy"},
-    {"prompt": "WIHY AI scans any food product and tells you exactly what's in it — no confusing labels, no marketing tricks, just science. Try it free at wihy.ai when we launch", "brand": "wihy"},
-    {"prompt": "We trained our AI on real peer-reviewed research — not influencer opinions. WIHY gives you health answers backed by science. Coming soon to wihy.ai", "brand": "wihy"},
-    {"prompt": "Your doctor gets 19 hours of nutrition training in med school. WIHY AI was trained on millions of nutrition studies. Which one do you want planning your meals? Sign up at wihy.ai", "brand": "wihy"},
-    {"prompt": "Stop Googling health questions and getting 50 different answers. WIHY AI gives you ONE answer backed by real research. Launching soon — wihy.ai", "brand": "wihy"},
-    {"prompt": "Ask WIHY anything: 'What should I eat to lose weight?' 'Is intermittent fasting safe?' 'Build me a workout plan.' Real AI. Real science. Real answers. Coming soon at wihy.ai", "brand": "wihy"},
-    {"prompt": "We're building the health app we wished existed. AI-powered meal plans, fitness programs, food scanning, and research — all in one place. Join the movement at wihy.ai", "brand": "wihy"},
-    {"prompt": "WIHY is not another calorie counter. It's an AI health platform that learns YOUR body, YOUR goals, and YOUR diet — then gives you a science-backed plan. Launching soon at wihy.ai", "brand": "wihy"},
-    {"prompt": "Sneak peek: WIHY AI just generated a full 7-day meal plan with grocery list in under 30 seconds. Personalized. Research-backed. Affordable. This is the future of health. wihy.ai", "brand": "wihy"},
-    {"prompt": "The food industry spends $14 billion a year convincing you junk food is fine. We built an AI to fight back with science. WIHY is coming. wihy.ai", "brand": "wihy"},
-    # ── Community Groceries launch hype ──
-    {"prompt": "Introducing Community Groceries — the smarter way to shop, cook, and eat healthy on any budget. AI-powered meal plans and grocery lists built for real families. Coming soon at communitygroceries.com", "brand": "communitygroceries"},
-    {"prompt": "What if your grocery list was built by AI that knows your budget, your family's allergies, and what's on sale this week? That's Community Groceries. Sign up at communitygroceries.com", "brand": "communitygroceries"},
-    {"prompt": "Feeding a family of four for under $100 a week — with balanced, healthy meals. Community Groceries makes it possible with AI-powered meal planning. Launching soon at communitygroceries.com", "brand": "communitygroceries"},
-    {"prompt": "We're tired of meal planning apps that suggest $15 salmon when you're on a $50/week budget. Community Groceries plans meals YOUR wallet can handle. Coming soon at communitygroceries.com", "brand": "communitygroceries"},
-    {"prompt": "Scan any product at the store. Community Groceries AI tells you if it's healthy, what to swap it for, and where to find it cheaper. Try it free at communitygroceries.com when we launch", "brand": "communitygroceries"},
-    {"prompt": "Meal prep Sunday just got an upgrade. Community Groceries generates a full week of meals + shopping list in seconds — personalized to your family. Launching soon at communitygroceries.com", "brand": "communitygroceries"},
-    {"prompt": "School lunch ideas. Weeknight dinners. Snacks that aren't junk. Community Groceries is the meal planning AI built for busy parents. Join the waitlist at communitygroceries.com", "brand": "communitygroceries"},
-    {"prompt": "Stop throwing away food. Community Groceries builds grocery lists that match your meal plan exactly — no waste, no extra trips, no stress. Coming soon at communitygroceries.com", "brand": "communitygroceries"},
-    {"prompt": "Every family deserves access to healthy food — regardless of budget. Community Groceries uses AI to make nutritious eating affordable and simple. Launching soon at communitygroceries.com", "brand": "communitygroceries"},
-    {"prompt": "Your grandma planned meals by hand. You can let AI do it in 30 seconds. Same love, smarter tools. Community Groceries — coming soon at communitygroceries.com", "brand": "communitygroceries"},
-    {"prompt": "Behind the scenes: we just tested Community Groceries AI with a real family of five. Full week of meals, grocery list, $78 total. This is what we're building. communitygroceries.com", "brand": "communitygroceries"},
-    {"prompt": "Healthy eating shouldn't require a nutrition degree or a six-figure salary. Community Groceries makes it dead simple with AI. Join us at communitygroceries.com", "brand": "communitygroceries"},
+    # ── Eden by WIHY launch hype ──
+    {"prompt": "Introducing Eden by WIHY — your AI health companion that turns what you think into what you do. Ask any health question, get research-backed answers from 48M+ studies, and walk away with a real plan. wihy.ai", "brand": "wihy"},
+    {"prompt": "Eden doesn't just give you information — it gives you decisions. Ask Eden what to eat, scan your food, build a meal plan, and send your grocery list to Instacart in one flow. That's Eden by WIHY. wihy.ai", "brand": "wihy"},
+    {"prompt": "Other apps track your calories. Eden by WIHY explains them, connects them to your goals, and tells you exactly what to do next. From thought to action — that's the difference. wihy.ai", "brand": "wihy"},
+    {"prompt": "Ask Eden: 'Is this healthy for me?' It scans the barcode, reads the label, detects additives and carcinogens, and tells you what to buy instead. No guesswork. Real science. Eden by WIHY. wihy.ai", "brand": "wihy"},
+    {"prompt": "Eden by WIHY builds you a full 7-day meal plan in under 30 seconds — personalized to your goals, your diet, your budget — then turns it into a grocery list you can send straight to Walmart or Instacart. wihy.ai", "brand": "wihy"},
+    {"prompt": "Your doctor got 19 hours of nutrition training in medical school. Eden by WIHY was trained on 48 million peer-reviewed research articles. Ask Eden what to eat. wihy.ai", "brand": "wihy"},
+    {"prompt": "Eden by WIHY connects three things no other platform does: research, real food, and your actual behavior. Then it turns that into one clear action. Ask Eden. Eat better. Live healthier. wihy.ai", "brand": "wihy"},
+    {"prompt": "Stop Googling your health questions and getting 10 conflicting answers. Eden by WIHY gives you one answer — backed by real research — and a plan to act on it. wihy.ai", "brand": "wihy"},
+    {"prompt": "Eden isn't another calorie counter. It's a decision engine for your health. It watches your patterns, learns your habits, and tells you exactly what to do next. Eden by WIHY — wihy.ai", "brand": "wihy"},
+    {"prompt": "The food industry spends $14 billion a year marketing processed food as healthy. Eden by WIHY was built to fight back — with 48 million research studies and a barcode scanner. wihy.ai", "brand": "wihy"},
+    {"prompt": "Scan any food with Eden. It detects hidden sugars, additives, carcinogens, and allergens — then suggests a better option. This is what food transparency actually looks like. Eden by WIHY. wihy.ai", "brand": "wihy"},
+    {"prompt": "Eden by WIHY learns your eating habits, cravings, and patterns — then tells you what's coming before it happens. Predictive health coaching that actually knows you. wihy.ai", "brand": "wihy"},
+    # ── Cora by Community Groceries launch hype ──
+    {"prompt": "Introducing Cora by Community Groceries — your intelligent grocery and pantry companion. Cora builds your grocery list from your meal plan, tracks your pantry, and connects to Instacart, Walmart, and Amazon in one flow. communitygroceries.com", "brand": "communitygroceries"},
+    {"prompt": "Most grocery apps are built around transactions. Cora is built around your family. It knows what's in your pantry, builds your list automatically, and gets it to your door without the stress. Plan smarter. Shop easier. Waste less. communitygroceries.com", "brand": "communitygroceries"},
+    {"prompt": "Cora turns your meal plan into a grocery list and sends it straight to Walmart or Instacart. Thought → Grocery List → Checkout. That's Cora by Community Groceries. communitygroceries.com", "brand": "communitygroceries"},
+    {"prompt": "You don't just struggle with what to eat. You struggle with what you already have, what to buy, and how to stay organized. Cora by Community Groceries solves all of it in one place. communitygroceries.com", "brand": "communitygroceries"},
+    {"prompt": "Scan your receipt with Cora and it instantly builds your pantry inventory. Know exactly what you have, what you're running low on, and what to buy next. No duplicate purchases. No forgotten ingredients. Cora by Community Groceries. communitygroceries.com", "brand": "communitygroceries"},
+    {"prompt": "Cora builds your grocery list automatically from your meal plan, pantry gaps, budget, and family preferences. No more guessing. No more overbuying. Just smarter, faster shopping. communitygroceries.com", "brand": "communitygroceries"},
+    {"prompt": "The average family wastes $1,500 of food every year. Cora by Community Groceries helps you use what you already have — pantry-first meal suggestions, reorder reminders, and smarter shopping built in. communitygroceries.com", "brand": "communitygroceries"},
+    {"prompt": "Cora by Community Groceries connects your whole household. Shared grocery lists. Shared pantry visibility. Family meal coordination. Everyone on the same page — from planning to purchase. communitygroceries.com", "brand": "communitygroceries"},
+    {"prompt": "Every family deserves access to healthy food they can actually afford. Cora uses budget-aware recommendations, pantry-first suggestions, and direct retailer connections to make it happen. communitygroceries.com", "brand": "communitygroceries"},
+    {"prompt": "Cora doesn't just help you shop. It helps you think about food differently — what you have, what you need, what you can cook tonight. Intelligent grocery and pantry management for real households. communitygroceries.com", "brand": "communitygroceries"},
 ]
 
 # ── Evergreen topics — ongoing educational content ──────────────────────
 EVERGREEN_TOPICS: List[Dict[str, str]] = [
-    # wihy — superhuman optimization: biohacking, longevity, peak performance, become the best version of yourself
-    {"prompt": "Do these 5 things every morning and your body will perform like a machine: cold shower, sunlight exposure, protein-first meal, breathwork, movement. The superhuman morning routine backed by science", "brand": "wihy"},
-    {"prompt": "Walking 10,000 steps a day is good. But adding just 2 minutes of cold water at the end of your shower increases norepinephrine by 530%. Small upgrades, superhuman results", "brand": "wihy"},
-    {"prompt": "Your VO2 max is the single best predictor of how long you'll live — better than cholesterol, blood pressure, or any blood test. Here's how to improve it starting today", "brand": "wihy"},
-    {"prompt": "Grip strength predicts all-cause mortality better than blood pressure. The stronger your grip, the longer you live. Here's the 5-minute daily protocol to build it", "brand": "wihy"},
-    {"prompt": "Want to age slower? Zone 2 cardio 150 minutes per week. Strength training 3x per week. 7+ hours sleep. High protein diet. That's the entire longevity playbook backed by research", "brand": "wihy"},
-    {"prompt": "10 minutes of cold exposure increases dopamine by 250% for hours — no caffeine, no supplements, just ice water. This is how you become superhuman without spending a dime", "brand": "wihy"},
-    {"prompt": "Time-restricted eating (eating within an 8-hour window) activates autophagy — your body literally repairs damaged cells. This is the closest thing to a biological reset button", "brand": "wihy"},
-    {"prompt": "Elite athletes sleep 9-10 hours. Your muscle doesn't grow in the gym — it grows during deep sleep. Here's how to optimize your sleep architecture for maximum recovery", "brand": "wihy"},
-    {"prompt": "Sauna 4x per week reduces all-cause mortality by 40%. Heat stress activates heat shock proteins that repair DNA damage. Your gym membership should include the sauna", "brand": "wihy"},
-    {"prompt": "The human body produces more electricity than a 120-volt battery. You are literally a biological machine — here's how to optimize your engine with food, movement, and recovery", "brand": "wihy"},
-    {"prompt": "Creatine isn't just for bodybuilders. Research shows it improves memory, reduces brain fog, and protects against neurodegeneration. 5g per day — the most studied supplement on earth", "brand": "wihy"},
-    {"prompt": "Your mitochondria are the power plants of every cell. Red light therapy, cold exposure, and exercise all increase mitochondrial density. More mitochondria = more energy = superhuman output", "brand": "wihy"},
-    {"prompt": "Stop counting calories. Start counting protein. 1g per pound of body weight. This single change transforms body composition faster than any diet ever created", "brand": "wihy"},
-    {"prompt": "Grounding — walking barefoot on earth — reduces inflammation markers in clinical studies. Free. Zero side effects. 20 minutes a day. The most underrated health hack that exists", "brand": "wihy"},
-    {"prompt": "Your body replaces 330 billion cells every day. Feed it the right raw materials and you literally become a new, upgraded version of yourself every 90 days", "brand": "wihy"},
-    # communitygroceries — recipes, easy meals, food that drives commerce and family dinner tables
-    {"prompt": "30 Minute Shrimp Tacos: Season shrimp with chili, cumin, garlic. Sear 3 min per side. Serve on warm corn tortillas with shredded cabbage, lime, cilantro, and Greek yogurt. Family dinner done — 320 cal, 25g protein", "brand": "communitygroceries"},
-    {"prompt": "One-pot chicken and rice: Brown chicken thighs, add rice, broth, frozen peas, garlic. Cover and simmer 20 minutes. One pan. One cleanup. Feeds a family of four for under $12", "brand": "communitygroceries"},
-    {"prompt": "Sheet pan salmon and vegetables: Toss broccoli, sweet potato, and salmon with olive oil and lemon. 400°F for 20 minutes. High omega-3, zero effort, restaurant quality at home", "brand": "communitygroceries"},
-    {"prompt": "5-ingredient black bean tacos the kids actually love: canned black beans, taco seasoning, corn tortillas, shredded cheese, salsa. 10 minutes. $6 for the whole family. Meatless Monday winner", "brand": "communitygroceries"},
-    {"prompt": "Sunday meal prep that saves your week: Cook 2 lbs ground turkey, a pot of brown rice, and roast a sheet pan of mixed veggies. Mix and match all week. 5 lunches prepped in 90 minutes", "brand": "communitygroceries"},
-    {"prompt": "Slow cooker pulled chicken: Chicken breast + salsa + cumin + garlic. 6 hours on low. Shred. Use for tacos, bowls, salads, wraps. One cook, four different meals", "brand": "communitygroceries"},
-    {"prompt": "Quick peanut noodles the whole family loves: Cook spaghetti. Toss with peanut butter, soy sauce, lime juice, sesame oil, and sriracha. Top with cucumber and cilantro. 15 minutes. Under $8", "brand": "communitygroceries"},
-    {"prompt": "Egg muffin cups — breakfast meal prep: Whisk 12 eggs with spinach, bell pepper, cheese. Pour into muffin tin. Bake 20 min at 375°F. Grab-and-go breakfast for the entire week", "brand": "communitygroceries"},
-    {"prompt": "Budget grocery haul under $50 that feeds a family of 4 for a full week: chicken thighs, rice, beans, eggs, frozen veggies, bananas, oats, tortillas, peanut butter, canned tomatoes. Practical. Nutritious. Affordable", "brand": "communitygroceries"},
-    {"prompt": "Healthy air fryer chicken tenders: Cut chicken breast into strips. Coat in egg wash then panko + garlic powder. Air fry 400°F 10 min. Crispier than fast food. 28g protein per serving. Kids go crazy for these", "brand": "communitygroceries"},
-    {"prompt": "3-ingredient banana oat pancakes: Mash 2 ripe bananas + 1 cup oats + 2 eggs. Blend. Cook like regular pancakes. No flour, no added sugar. Kids think they're getting a treat. You know it's actually healthy", "brand": "communitygroceries"},
-    {"prompt": "The $3 lunch that beats any drive-through: Rice + canned black beans + frozen corn + salsa + avocado. Microwave the first three, top with the rest. 15g protein, 8g fiber, and it actually tastes incredible", "brand": "communitygroceries"},
+    # wihy — superhuman optimization + Eden product tie-ins
+    {"prompt": "Do these 5 things every morning and your body will perform like a machine: cold shower, sunlight exposure, protein-first meal, breathwork, movement. Ask Eden by WIHY to build you the exact meal that starts this routine right. wihy.ai", "brand": "wihy"},
+    {"prompt": "Your VO2 max is the single best predictor of how long you'll live — better than cholesterol, blood pressure, or any blood test. Eden by WIHY can build you a fitness + nutrition plan to improve it starting today. wihy.ai", "brand": "wihy"},
+    {"prompt": "Want to age slower? Zone 2 cardio 150 min/week. Strength training 3x/week. 7+ hours sleep. High protein diet. Ask Eden by WIHY to build the exact meal plan and workout schedule for this protocol. wihy.ai", "brand": "wihy"},
+    {"prompt": "Time-restricted eating (8-hour window) activates autophagy — your body literally repairs damaged cells. Eden by WIHY can build your entire fasting schedule and tell you exactly what to eat when you break it. wihy.ai", "brand": "wihy"},
+    {"prompt": "Creatine isn't just for bodybuilders. Research shows 5g/day improves memory, reduces brain fog, and protects against neurodegeneration. Eden by WIHY connects supplements to your full health picture. wihy.ai", "brand": "wihy"},
+    {"prompt": "Stop counting calories. Start counting protein — 1g per pound of body weight. This single change transforms body composition faster than any diet. Ask Eden by WIHY to build your protein-first meal plan. wihy.ai", "brand": "wihy"},
+    {"prompt": "Sauna 4x per week reduces all-cause mortality by 40%. But what you eat before and after the sauna matters just as much. Ask Eden by WIHY what to eat to maximize recovery. wihy.ai", "brand": "wihy"},
+    {"prompt": "Your body replaces 330 billion cells every day. Feed it the right raw materials and you become a new, upgraded version of yourself every 90 days. Eden by WIHY tells you exactly what those raw materials are. wihy.ai", "brand": "wihy"},
+    {"prompt": "Grip strength predicts all-cause mortality better than blood pressure. The stronger your grip, the longer you live. Eden by WIHY builds you the workout + nutrition protocol to train it. wihy.ai", "brand": "wihy"},
+    {"prompt": "10 minutes of cold exposure increases dopamine by 250% for hours. Eden by WIHY connects your daily habits — sleep, food, movement, recovery — into one personalized system. wihy.ai", "brand": "wihy"},
+    {"prompt": "Eden by WIHY tracks your eating patterns, learns your cravings, and predicts your habits before they happen. This is what personalized health actually looks like — not a one-size-fits-all app. wihy.ai", "brand": "wihy"},
+    {"prompt": "You don't need more health information. You need better decisions. Eden by WIHY takes 48M research studies and turns them into one clear action for YOUR body, YOUR goals, TODAY. wihy.ai", "brand": "wihy"},
+    {"prompt": "Eden by WIHY doesn't just scan your food — it explains it, connects it to your goals, and tells you what to buy instead. From barcode to decision in seconds. wihy.ai", "brand": "wihy"},
+    {"prompt": "Thought → Plan → Checkout. Ask Eden what to eat. Get a 7-day meal plan. Send your grocery list to Instacart, Walmart, or Amazon. Eden by WIHY closes the loop between knowing and doing. wihy.ai", "brand": "wihy"},
+    {"prompt": "Elite athletes sleep 9-10 hours because muscle grows during deep sleep, not in the gym. Ask Eden by WIHY to optimize your nutrition for recovery — what to eat before bed matters more than your protein shake. wihy.ai", "brand": "wihy"},
+    # communitygroceries — Cora product features, pantry intelligence, smarter shopping
+    {"prompt": "Cora by Community Groceries tracks your pantry automatically. Scan a receipt — Cora logs everything. It tells you what you already have, what you're running low on, and what to reorder. No more buying things you already own. communitygroceries.com", "brand": "communitygroceries"},
+    {"prompt": "Cora builds your grocery list from your meal plan — automatically. It checks your pantry first, skips what you already have, and only lists what you actually need. Smarter. Faster. Less waste. communitygroceries.com", "brand": "communitygroceries"},
+    {"prompt": "Cora connects to Instacart, Walmart, Amazon, and Kroger. Build your list in Cora, send it to your preferred retailer, and your groceries are on the way. Thought → List → Checkout. That's the Cora flow. communitygroceries.com", "brand": "communitygroceries"},
+    {"prompt": "Most people don't know what's in their own pantry. Cora does. Receipt scanning, automatic inventory tracking, low stock reminders — Cora makes your household pantry intelligent. communitygroceries.com", "brand": "communitygroceries"},
+    {"prompt": "Cora is budget-aware. It knows your household food budget, suggests meals built around what you already have, and recommends the most cost-effective shopping path. Healthy food doesn't have to be expensive when you shop smarter. communitygroceries.com", "brand": "communitygroceries"},
+    {"prompt": "Shared grocery lists. Shared pantry. One household, everyone connected. Cora by Community Groceries keeps the whole family coordinated — from meal planning to the final purchase. communitygroceries.com", "brand": "communitygroceries"},
+    {"prompt": "The average American household wastes $1,500 of food per year. Cora fixes that with pantry-first meal planning, reorder reminders, and smart consumption tracking. Use what you have. Buy only what you need. communitygroceries.com", "brand": "communitygroceries"},
+    {"prompt": "Cora doesn't just help you shop — it helps you organize your food life. Pantry inventory, grocery lists, meal coordination, retailer connections, and household budgeting — all in one intelligent platform. communitygroceries.com", "brand": "communitygroceries"},
+    {"prompt": "Food access is a real problem. Cora by Community Groceries is built to make smarter, healthier grocery decisions accessible to every household — regardless of budget, neighborhood, or schedule. communitygroceries.com", "brand": "communitygroceries"},
+    {"prompt": "Cora learns your household. It knows what your family eats, what you always run out of, and what you never finish. Over time, it builds a smarter grocery experience personalized to your actual habits. communitygroceries.com", "brand": "communitygroceries"},
+    {"prompt": "With Cora, your meal plan and your grocery list are the same thing. Plan your week, Cora checks your pantry, builds the list, and sends it to Walmart or Instacart. Dinner is handled. communitygroceries.com", "brand": "communitygroceries"},
+    {"prompt": "Cora by Community Groceries is part of a bigger mission: smarter food access for every community. Pantry intelligence, budget-aware shopping, and real-world fulfillment — built for households that need it most. communitygroceries.com", "brand": "communitygroceries"},
     # childrennutrition — picky eaters, kids nutrition tips, making healthy food fun
     {"prompt": "5 proven strategies to get picky eaters to try new foods without a meltdown", "brand": "childrennutrition"},
     {"prompt": "Why your toddler refuses vegetables and the one trick that actually works", "brand": "childrennutrition"},
@@ -229,6 +234,45 @@ def _select_topics(count: int) -> List[Dict[str, str]]:
         picks.extend(extra)
 
     return picks[:count]
+
+
+async def _post_to_x(client: httpx.AsyncClient, text: str, brand: str) -> bool:
+    """Post a tweet to @Wihyai on X using OAuth 1.0a. Returns True on success."""
+    if not X_POSTING_ENABLED:
+        return False
+    if not all([_TWITTER_API_KEY, _TWITTER_API_SECRET, _TWITTER_ACCESS_TOKEN, _TWITTER_ACCESS_TOKEN_SECRET]):
+        logger.warning("X posting skipped — Twitter credentials not configured")
+        return False
+
+    # Import OAuth helper from engagement service
+    try:
+        from src.maya.services.engagement_poster_service import _twitter_oauth1_header
+    except ImportError:
+        logger.error("X posting: could not import OAuth helper")
+        return False
+
+    # X hard limit is 280 chars
+    tweet = text[:277] + "..." if len(text) > 280 else text
+
+    url = "https://api.twitter.com/2/tweets"
+    try:
+        auth = _twitter_oauth1_header("POST", url, {})
+        r = await client.post(
+            url,
+            headers={"Authorization": auth, "Content-Type": "application/json"},
+            json={"text": tweet},
+            timeout=15,
+        )
+        data = r.json()
+        if r.status_code == 201 and data.get("data", {}).get("id"):
+            tweet_id = data["data"]["id"]
+            logger.info("X post published brand=%s tweet_id=%s text=%s", brand, tweet_id, tweet[:60])
+            return True
+        logger.warning("X post failed brand=%s status=%d body=%s", brand, r.status_code, str(data)[:200])
+        return False
+    except Exception as e:
+        logger.error("X posting error brand=%s: %s", brand, e)
+        return False
 
 
 class SocialPostingService:
@@ -396,6 +440,10 @@ class SocialPostingService:
                                     "Shania: Published post [%s] brand=%s template=%s platforms=%s",
                                     topic["prompt"][:50], topic["brand"], topic.get("template_key", "legacy"), platforms,
                                 )
+                                # Also post to X (@Wihyai)
+                                resp_data = resp.json() if resp.headers.get("content-type", "").startswith("application/json") else {}
+                                x_text = resp_data.get("caption") or resp_data.get("text") or topic["prompt"]
+                                await _post_to_x(client, x_text, topic["brand"])
                             else:
                                 errors += 1
                                 logger.warning(

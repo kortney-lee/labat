@@ -44,7 +44,7 @@ steps:
       - '--set-env-vars'
       - 'APP_MODULE=src.apps.alex_app:app,ENV=production,LOG_LEVEL=INFO,SERVICES_URL=https://services.wihy.ai,WIHY_ML_CLIENT_ID=wihy_ml_mk1waylw,WIHY_VECTOR_STORE_ID=vs_69b0bd9387dc8191b9bc4d8d8f9c4cb1,AUTH_SERVICE_URL=https://auth.wihy.ai,LABAT_URL=https://wihy-labat-n4l2vldq3q-uc.a.run.app,SHANIA_GRAPHICS_URL=https://wihy-shania-graphics-12913076533.us-central1.run.app,AD_POSTING_ENABLED=false,BRAND_ENFORCEMENT_MODE=warn'
       - '--set-secrets'
-      - 'INTERNAL_ADMIN_TOKEN=internal-admin-token:latest,WIHY_ML_CLIENT_SECRET=wihy-ml-client-secret:latest,OPENAI_API_KEY=openai-api-key:latest,WIHY_OPENAI_API_KEY=openai-api-key:latest,META_PAGE_ID_WIHY=meta-page-id-wihy:latest,META_PAGE_ID_VOWELS=meta-page-id-vowels:latest,META_PAGE_ID_COMMUNITYGROCERIES=meta-page-id-communitygroceries:latest,META_PAGE_ID_CHILDRENNUTRITION=meta-page-id-childrennutrition:latest,META_PAGE_ID_PARENTINGWITHCHRIST=meta-page-id-parentingwithchrist:latest,META_PAGE_ID_OTAKULOUNGE=meta-page-id-otakulounge:latest'
+      - 'INTERNAL_ADMIN_TOKEN=internal-admin-token:latest,WIHY_ML_CLIENT_SECRET=wihy-ml-client-secret:latest,OPENAI_API_KEY=openai-api-key:latest,WIHY_OPENAI_API_KEY=openai-api-key:latest,TWITTER_BEARER_TOKEN=twitter-bearer-token:latest,META_PAGE_ID_WIHY=meta-page-id-wihy:latest,META_PAGE_ID_VOWELS=meta-page-id-vowels:latest,META_PAGE_ID_COMMUNITYGROCERIES=meta-page-id-communitygroceries:latest,META_PAGE_ID_CHILDRENNUTRITION=meta-page-id-childrennutrition:latest,META_PAGE_ID_PARENTINGWITHCHRIST=meta-page-id-parentingwithchrist:latest,META_PAGE_ID_OTAKULOUNGE=meta-page-id-otakulounge:latest'
       - '--min-instances'
       - '1'
       - '--max-instances'

@@ -16,7 +16,7 @@ from src.labat.services.token_service import get_shania_page_access_token
 
 _BRAND_SCOPE = os.getenv("SHANIA_BRAND_SCOPE", "").strip().lower() or None
 _ENFORCE_MODE = (os.getenv("BRAND_ENFORCEMENT_MODE", "warn") or "warn").strip().lower() == "enforce"
-_SOCIAL_POSTING_DISABLED = (os.getenv("SOCIAL_POSTING_DISABLED", "true") or "true").strip().lower() in ("1", "true", "yes", "on")
+_SOCIAL_POSTING_DISABLED = (os.getenv("SOCIAL_POSTING_DISABLED", "false") or "false").strip().lower() in ("1", "true", "yes", "on")
 
 
 def _default_page_id() -> str:

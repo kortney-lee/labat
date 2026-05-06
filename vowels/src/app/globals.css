@@ -88,6 +88,32 @@ body::before {
   animation-duration: 1.8s;
 }
 
+.article-prose p {
+  font-size: 1.12rem;
+  line-height: 1.95;
+  letter-spacing: 0.002em;
+  color: #1f2937;
+  margin-top: 1.15em;
+  margin-bottom: 1.15em;
+}
+
+.article-prose h2 {
+  margin-top: 1.9em;
+  margin-bottom: 0.7em;
+}
+
+.article-prose h3 {
+  margin-top: 1.5em;
+  margin-bottom: 0.55em;
+}
+
+.article-prose ul,
+.article-prose ol,
+.article-prose blockquote {
+  margin-top: 1.2em;
+  margin-bottom: 1.2em;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .reveal,
   .reveal-delay-1,

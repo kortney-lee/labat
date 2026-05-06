@@ -118,6 +118,19 @@ async def _run_daily_report():
         await asyncio.sleep(86400)  # 24 hours
 
 
+async def _run_twitter_trends():
+    """Poll Twitter trends every hour and store in Firestore for keyword discovery."""
+    await asyncio.sleep(180)  # 3 min initial delay
+    while True:
+        try:
+            from src.maya.services.twitter_trends_service import run_once
+            result = await run_once()
+            logger.info("Twitter trends fetched: %d health-relevant trends", result.get("total_health_trends", 0))
+        except Exception as e:
+            logger.error("Twitter trends fetch failed: %s", e)
+        await asyncio.sleep(3600)  # 1 hour
+
+
 # ── Lifespan ──────────────────────────────────────────────────────────────────
 
 @asynccontextmanager
@@ -138,6 +151,7 @@ async def lifespan(app: FastAPI):
     background_tasks["opportunity_scan"] = asyncio.create_task(_run_opportunity_scan())
     background_tasks["analytics_ingestion"] = asyncio.create_task(_run_analytics_ingestion())
     background_tasks["daily_report"] = asyncio.create_task(_run_daily_report())
+    background_tasks["twitter_trends"] = asyncio.create_task(_run_twitter_trends())
     logger.info("ALEX: %d background tasks started", len(background_tasks))
 
     # Start autonomous ad creation (LABAT photo ads) only when explicitly enabled.

@@ -563,6 +563,8 @@ class ThreadMonitor:
                 try:
                     if thread.platform == "twitter":
                         new_replies = await self._get_twitter_replies(client, thread)
+                    elif thread.platform == "threads":
+                        new_replies = await self._get_threads_replies(client, thread)
                     else:
                         continue  # Instagram/Facebook/TikTok: no reply API available
 
@@ -635,6 +637,44 @@ class ThreadMonitor:
             logger.error(f"Twitter replies fetch error: {e}")
             return []
 
+    # ── Threads reply fetching ──────────────────────────────────────────────────
+
+    async def _get_threads_replies(
+        self,
+        client: httpx.AsyncClient,
+        thread: _TrackedThread,
+    ) -> list:
+        """
+        Fetch replies to our Threads post using the Threads Replies API.
+        Returns list of {"id": str, "body": str, "author": str}
+        """
+        if not THREADS_ACCESS_TOKEN:
+            return []
+        post_id = thread.our_comment_id
+        try:
+            url = f"https://graph.threads.net/v1.0/{post_id}/replies"
+            r = await client.get(
+                url,
+                params={
+                    "fields": "id,text,username,timestamp",
+                    "access_token": THREADS_ACCESS_TOKEN,
+                },
+                timeout=15,
+            )
+            data = r.json()
+            replies = data.get("data", [])
+            return [
+                {
+                    "id": rep["id"],
+                    "body": rep.get("text", ""),
+                    "author": rep.get("username", ""),
+                }
+                for rep in replies
+            ]
+        except Exception as e:
+            logger.error("Threads replies fetch error post=%s: %s", post_id, e)
+            return []
+
     # ── Auto-reply handler ──────────────────────────────────────────────────────
 
     async def _handle_reply(
@@ -658,6 +698,8 @@ class ThreadMonitor:
 
         if thread.platform == "twitter":
             post_result = await _post_twitter_reply(client, reply_id, comment_text)
+        elif thread.platform == "threads":
+            post_result = await _post_threads_reply(client, reply_id, comment_text)
         else:
             return
 
@@ -775,9 +817,9 @@ async def engage_lead(
         if result.get("success"):
             logger.info(f"Posted to {platform}: post_id={result.get('platform_post_id')} lead={lead_id}")
 
-            # Step 3: Register with thread monitor (Twitter only — has reply API)
+            # Step 3: Register with thread monitor (Twitter + Threads have reply APIs)
             our_id = result.get("platform_post_id")
-            if our_id and platform == "twitter":
+            if our_id and platform in ("twitter", "threads"):
                 _conv_id = conversation_tweet_id or target_id
                 thread_monitor.track(
                     platform=platform,

@@ -11,6 +11,12 @@ function toArray(value: unknown): string[] {
   return [];
 }
 
+function toOptionalString(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const trimmed = value.trim();
+  return trimmed ? trimmed : undefined;
+}
+
 function readingTimeMinutes(text: string): number {
   const words = text.trim().split(/\s+/).length;
   return Math.max(1, Math.round(words / 220));
@@ -19,6 +25,7 @@ function readingTimeMinutes(text: string): number {
 function parseArticleFile(filePath: string): ArticleWithContent {
   const raw = fs.readFileSync(filePath, "utf8");
   const { data, content } = matter(raw);
+  const wihyData = typeof data.wihyData === "object" && data.wihyData !== null ? (data.wihyData as Record<string, unknown>) : undefined;
 
   const slug = String(data.slug || path.basename(filePath, path.extname(filePath)));
   const article: ArticleWithContent = {
@@ -39,6 +46,19 @@ function parseArticleFile(filePath: string): ArticleWithContent {
     isSponsored: Boolean(data.isSponsored || false),
     sponsorName: data.sponsorName ? String(data.sponsorName) : undefined,
     sourceLinks: toArray(data.sourceLinks),
+    quickTake: toOptionalString(data.quickTake),
+    wihyData:
+      wihyData || data.wihyDataIntakeTrend || data.wihyDataMostCommonSource || data.wihyDataCommonIssue
+        ? {
+            intakeTrend: toOptionalString(wihyData?.intakeTrend ?? data.wihyDataIntakeTrend),
+            mostCommonSource: toOptionalString(wihyData?.mostCommonSource ?? data.wihyDataMostCommonSource),
+            commonIssue: toOptionalString(wihyData?.commonIssue ?? data.wihyDataCommonIssue),
+          }
+        : undefined,
+    midArticleCtaLabel: toOptionalString(data.midArticleCtaLabel),
+    midArticleCtaHref: toOptionalString(data.midArticleCtaHref),
+    whatToDo: toArray(data.whatToDo),
+    continueLearning: toArray(data.continueLearning),
     body: content,
   };
 

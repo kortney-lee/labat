@@ -9,6 +9,12 @@ export type ArticleCategory =
 
 export type ArticleStatus = "draft" | "published" | "archived";
 
+export interface WIHYDataSummary {
+  intakeTrend?: string;
+  mostCommonSource?: string;
+  commonIssue?: string;
+}
+
 export interface Article {
   slug: string;
   title: string;
@@ -27,6 +33,12 @@ export interface Article {
   isSponsored?: boolean;
   sponsorName?: string;
   sourceLinks?: string[];
+  quickTake?: string;
+  wihyData?: WIHYDataSummary;
+  midArticleCtaLabel?: string;
+  midArticleCtaHref?: string;
+  whatToDo?: string[];
+  continueLearning?: string[];
 }
 
 export interface ArticleWithContent extends Article {
