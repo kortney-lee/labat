@@ -249,13 +249,13 @@ def _team(variant: str) -> str:
 
 # Nurture sequence: (stage, days_after_signup, template_id, subject)
 NURTURE_SEQUENCE = [
-    (0, 0,  "book_delivery",    "Your free copy is here, {first_name}"),
-    (1, 1,  "did_you_get_this", "Did you get this?"),
-    (2, 3,  "big_benefit",      "{big_benefit} waiting inside..."),
-    (3, 5,  "got_questions",    "Got questions about {topic}?"),
-    (4, 7,  "social_proof",     "Hundreds of readers can't be wrong..."),
-    (5, 10, "im_surprised",     "Frankly, I'm a little surprised..."),
-    (6, 14, "last_chance",      "Last chance..."),
+    (0, 0,  "book_delivery",    "Why I wrote this, {first_name}"),
+    (1, 1,  "did_you_get_this", "The first page of the book"),
+    (2, 3,  "big_benefit",      "What's actually in \"natural flavors\""),
+    (3, 5,  "got_questions",    "The 5-second test for any food label"),
+    (4, 7,  "social_proof",     "What changed after Chapter 6"),
+    (5, 10, "im_surprised",     "The chapter everyone dog-ears"),
+    (6, 14, "last_chance",      "My last email to you"),
 ]
 
 
@@ -327,197 +327,352 @@ def _all_format_buttons() -> str:
 # ── Template builders ─────────────────────────────────────────────────────────
 
 def _render_book_delivery(first_name: str, variant: str = "", **kw) -> str:
-    """Day 0 — warm welcome + free introduction download + full book upsell."""
+    """Day 0 — origin story: why Kortney wrote the book. No download link. Buy CTA."""
     c = _get_copy(variant)
     return _email_wrap(f"""
-<tr><td style="padding:40px 32px 16px;">
+<tr><td style="padding:40px 32px 0;">
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
 Hey {first_name},</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-Thanks for signing up — your free introduction to <strong>What Is Healthy?</strong> is ready below. I wrote this book because I got tired of watching people get misled by food labels and marketing. I wanted to put the real research in one place — no fluff, no agenda.</p>
+My grandmother died of type 2 diabetes at 64.</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-Your free introduction (the first 27 pages) is a great first look at what's inside — and I think you're going to find it eye-opening.</p>
+She wasn't reckless about food. She read labels. She bought "low-fat." She chose "heart-healthy" cereals and "natural" juices. By every measure she understood, she was eating well.</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-Here's your free introduction:</p>
+It didn't matter.</p>
+<p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
+After she passed, I went down a rabbit hole trying to understand how someone who <em>tried</em> could still end up that sick. What I found made me furious — and eventually led me to write <strong>What Is Healthy?</strong></p>
+<p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
+Here's a small sample of what the research showed me:</p>
 </td></tr>
-<tr><td style="padding:0 32px 16px;text-align:center;">
-{_cta_button("Download My Free Introduction", CONFIRM_DOWNLOAD_URL)}
+<tr><td style="padding:0 32px 20px;">
+<table width="100%" cellpadding="0" cellspacing="0"
+       style="background:#eff6ff;border-left:4px solid #1e40af;border-radius:0 8px 8px 0;">
+<tr><td style="padding:20px 24px;">
+<p style="margin:0 0 14px;font-size:16px;line-height:1.8;color:#1e3a5f;">
+&#9679;&nbsp; The FDA allows over <strong>3,000 different chemicals</strong> under the single label "natural flavors" — a term specifically designed to sound harmless while telling you nothing about what's actually in your food.</p>
+<p style="margin:0 0 14px;font-size:16px;line-height:1.8;color:#1e3a5f;">
+&#9679;&nbsp; The ingredient most strongly linked to metabolic disease appears on food labels under <strong>at least 61 different names</strong>. Most people eat it every single day without knowing it.</p>
+<p style="margin:0 0 0;font-size:16px;line-height:1.8;color:#1e3a5f;">
+&#9679;&nbsp; The US food industry spends <strong>$14 billion per year</strong> marketing to children — more than the GDP of some nations — specifically to build brand loyalty before a child can read a label.</p>
+</td></tr></table>
 </td></tr>
-<tr><td style="padding:16px 32px 12px;">
-<p style="margin:0 0 12px;font-size:17px;line-height:1.8;color:#374151;">
-The introduction ends right as things get interesting. The full 264-page book is where the real answers live — available in every format:</p>
+<tr><td style="padding:0 32px 20px;">
+<p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
+None of this is conspiracy. It's in the regulatory filings, the peer-reviewed research, and the industry's own documents. I spent two years pulling it together — no agenda, no supplements to sell, no diet to push.</p>
+<p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
+That became <strong>What Is Healthy?</strong> — 264 pages on what the food industry doesn't want you to understand, and exactly what to do about it. Available in every format:</p>
 </td></tr>
-<tr><td style="padding:0 32px 16px;">
+<tr><td style="padding:0 32px 8px;">
 {_all_format_buttons()}
+<p style="margin:8px 0 0;font-size:13px;line-height:1.6;color:#9ca3af;text-align:center;">
+Paperback ships free &bull; Kindle &amp; Audible available instantly</p>
 </td></tr>
-<tr><td style="padding:8px 32px 32px;">
+<tr><td style="padding:24px 32px 32px;border-top:1px solid #f3f4f6;margin-top:24px;">
 <p style="margin:0;font-size:17px;line-height:1.8;color:#374151;">
-I'll check in tomorrow.</p>
+I'll send you the first page of the book tomorrow.</p>
 <p style="margin:20px 0 0;font-size:17px;line-height:1.8;color:#374151;">
 Talk soon,<br/>{_team(variant)}</p>
 </td></tr>""", variant=variant)
 
 
 def _render_did_you_get_this(first_name: str, variant: str = "", **kw) -> str:
-    """Day 1 — check-in, tease paperback."""
+    """Day 1 — embed the book's opening prose as HTML. Cut at cliffhanger. Buy CTA."""
     c = _get_copy(variant)
     return _email_wrap(f"""
-<tr><td style="padding:40px 32px 32px;">
+<tr><td style="padding:40px 32px 0;">
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
 Hey {first_name},</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-Yesterday you grabbed the free introduction to <strong>What Is Healthy?</strong> — just wanted to check in and see how it landed.</p>
+Here's how <strong>What Is Healthy?</strong> opens:</p>
+</td></tr>
+<tr><td style="padding:0 32px 20px;">
+<table width="100%" cellpadding="0" cellspacing="0"
+       style="background:#fafafa;border:1px solid #e5e7eb;border-radius:8px;">
+<tr><td style="padding:28px 32px;">
+<p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#374151;font-style:italic;">
+We are the sickest generation of Americans in recorded history.</p>
+<p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#374151;font-style:italic;">
+Not sicker because we are older. Not sicker because we have stopped trying. We are sicker
+in spite of knowing more about nutrition than any generation before us. We have more
+diet books, more health apps, more organic labels, and more "wellness" products than
+ever before — and the rates of obesity, type 2 diabetes, heart disease, and metabolic
+dysfunction keep climbing.</p>
+<p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#374151;font-style:italic;">
+Something is very wrong with the story we've been told about food.</p>
+<p style="margin:0 0 18px;font-size:15px;line-height:1.9;color:#374151;font-style:italic;">
+Most people feel it. They follow the advice and don't get better. They read the labels
+and still feel confused. They try harder and the needle doesn't move. And after a while,
+they start to wonder if the problem is them — if they're just not disciplined enough,
+not consistent enough, not smart enough about food.</p>
+<p style="margin:0 0 0;font-size:15px;line-height:1.9;color:#374151;font-style:italic;">
+They're not. The system is broken — and it was designed to be.</p>
+</td></tr></table>
+</td></tr>
+<tr><td style="padding:0 32px 20px;">
+<p style="margin:20px 0 20px;font-size:17px;line-height:1.8;color:#374151;">
+The next chapter is called <strong>"How Did We Get Here?"</strong></p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-That introduction is just the first 27 pages. The full 264-page book is where all the answers actually live — the part that explains how we got here and what to do about it.</p>
-<p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-A lot of our readers grab the paperback or hardcover so they can highlight it and keep it on the kitchen counter before grocery runs. Others prefer Kindle or Audible. Every format is $24.99 or under:</p>
+It answers the question most people have been afraid to ask — because the answer means
+the problem isn't you. It was never you. And once you see it, you can't unsee it.</p>
+<p style="margin:0 0 12px;font-size:17px;line-height:1.8;color:#374151;">
+The full 264-page book, in every format:</p>
+</td></tr>
+<tr><td style="padding:0 32px 8px;">
 {_all_format_buttons()}
-<p style="margin:24px 0 0;font-size:17px;line-height:1.8;color:#374151;">
-Hope to talk to you soon,<br/>{_team(variant)}</p>
+</td></tr>
+<tr><td style="padding:20px 32px 32px;border-top:1px solid #f3f4f6;">
+<p style="margin:0;font-size:17px;line-height:1.8;color:#374151;">
+More coming in a few days.</p>
+<p style="margin:20px 0 0;font-size:17px;line-height:1.8;color:#374151;">
+Talk soon,<br/>{_team(variant)}</p>
 </td></tr>""", variant=variant)
 
 
 def _render_big_benefit(first_name: str, variant: str = "", **kw) -> str:
-    """Day 3 — value bullets, chapter tease, soft paperback mention."""
+    """Day 3 — deep dive on 'natural flavors' deception + variant-specific angle."""
     c = _get_copy(variant)
     return _email_wrap(f"""
-<tr><td style="padding:40px 32px 32px;">
+<tr><td style="padding:40px 32px 0;">
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
 Hey {first_name},</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-A few days ago you grabbed the free introduction to <strong>What Is Healthy?</strong></p>
+Here's something from the book I think about every time I'm in a grocery store.</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-Good. Because I'm always glad to connect with someone who wants to {c['topic_benefit']}.</p>
+Pick up any packaged food. Find the ingredients list. Look for the words
+<strong>"natural flavors."</strong></p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-If you haven't opened it yet, here's a taste of what's waiting in the full 264-page book:</p>
-{_bullets(c)}
+You'll find it on almost everything — granola bars, yogurt, flavored water, crackers,
+baby food. It sounds harmless. "Natural" is right there in the name.</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-And that's just the beginning. {c['chapter_hook']}</p>
+Here's what the label doesn't tell you: "natural flavors" is a legal catch-all term
+that covers <strong>over 3,000 approved additives</strong>. Under FDA rules, any
+substance originally derived from a plant or animal — no matter how extensively
+processed — can be called a "natural flavor." Beaver anal glands.
+Insect-derived colorants. Chemically extracted compounds that have never appeared
+in nature in that form. All of it: "natural flavors."</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-That's 264 pages of real research — no filler, no agenda. Available in paperback, hardcover, Kindle, and Audible:</p>
+This isn't an accident. It's a design decision — made by an industry that spent decades
+lobbying for label language that sounds reassuring while revealing nothing.</p>
+</td></tr>
+<tr><td style="padding:0 32px 20px;">
+<table width="100%" cellpadding="0" cellspacing="0"
+       style="background:#fef9ec;border-left:4px solid #d97706;border-radius:0 8px 8px 0;">
+<tr><td style="padding:20px 24px;">
+<p style="margin:0 0 10px;font-size:15px;font-weight:700;color:#92400e;">
+What this means for {c['topic']}:</p>
+<p style="margin:0 0 10px;font-size:15px;line-height:1.8;color:#78350f;">&#9679;&nbsp; {c['bullet1']}</p>
+<p style="margin:0 0 10px;font-size:15px;line-height:1.8;color:#78350f;">&#9679;&nbsp; {c['bullet2']}</p>
+<p style="margin:0 0 0;font-size:15px;line-height:1.8;color:#78350f;">&#9679;&nbsp; {c['bullet3']}</p>
+</td></tr></table>
+</td></tr>
+<tr><td style="padding:0 32px 20px;">
+<p style="margin:20px 0 20px;font-size:17px;line-height:1.8;color:#374151;">
+{c['chapter_hook']}</p>
+<p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
+There are 22 more revelations like this in the book. Each one changes the way you
+read a label — and what you put in your cart. Available in every format:</p>
+</td></tr>
+<tr><td style="padding:0 32px 8px;">
 {_all_format_buttons()}
-<p style="margin:24px 0 0;font-size:17px;line-height:1.8;color:#374151;">
+</td></tr>
+<tr><td style="padding:20px 32px 32px;border-top:1px solid #f3f4f6;">
+<p style="margin:0;font-size:17px;line-height:1.8;color:#374151;">
 Talk soon,<br/>{_team(variant)}</p>
 </td></tr>""", variant=variant)
 
 
 def _render_got_questions(first_name: str, variant: str = "", **kw) -> str:
-    """Day 5 — curse of knowledge angle, WIHY app mention."""
+    """Day 5 — actionable framework: the 5-second label test. WIHY plug."""
     c = _get_copy(variant)
     return _email_wrap(f"""
-<tr><td style="padding:40px 32px 32px;">
+<tr><td style="padding:40px 32px 0;">
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
 Hey {first_name},</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-How are you finding <strong>What Is Healthy?</strong> so far?</p>
+One of the most useful things in the book is a framework I call the
+<strong>5-second label test</strong>. Here's the short version:</p>
+</td></tr>
+<tr><td style="padding:0 32px 20px;">
+<table width="100%" cellpadding="0" cellspacing="0"
+       style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;">
+<tr><td style="padding:24px 28px;">
+<p style="margin:0 0 10px;font-size:15px;font-weight:700;color:#166534;">
+The 5-Second Label Test:</p>
+<p style="margin:0 0 12px;font-size:15px;line-height:1.8;color:#14532d;">
+<strong>1.</strong> Flip the package over. Find the ingredients list — not the nutrition facts panel.</p>
+<p style="margin:0 0 12px;font-size:15px;line-height:1.8;color:#14532d;">
+<strong>2.</strong> Count how many ingredients have names you couldn't say out loud at a grocery store. Not abbreviations or jargon — just: would a person call this an ingredient at home?</p>
+<p style="margin:0 0 12px;font-size:15px;line-height:1.8;color:#14532d;">
+<strong>3.</strong> If more than 2 of them fail that test, put it back.</p>
+<p style="margin:0 0 0;font-size:15px;line-height:1.8;color:#14532d;">
+That's it. You don't need a chemistry degree. You don't need a calorie counter. You
+just need five seconds and the back of the package.</p>
+</td></tr></table>
+</td></tr>
+<tr><td style="padding:0 32px 20px;">
+<p style="margin:20px 0 20px;font-size:17px;line-height:1.8;color:#374151;">
+The book has 11 more frameworks like this — each one built for a real situation:
+reading labels in under a minute, identifying hidden sugars by their 61 alternate names,
+knowing which "health food" aisle products are junk in disguise.</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-I hope it's been useful. But maybe it provoked even more questions about {c['topic']}.</p>
-<p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-That's what I call the curse of knowledge — the more information you get on a topic, the more confusing it can become. Because information alone isn't that useful.</p>
-<p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-Without something to help you sort through it, prioritize and actually use it, you can get lost down a rabbit hole of conflicting health advice.</p>
-<p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-But there's a way out — and that's through experience.</p>
-<p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-I've spent years researching what happened to our food system, working with real families, and building tools to make {c['goal']} as simple as possible. And during that time I've learned exactly what it takes to get results — without fad diets or expensive organic everything.</p>
-<p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-That's why we built <strong>WIHY</strong> — a free app that lets you ask health questions, scan food labels, and get straight answers backed by real research. Think of it as having the book's knowledge in your pocket at the grocery store.</p>
-<div style="text-align:center;margin-bottom:16px;">
-{_cta_button("Try WIHY Free", WIHY_URL)}
+We also built <strong>Eden by WIHY</strong> — a free AI that lets you ask any food or
+health question and get a straight answer backed by the same research as the book.
+Think of it as the book, but in your pocket at the grocery store.</p>
+<div style="text-align:center;margin:0 0 20px;">
+{_cta_button("Try Eden Free", WIHY_URL)}
 </div>
-<p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-And here are a few things worth revisiting in the book:</p>
-{_bullets(c)}
-<p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-If you want to keep the book handy — on your counter, in your bag, wherever — the paperback is $24.99 with free shipping.</p>
-{_paperback_buttons()}
-<p style="margin:24px 0 0;font-size:17px;line-height:1.8;color:#374151;">
+<p style="margin:0 0 12px;font-size:17px;line-height:1.8;color:#374151;">
+And if you want all 12 frameworks in one place — the full book:</p>
+</td></tr>
+<tr><td style="padding:0 32px 8px;">
+{_all_format_buttons()}
+</td></tr>
+<tr><td style="padding:20px 32px 32px;border-top:1px solid #f3f4f6;">
+<p style="margin:0;font-size:17px;line-height:1.8;color:#374151;">
 Best,<br/>{_team(variant)}</p>
 </td></tr>""", variant=variant)
 
 
 def _render_social_proof(first_name: str, variant: str = "", **kw) -> str:
-    """Day 7 — testimonial, paperback upsell."""
+    """Day 7 — reader story told as mini narrative. Specific outcome. Buy CTA."""
     c = _get_copy(variant)
     return _email_wrap(f"""
-<tr><td style="padding:40px 32px 32px;">
+<tr><td style="padding:40px 32px 0;">
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
 Hey {first_name},</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-Since releasing <strong>What Is Healthy?</strong>, hundreds of readers have grabbed their copy — and the feedback has been incredible.</p>
+A reader named Sarah sent me a message a few weeks after getting the book.</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-Here's what one reader had to say:</p>
-<blockquote style="margin:0 0 20px;padding:16px 24px;background:#f9fafb;border-left:4px solid #1e40af;border-radius:4px;font-size:16px;line-height:1.8;color:#4b5563;font-style:italic;">
-"I had no idea how much the food industry was manipulating what I thought was healthy. This book opened my eyes. I've already changed the way I shop for my family."
-</blockquote>
+She said she'd read Chapter 6 — the one about how grocery stores are physically designed
+to increase impulse purchases of processed food — and then walked into a grocery store
+and felt like she was seeing it for the first time. The end-cap displays. The eye-level
+placement. The "sale" signage that drives you toward items with the highest margin.</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-Before I even wrote this book, I wanted to make sure the information would actually help real families make better choices. That's why every page is backed by research — not opinions, not trends, not sponsored advice.</p>
+She said: <em>"I literally walked out of the store with half the things I normally
+buy and spent $40 less. I wasn't trying. I just couldn't un-see what the book showed me."</em></p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-A lot of readers have told us that having the physical copy makes a huge difference. Something about holding it, flipping to a chapter before a grocery run, handing it to your partner — it just sticks.</p>
+That's what this book does. It's not a list of rules. It's not a diet. It's the understanding
+that, once you have it, changes how you see every food decision — in the store, in the kitchen,
+on the label.</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-It's $24.99 and we cover shipping. Same content you already have, just in a format that lasts.</p>
-{_paperback_buttons()}
-<p style="margin:24px 0 0;font-size:17px;line-height:1.8;color:#374151;">
-I hope the book is making a difference for you.</p>
-<p style="margin:20px 0 0;font-size:17px;line-height:1.8;color:#374151;">
+That's what I wrote it for. And it's why {c['desired_result']} is actually possible —
+once you know what you're looking at.</p>
+</td></tr>
+<tr><td style="padding:0 32px 20px;">
+<table width="100%" cellpadding="0" cellspacing="0"
+       style="background:#f9fafb;border-left:4px solid #6b7280;border-radius:0 8px 8px 0;">
+<tr><td style="padding:20px 24px;">
+<p style="margin:0 0 0;font-size:15px;line-height:1.9;color:#4b5563;font-style:italic;">
+"I had my husband read Chapter 3 while I made dinner. He came downstairs and just
+said: 'We've been lied to for 30 years.' We cleared out half the pantry that night."
+<br/><span style="font-style:normal;font-weight:600;color:#6b7280;">— Marcus, reader since 2024</span></p>
+</td></tr></table>
+</td></tr>
+<tr><td style="padding:0 32px 20px;">
+<p style="margin:20px 0 12px;font-size:17px;line-height:1.8;color:#374151;">
+The full book, in every format:</p>
+</td></tr>
+<tr><td style="padding:0 32px 8px;">
+{_all_format_buttons()}
+</td></tr>
+<tr><td style="padding:20px 32px 32px;border-top:1px solid #f3f4f6;">
+<p style="margin:0;font-size:17px;line-height:1.8;color:#374151;">
 Best,<br/>{_team(variant)}</p>
 </td></tr>""", variant=variant)
 
 
 def _render_im_surprised(first_name: str, variant: str = "", **kw) -> str:
-    """Day 10 — urgency, why haven't you ordered?"""
+    """Day 10 — tease the most dog-eared chapter. Specific content. Urgency. Buy CTA."""
     c = _get_copy(variant)
     return _email_wrap(f"""
-<tr><td style="padding:40px 32px 32px;">
+<tr><td style="padding:40px 32px 0;">
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
 Hey {first_name},</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-Call me crazy, but I'm a little surprised you still haven't ordered the physical copy of <strong>What Is Healthy?</strong></p>
+There's one chapter in <strong>What Is Healthy?</strong> that readers dog-ear more than
+any other.</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-If you really want to start {c['desired_result']} (and I'm guessing you do — or you wouldn't have downloaded the book), then having it in your kitchen is the easiest way to make it happen.</p>
+It's not the one about natural flavors. It's not the one about the food industry's
+lobbying history. It's a chapter called <strong>"What the Grocery Store Doesn't
+Want You to Know"</strong> — and it's the most practical chapter in the book.</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-Here's what you'll keep coming back to:</p>
-{_bullets(c)}
+Here's the short version of one insight from it:</p>
+</td></tr>
+<tr><td style="padding:0 32px 20px;">
+<table width="100%" cellpadding="0" cellspacing="0"
+       style="background:#eff6ff;border-left:4px solid #1e40af;border-radius:0 8px 8px 0;">
+<tr><td style="padding:20px 24px;">
+<p style="margin:0 0 14px;font-size:15px;line-height:1.9;color:#1e3a5f;">
+The average grocery store stocks 40,000 items. Studies show shoppers make 60–70% of
+purchase decisions <em>in the store</em>, not at home on a list.</p>
+<p style="margin:0 0 0;font-size:15px;line-height:1.9;color:#1e3a5f;">
+The store layout — the produce at the entrance, the dairy at the back, the end-caps
+and eye-level shelving — is not designed for your convenience. It's designed by
+category managers paid specifically to maximize impulse purchases of high-margin
+processed items.</p>
+</td></tr></table>
+</td></tr>
+<tr><td style="padding:0 32px 20px;">
+<p style="margin:20px 0 20px;font-size:17px;line-height:1.8;color:#374151;">
+The chapter breaks down exactly how this works, aisle by aisle — and gives you a
+shopping approach that routes around it. Most readers say they save $30–50 per trip
+just by changing how they walk through the store.</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-And whatever else you find inside that changes the way you eat, shop, and feed your family.</p>
-<p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-If you're serious about {c['goal']}, this should be a no-brainer for you.</p>
-<p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-$24.99. Free shipping. Same book, just in your hands.</p>
-{_paperback_buttons()}
-<p style="margin:24px 0 0;font-size:17px;line-height:1.8;color:#374151;">
+That chapter alone is worth the price of the book. And there are 18 more like it.</p>
+<p style="margin:0 0 12px;font-size:17px;line-height:1.8;color:#374151;">
+Get the full book in whatever format works for you:</p>
+</td></tr>
+<tr><td style="padding:0 32px 8px;">
+{_all_format_buttons()}
+</td></tr>
+<tr><td style="padding:20px 32px 32px;border-top:1px solid #f3f4f6;">
+<p style="margin:0;font-size:17px;line-height:1.8;color:#374151;">
 Best,<br/>{_team(variant)}</p>
 </td></tr>""", variant=variant)
 
 
 def _render_last_chance(first_name: str, variant: str = "", **kw) -> str:
-    """Day 14 — final push. Paperback + CG + WIHY."""
+    """Day 14 — honest final email. Story-based. All formats. CG + Eden plug."""
     c = _get_copy(variant)
     return _email_wrap(f"""
-<tr><td style="padding:40px 32px 32px;">
+<tr><td style="padding:40px 32px 0;">
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
 Hey {first_name},</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-Are you still interested in {c['goal']}?</p>
+This is my last email.</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-I'm asking because this is my last email to you.</p>
+Over the past two weeks I've shared: why I wrote this book, the opening chapter,
+what's actually hiding inside "natural flavors," a framework for reading any label in
+five seconds, a reader whose grocery bill dropped $40 the first week, and the chapter
+that changes how you walk through a store.</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-Over the last two weeks I've been writing to you about <strong>What Is Healthy?</strong> — the book you downloaded for free. A lot of readers have ordered the physical copy and we're running through inventory faster than expected.</p>
+All of it comes from one 264-page book built on two years of research.</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-If you'd still like the paperback — the version you can keep on your counter, flip through before grocery trips, and share with family — just click below. $24.99 with free shipping.</p>
-{_paperback_buttons()}
-<p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-If not, no hard feelings. Your free digital copy is yours to keep forever:</p>
-<div style="text-align:center;margin-bottom:16px;">
-{_cta_button("Re-download the Book", CONFIRM_DOWNLOAD_URL)}
-</div>
-<p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-Before we go, I also wanted to mention two things we've been building that connect directly to what the book is all about:</p>
-<p style="margin:0 0 8px;font-size:17px;line-height:1.8;color:#374151;">
-<strong>Community Groceries</strong> (<a href="{CG_URL}" style="color:#1e40af;">{CG_URL}</a>) — healthier products, better prices, delivered to your door.</p>
-<p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-<strong>WIHY</strong> (<a href="{WIHY_URL}" style="color:#1e40af;">{WIHY_URL}</a>) — scan labels, ask health questions, and get real answers backed by research.</p>
-<p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
+I'm not going to make a hard sell here. If any of this landed for you — if you found
+yourself thinking differently about a label, a grocery aisle, or what you're feeding
+your family — the full book is going to be worth it. If none of it landed, it's
+probably not the right time. And that's fine.</p>
+<p style="margin:0 0 12px;font-size:17px;line-height:1.8;color:#374151;">
+If you want it:</p>
+</td></tr>
+<tr><td style="padding:0 32px 8px;">
+{_all_format_buttons()}
+</td></tr>
+<tr><td style="padding:24px 32px 0;">
+<p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#6b7280;">
+Two more things worth knowing, both connected to what the book is about:</p>
+<p style="margin:0 0 12px;font-size:16px;line-height:1.8;color:#374151;">
+<strong>Eden by WIHY</strong> — a free AI you can ask any food or health question.
+Scan a label in the store. Ask why a specific ingredient matters. Get straight answers
+backed by real research, not sponsored content.
+<a href="{WIHY_URL}" style="color:#1e40af;">Try it free at wihy.ai</a></p>
+<p style="margin:0 0 0;font-size:16px;line-height:1.8;color:#374151;">
+<strong>Community Groceries</strong> — a grocery service built around the principles
+in the book. Real food, fair prices, without the processed aisle.
+<a href="{CG_URL}" style="color:#1e40af;">communitygroceries.com</a></p>
+</td></tr>
+<tr><td style="padding:24px 32px 32px;border-top:1px solid #f3f4f6;margin-top:24px;">
+<p style="margin:0;font-size:17px;line-height:1.8;color:#374151;">
 Whatever you decide — keep reading those labels.</p>
 <p style="margin:20px 0 0;font-size:17px;line-height:1.8;color:#374151;">
 All the best,<br/>{_team(variant)}</p>
@@ -525,22 +680,24 @@ All the best,<br/>{_team(variant)}</p>
 
 
 def _render_buy_now_offer(first_name: str, variant: str = "", **kw) -> str:
-    """Immediate buyer-intent push for paid book leads."""
+    """Immediate buyer-intent push — short, direct, all formats."""
     c = _get_copy(variant)
     return _email_wrap(f"""
-<tr><td style="padding:40px 32px 32px;">
+<tr><td style="padding:40px 32px 0;">
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
 Hey {first_name},</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-You clicked because you want real answers now. If you are serious about {c['goal']},
-get the physical copy of <strong>What Is Healthy?</strong> today.</p>
+<strong>What Is Healthy?</strong> is 264 pages on what the food industry doesn't want
+you to understand — and exactly what to do about it. No diet. No rules. Just the research
+that changes how you see every food decision.</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-This is the same research-backed framework people use to clean up grocery decisions,
-drop the confusion, and make better choices fast. No fluff. No food-industry spin.</p>
-<p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-$24.99. Free shipping. Choose your cover below:</p>
-{_paperback_buttons()}
-<p style="margin:24px 0 0;font-size:17px;line-height:1.8;color:#374151;">
+Available in every format:</p>
+</td></tr>
+<tr><td style="padding:0 32px 8px;">
+{_all_format_buttons()}
+</td></tr>
+<tr><td style="padding:20px 32px 32px;border-top:1px solid #f3f4f6;">
+<p style="margin:0;font-size:17px;line-height:1.8;color:#374151;">
 To your health,<br/>{_team(variant)}</p>
 </td></tr>""", variant=variant)
 
