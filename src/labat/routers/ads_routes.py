@@ -229,6 +229,7 @@ async def create_creative(body: CreateCreativeRequest, _=Depends(require_admin))
             object_story_spec=body.object_story_spec,
             object_story_id=body.object_story_id,
             url_tags=body.url_tags,
+            variant=body.variant,
         )
         return CreativeResponse(id=result["id"], name=body.name)
     except MetaAPIError as e:
@@ -244,6 +245,44 @@ async def list_creatives(limit: int = Query(50, ge=1, le=200), _=Depends(require
         return await ads_service.list_creatives(limit=limit)
     except MetaAPIError as e:
         raise HTTPException(status_code=e.status_code or 502, detail=str(e))
+
+
+@router.post("/creatives/patch-utm-tags")
+async def patch_utm_tags_on_live_ads(_=Depends(require_admin)):
+    """
+    One-time: iterate all active ad creatives, infer variant from name,
+    and set url_tags with proper utm_content. Safe to re-run (idempotent).
+    """
+    from src.labat.services.ads_service import _infer_variant, _book_utm_tags
+    from src.labat.meta_client import graph_post
+
+    creatives = await ads_service.list_creatives(limit=200)
+    patched, skipped, errors = [], [], []
+
+    for c in creatives.get("data", []):
+        cid = c.get("id", "")
+        name = c.get("name", "")
+        existing_tags = c.get("url_tags", "")
+
+        # Skip if already has utm_content set correctly
+        if "utm_content=" in existing_tags and "utm_content=general" not in existing_tags:
+            skipped.append({"id": cid, "name": name, "reason": "already has utm_content"})
+            continue
+
+        variant = _infer_variant(name)
+        if not variant:
+            skipped.append({"id": cid, "name": name, "reason": "no variant inferred"})
+            continue
+
+        new_tags = _book_utm_tags(variant)
+        try:
+            await graph_post(cid, data={"url_tags": new_tags}, access_token=ads_service._token())
+            patched.append({"id": cid, "name": name, "variant": variant, "url_tags": new_tags})
+        except Exception as e:
+            errors.append({"id": cid, "name": name, "error": str(e)})
+
+    return {"patched": len(patched), "skipped": len(skipped), "errors": len(errors),
+            "details": {"patched": patched, "skipped": skipped, "errors": errors}}
 
 
 # ── Ad Videos ─────────────────────────────────────────────────────────────────

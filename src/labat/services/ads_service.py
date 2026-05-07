@@ -324,19 +324,58 @@ async def delete_ad(ad_id: str) -> Dict[str, Any]:
 
 # ── Ad Creatives ──────────────────────────────────────────────────────────────
 
+# Variant keywords in creative/adset names → utm_content value
+_NAME_TO_VARIANT: dict[str, str] = {
+    "weight": "weight", "lose weight": "weight", "weight loss": "weight",
+    "kids": "kids", "children": "kids", "family": "family",
+    "energy": "energy", "fatigue": "energy", "tired": "energy",
+    "grocery": "groceries", "groceries": "groceries", "budget": "groceries",
+    "warning": "warning", "label": "warning", "ingredients": "warning",
+    "realfood": "realfood", "real food": "realfood",
+    "eliminate": "eliminate", "biglie": "biglie", "big lie": "biglie",
+    "mistakes": "mistakes", "finally": "finally", "confused": "confused",
+}
+
+
+def _infer_variant(name: str) -> Optional[str]:
+    """Infer utm_content variant from creative/adset name."""
+    low = name.lower()
+    for keyword, variant in _NAME_TO_VARIANT.items():
+        if keyword in low:
+            return variant
+    return None
+
+
+def _book_utm_tags(variant: str, source: str = "facebook", medium: str = "paid") -> str:
+    return f"utm_source={source}&utm_medium={medium}&utm_content={variant}&utm_campaign=whatishealthy_book"
+
+
 async def create_creative(
     name: str,
     object_story_spec: Optional[Dict[str, Any]] = None,
     object_story_id: Optional[str] = None,
     url_tags: Optional[str] = None,
+    variant: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """Create an ad creative. Use object_story_id for existing posts, or object_story_spec for new ad content."""
+    """
+    Create an ad creative.
+    If this is a book/health creative and no url_tags provided, auto-injects
+    UTM tracking with variant from the creative name or explicit variant param.
+    """
     import json
     json_body: Dict[str, Any] = {"name": name}
     if object_story_id:
         json_body["object_story_id"] = object_story_id
     elif object_story_spec:
         json_body["object_story_spec"] = object_story_spec
+
+    # Auto-inject UTM url_tags for book creatives if not already set
+    if not url_tags:
+        resolved_variant = variant or _infer_variant(name)
+        if resolved_variant:
+            url_tags = _book_utm_tags(resolved_variant)
+            logger.info("Auto-injected url_tags for creative %r: %s", name, url_tags)
+
     if url_tags:
         json_body["url_tags"] = url_tags
 

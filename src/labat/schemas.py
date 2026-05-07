@@ -300,6 +300,11 @@ class CreateCreativeRequest(BaseModel):
         None, description="Existing page post ID in format {page_id}_{post_id}"
     )
     url_tags: Optional[str] = None
+    variant: Optional[str] = Field(
+        None,
+        description="Lead variant for UTM auto-injection: weight|kids|energy|groceries|family|confused|warning|realfood|etc. "
+                    "If omitted, inferred from creative name. Sets utm_content on all ad destination URLs."
+    )
 
 
 class CreativeResponse(BaseModel):
@@ -548,3 +553,22 @@ class UpdateAdRuleRequest(BaseModel):
     evaluation_spec: Optional[Dict[str, Any]] = None
     execution_spec: Optional[Dict[str, Any]] = None
     schedule_spec: Optional[Dict[str, Any]] = None
+
+
+# ── Amazon Book Affiliate (MVP) ──────────────────────────────────────────────
+
+class BookAffiliatePublishRequest(BaseModel):
+    asin: Optional[str] = Field(None, description="Specific ASIN to promote")
+    page_id: Optional[str] = Field(None, description="Optional page override for Facebook posting")
+    seed: Optional[int] = Field(None, description="Seed for deterministic variant selection")
+    dry_run: bool = Field(False, description="Return payload only without publishing")
+
+
+# ── Amazon Ads API (Scaffolding) ─────────────────────────────────────────────
+
+class AmazonSPCampaignCreateRequest(BaseModel):
+    profile_id: Optional[str] = Field(None, description="Amazon Ads profile ID (scope)")
+    campaign: Dict[str, Any] = Field(
+        ...,
+        description="Sponsored Products campaign object as required by Amazon Ads API",
+    )
