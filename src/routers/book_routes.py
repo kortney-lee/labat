@@ -511,7 +511,7 @@ async def unsubscribe(req: UnsubscribeRequest):
 
 # Map ad IDs to landing page variants for dynamic email content
 _AD_ID_TO_VARIANT = {
-    # v6 ads
+    # v6 ads (April 2026 qualifying campaign)
     "120243540924860504": "warning",
     "120243540927410504": "realfood",
     "120243540928380504": "eliminate",
@@ -525,7 +525,14 @@ _AD_ID_TO_VARIANT = {
     "120243541078410504": "groceries",
     "120243541083780504": "family",
     "120243541087720504": "confused",
+    # April 2026 qualifying campaign — new ad IDs (generic, no variant differentiation)
+    # TODO: split into variant-specific ad sets and add IDs here
+    "120243541002540504": "general",
+    "120243541005360504": "general",
 }
+# NOTE: For proper variant segmentation on web-form leads (not Meta native forms),
+# Facebook ads must include utm_content=weight|kids|energy|groceries|family|confused
+# in their tracking URL template. Current campaign uses generic ad group names.
 
 META_TOKEN = os.getenv("META_SYSTEM_USER_TOKEN", "")
 

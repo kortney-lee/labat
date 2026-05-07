@@ -44,14 +44,14 @@ static/
 .firebase/
 email_assets/
 
-# Local-only artifacts that must never be deployed
+# Large frontend apps — not needed by Python Cloud Run services
+vowels/
+shania/
+
+# Temp/local-only files
+.tmp_*
+local_previews/
 shania/.canva-refresh-token.local
 shania/test-canva-local.ts
-shania/hosting/.firebase/
-.tmp_caption_alex.txt
 
-# Do NOT ignore:
-# - shania/package.json, package-lock.json, tsconfig.json (needed for build)
-# - shania/assets/**/*.png (needed for Docker image)
-# - shania/assets/**/*.jpg
-# - shania/assets/**/*.mp4
+# Do NOT ignore: src/, requirements*.txt, cloudbuild*.yaml, Dockerfile
