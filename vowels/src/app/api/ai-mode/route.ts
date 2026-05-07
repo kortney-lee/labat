@@ -16,7 +16,7 @@ function upstreamHeaders() {
 
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
-  const q = (url.searchParams.get("q") || "").trim();
+  const q = (url.searchParams.get("q") || url.searchParams.get("query") || "").trim();
   const context = (url.searchParams.get("context") || "personal").trim();
   const limit = url.searchParams.get("limit") || "8";
   const includeRelated = url.searchParams.get("include_related") || "true";
