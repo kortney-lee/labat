@@ -350,26 +350,30 @@ def _day0_school(name: str, company: str) -> str:
 <tr><td style="padding:40px 40px 24px;">
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">Hey {name},</p>
 <p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
-My name is Kortney Lee. I wrote a book called <em>What Is Healthy? And Why Is It So Hard
-to Achieve</em>, and I&rsquo;m reaching out to {org} because the students and parents
-you work with are living the questions this book answers.</p>
+My name is Kortney Lee &mdash; author, speaker, and someone who has spent years studying
+why so many Americans are sick and what it has to do with what we eat. I&rsquo;m reaching
+out to {org} because I believe schools are one of the most powerful places left where
+we can actually change this trajectory.</p>
 <p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
-Here&rsquo;s why I came to you specifically: schools are where habits get formed and where
-health literacy &mdash; or the lack of it &mdash; takes root. A generation of children is
-growing up more overweight, more fatigued, and more dependent on medication than any
-before them. That&rsquo;s not a willpower problem. It&rsquo;s a knowledge and system problem. And
-it starts getting solved in schools.</p>
+Here&rsquo;s the reality: a generation of children is growing up more overweight, more
+fatigued, and more medicated than any before them. Type 2 diabetes &mdash; once called
+&ldquo;adult onset&rdquo; &mdash; is now showing up in middle schoolers. This isn&rsquo;t a
+discipline problem. It&rsquo;s an information problem. And it&rsquo;s one schools are uniquely
+positioned to address.</p>
 <p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
-<strong>What I&rsquo;m asking:</strong> Consider the book for a parent education workshop,
-a health class supplemental reading unit, or a student assembly. Chapters 1&ndash;3 work as
-a standalone unit on label reading and food industry basics for high school health
-classes. Parent workshops drawing on the book run about 60&ndash;90 minutes and draw well
-because the topic is something every parent is already thinking about. And I&rsquo;m
-available for student assemblies at no charge for Title I schools.</p>
+<strong>What I&rsquo;m asking:</strong> I&rsquo;d love to come speak &mdash; to students,
+parents, or both. My speaking engagements cover nutrition basics in plain language:
+what&rsquo;s actually in the food your students eat every day, how to read a label, why
+processed food is designed to override hunger and fullness signals, and what families
+can realistically do about it without overhauling their budget or their lives.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Student assemblies run 45 minutes with Q&amp;A. Parent evenings run 60&ndash;90 minutes.
+I&rsquo;m also available for teacher professional development on food literacy and for
+health class guest sessions. <strong>No charge for Title I schools.</strong></p>
 <p style="margin:0 0 0;font-size:16px;line-height:1.85;color:#374151;">
-The goal is simple: students should leave knowing how to read a label, understanding
-why certain foods are marketed to them the way they are, and feeling like good choices
-are actually possible for them &mdash; not just for people with more money or more time.</p>
+The book, <em>What Is Healthy?</em>, is the research behind the talk &mdash; if your
+school wants to extend the conversation into the classroom or send something home with
+students and parents, it&rsquo;s all there in 264 pages written for a general audience.</p>
 </td></tr>
 {_PREFACE}
 <tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
