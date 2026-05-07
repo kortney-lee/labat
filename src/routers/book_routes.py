@@ -498,6 +498,67 @@ class UnsubscribeRequest(BaseModel):
     email: EmailStr
 
 
+# ── B2B Admin Seeding ─────────────────────────────────────────────────────────
+
+class B2BSeedEntry(BaseModel):
+    email: EmailStr
+    first_name: str = ""
+    last_name: str = ""
+    company_name: str = ""
+    business_type: str = "other"
+    message: str = ""
+
+
+class B2BSeedRequest(BaseModel):
+    leads: list[B2BSeedEntry]
+
+
+@router.post("/admin/seed-b2b")
+async def seed_b2b_leads(req: B2BSeedRequest, request: Request):
+    """
+    Admin: bulk-add B2B leads and trigger Day 0 email for each.
+    Skips duplicates already in the system.
+    """
+    admin_token = os.getenv("INTERNAL_ADMIN_TOKEN", "")
+    req_token = request.headers.get("x-admin-token", "")
+    if admin_token and req_token != admin_token:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    from src.services.book_leads_service import save_lead
+    from src.services.b2b_nurture_service import trigger_b2b_day0
+
+    results = []
+    for entry in req.leads:
+        email = entry.email.lower().strip()
+        already = await email_exists(email)
+        if already:
+            results.append({"email": email, "status": "duplicate"})
+            continue
+
+        btype = (entry.business_type or "other").strip().lower()
+        try:
+            await save_lead(
+                email=email,
+                source="b2b_admin_seed",
+                first_name=entry.first_name.strip(),
+                last_name=entry.last_name.strip(),
+                business_type=btype,
+                company_name=entry.company_name.strip(),
+                message=entry.message.strip(),
+            )
+            sent = await trigger_b2b_day0(email, entry.first_name.strip(), btype, entry.company_name.strip())
+            results.append({"email": email, "status": "added", "day0_sent": sent})
+            logger.info("B2B seed: added %s (%s / %s)", email, btype, entry.company_name)
+        except Exception as e:
+            logger.error("B2B seed error for %s: %s", email, e)
+            results.append({"email": email, "status": "error", "detail": str(e)})
+
+    added = sum(1 for r in results if r["status"] == "added")
+    skipped = sum(1 for r in results if r["status"] == "duplicate")
+    errors = sum(1 for r in results if r["status"] == "error")
+    return {"added": added, "skipped": skipped, "errors": errors, "results": results}
+
+
 @router.post("/unsubscribe")
 async def unsubscribe(req: UnsubscribeRequest):
     """Unsubscribe an email from the nurture sequence."""
