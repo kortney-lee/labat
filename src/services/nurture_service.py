@@ -290,9 +290,13 @@ def _email_wrap(content: str, variant: str = "") -> str:
 <tr><td align="center">
 <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#ffffff;">
 {content}
-<tr><td style="padding:20px 40px;border-top:1px solid #e5e7eb;">
-<p style="margin:0;color:#9ca3af;font-size:12px;line-height:1.6;text-align:center;">
-Sent by {b['brand_label']} &middot; <a href="{UNSUBSCRIBE_URL}" style="color:#9ca3af;text-decoration:underline;">Unsubscribe</a>
+<tr><td style="padding:16px 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:0 0 6px;font-size:13px;line-height:1.6;color:#6b7280;">
+You're receiving this because you subscribed to Vowels. We send real research, real stories,
+and no sponsored content.</p>
+<p style="margin:0;color:#9ca3af;font-size:12px;line-height:1.6;">
+<a href="{UNSUBSCRIBE_URL}" style="color:#9ca3af;text-decoration:underline;">Unsubscribe</a>
+&middot; Sent by {b['brand_label']}
 </p></td></tr>
 </table></td></tr></table></body></html>"""
 
@@ -350,6 +354,41 @@ def _all_format_buttons() -> str:
     )
 
 
+def _soft_buy_section() -> str:
+    """Compact, low-pressure book mention. Information-first newsletters."""
+    return (
+        f'<table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 8px;">'
+        f'<tr><td style="padding:20px 0 0;">'
+        f'<p style="margin:0 0 12px;font-size:14px;line-height:1.7;color:#6b7280;">'
+        f'This is an excerpt from <em>What Is Healthy?</em> by Kortney O. Lee &mdash; '
+        f'264 pages on what the food industry doesn\'t want you to understand, and what to do about it. '
+        f'Available in paperback, hardcover, Kindle, and Audible.</p>'
+        f'<p style="margin:0;font-size:14px;line-height:1.7;color:#6b7280;">'
+        f'<a href="{PAPERBACK_URL_FEMALE}" style="color:#1e40af;text-decoration:underline;">Paperback (female cover)</a>'
+        f' &middot; '
+        f'<a href="{PAPERBACK_URL_MALE}" style="color:#1e40af;text-decoration:underline;">Paperback (male cover)</a>'
+        f' &middot; '
+        f'<a href="{AMAZON_KINDLE_URL}" style="color:#1e40af;text-decoration:underline;">Kindle</a>'
+        f' &middot; '
+        f'<a href="{AMAZON_AUDIBLE_URL}" style="color:#1e40af;text-decoration:underline;">Audible</a>'
+        f' &middot; '
+        f'<a href="{AMAZON_HARDCOVER_URL}" style="color:#1e40af;text-decoration:underline;">Hardcover</a>'
+        f'</p></td></tr></table>'
+    )
+
+
+def _reply_cta(question: str = "") -> str:
+    """Conversational reply invitation. Makes it a dialogue, not a broadcast."""
+    q = question or "What do you think?"
+    return (
+        f'<table width="100%" cellpadding="0" cellspacing="0">'
+        f'<tr><td style="padding:20px 0 0;border-top:1px solid #f3f4f6;">'
+        f'<p style="margin:0;font-size:15px;line-height:1.7;color:#374151;">'
+        f'<strong>{q}</strong> Hit reply &mdash; we read every response.</p>'
+        f'</td></tr></table>'
+    )
+
+
 def _brand_cards() -> str:
     """Stacked Eden + Cora rows: logo left, name + description + link right. No backgrounds."""
     def card(icon_url: str, name: str, tagline: str, description: str, cta: str, link: str) -> str:
@@ -398,19 +437,24 @@ def _brand_cards() -> str:
 # ── Template builders ─────────────────────────────────────────────────────────
 
 def _render_book_delivery(first_name: str, variant: str = "", **kw) -> str:
-    """Day 0 — full Preface from the book. Sets the question. Buy CTA."""
+    """Day 0 — Preface. Conversational, info-first, soft sell, reply CTA."""
     c = _get_copy(variant)
     return _email_wrap(f"""
 <tr><td style="padding:40px 40px 24px;">
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">Hey {first_name},</p>
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
-Before you start reading this book, I want you to take a few minutes to think about this question:</p>
+Before you read this, I want to be upfront: this is an excerpt from a book I wrote.
+I'm sharing it here because I think the question at the center of it is one worth
+sitting with — and because this newsletter exists to have exactly this kind of
+conversation.</p>
+<p style="margin:0 0 0;font-size:16px;line-height:1.8;color:#374151;">
+Take a few minutes with this one.</p>
 </td></tr>
 <tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
-<p style="margin:20px 0 16px;font-size:21px;font-weight:700;line-height:1.3;color:#111827;">
-Preface</p>
-<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
-<strong>What is healthy?</strong></p>
+<p style="margin:20px 0 4px;font-size:13px;font-weight:700;letter-spacing:0.08em;
+   text-transform:uppercase;color:#9ca3af;">From the Preface</p>
+<p style="margin:0 0 20px;font-size:20px;font-weight:700;line-height:1.3;color:#111827;">
+What is healthy?</p>
 <p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
 Is it the absence of disease? Daily trips to the gym? A fridge full of organic food?
 A number on the scale? A strict diet? Or is it glowing skin and visible abs?</p>
@@ -430,26 +474,20 @@ type 2 diabetes, heart disease, and obesity year after year — especially among
 The industry tells one story. The numbers tell another.</p>
 <p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
 Meanwhile, a generation of children is growing up more fatigued, more overweight, and
-more dependent on medication than ever before. In this book, we'll explore what it truly
-means to be healthy, how our environment and habits shape that reality, and what it takes
-to reclaim our well-being — not just for ourselves but for the generations that follow.</p>
-<p style="margin:0 0 4px;font-size:14px;line-height:1.6;color:#6b7280;text-align:right;font-style:italic;">
-— Kortney O. Lee, <em>What Is Healthy?</em>, Preface</p>
+more dependent on medication than ever before. In this series of emails, we'll explore
+what it truly means to be healthy, how our environment and habits shape that reality,
+and what it takes to reclaim our well-being — not just for ourselves but for the
+generations that follow.</p>
+<p style="margin:0 0 4px;font-size:14px;line-height:1.6;color:#9ca3af;text-align:right;font-style:italic;">
+— Kortney O. Lee, <em>What Is Healthy?</em></p>
 </td></tr>
-<tr><td align="center" style="padding:20px 40px 8px;">
-<img src="{BOOK_IMAGE_URL}" alt="What Is Healthy? book cover" width="140"
-     style="display:block;margin:0 auto;border:0;" />
-</td></tr>
-<tr><td style="padding:8px 40px 24px;">
-<p style="margin:0 0 12px;font-size:16px;line-height:1.8;color:#374151;">
-The full 264-page book:</p>
-{_all_format_buttons()}
-<p style="margin:10px 0 0;font-size:13px;line-height:1.6;color:#9ca3af;text-align:center;">
-Paperback ships free. Kindle and Audible available immediately.</p>
+<tr><td style="padding:0 40px 24px;">
+{_reply_cta("What's your answer to that question?")}
+{_soft_buy_section()}
 </td></tr>
 <tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
-Tomorrow I'll send you the opening chapter — the night that changed everything.</p>
+Tomorrow — the night that started all of this.</p>
 <p style="margin:20px 0 0;font-size:16px;line-height:1.8;color:#374151;">
 Talk soon,<br/>Kortney</p>
 </td></tr>""", variant=variant)
@@ -529,8 +567,8 @@ Chapter 1 asks the question Kortney couldn't stop asking after that night:</p>
 <p style="margin:0 0 16px;font-size:17px;font-weight:600;line-height:1.85;color:#111827;">
 "How did we get here?"</p>
 <p style="margin:0 0 16px;font-size:16px;line-height:1.8;color:#374151;">
-The full book — 264 pages, no agenda, no supplements to sell:</p>
-{_all_format_buttons()}
+{_reply_cta()}
+{_soft_buy_section()}
 </td></tr>
 <tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
@@ -572,7 +610,8 @@ This is not an accident. It is a design decision made by an industry that spent 
 {c['chapter_hook']}</p>
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
 There are 22 more chapters like this in the book. Each one changes how you read a label and what ends up in your cart.</p>
-{_all_format_buttons()}
+{_reply_cta("What label surprised you most recently?")}
+{_soft_buy_section()}
 </td></tr>
 <tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
@@ -604,8 +643,8 @@ One of the most practical things in the book is a framework I call the 5-second 
 <p style="margin:20px 0 20px;font-size:16px;line-height:1.8;color:#374151;">
 The book has 11 more frameworks like this — for reading labels quickly, spotting hidden sugars across 61 different names, and identifying which products in the health food aisle are not what they claim to be.</p>
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
-The full book with all 12 frameworks:</p>
-{_all_format_buttons()}
+{_reply_cta("What's a food habit you've questioned lately?")}
+{_soft_buy_section()}
 </td></tr>
 <tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
 <p style="margin:20px 0 12px;font-size:15px;line-height:1.8;color:#6b7280;">
@@ -645,8 +684,8 @@ That is what the book is built to do. Not rules. Not a diet. Just the kind of un
 </td></tr></table>
 </td></tr>
 <tr><td style="padding:0 40px 24px;">
-<p style="margin:20px 0 16px;font-size:16px;line-height:1.8;color:#374151;">The full book:</p>
-{_all_format_buttons()}
+{_reply_cta()}
+{_soft_buy_section()}
 </td></tr>
 <tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
@@ -679,7 +718,8 @@ It is not the natural flavors chapter. It is not the one about the food industry
 The chapter walks through how this works aisle by aisle and gives you a shopping approach that routes around it. Most readers say they save $30 to $50 per trip just by changing how they walk through the store.</p>
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
 That chapter alone is worth the cost of the book. There are 18 more like it.</p>
-{_all_format_buttons()}
+{_reply_cta("Have you ever noticed how a store was laid out against you?")}
+{_soft_buy_section()}
 </td></tr>
 <tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
@@ -700,8 +740,7 @@ Over the past two weeks I shared why I wrote this book, the opening chapter, wha
 All of it comes from one 264-page book built on two years of research.</p>
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
 I am not going to push hard here. If any of this made you think differently about a label, a grocery aisle, or what you are feeding your family, the book is worth it. If none of it landed, it is probably not the right time, and that is fine.</p>
-<p style="margin:0 0 16px;font-size:16px;line-height:1.8;color:#374151;">If you want it:</p>
-{_all_format_buttons()}
+<p style="margin:0 0 16px;font-size:16px;line-height:1.8;color:#374151;">{_soft_buy_section()}
 </td></tr>
 <tr><td style="padding:0 40px 16px;border-top:1px solid #e5e7eb;">
 <p style="margin:20px 0 6px;font-size:15px;line-height:1.8;color:#374151;">
@@ -731,10 +770,9 @@ Hey {first_name},</p>
 you to understand — and exactly what to do about it. No diet. No rules. Just the research
 that changes how you see every food decision.</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
-Available in every format:</p>
 </td></tr>
 <tr><td style="padding:0 40px 8px;">
-{_all_format_buttons()}
+{_soft_buy_section()}
 </td></tr>
 <tr><td style="padding:20px 40px 32px;border-top:1px solid #f3f4f6;">
 <p style="margin:0;font-size:17px;line-height:1.8;color:#374151;">
@@ -781,9 +819,8 @@ quietly, for years, before a diagnosis arrives.</p>
 — <em>What Is Healthy?</em>, Sugar chapter</p>
 </td></tr>
 <tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
-<p style="margin:20px 0 12px;font-size:16px;line-height:1.8;color:#374151;">
-The full book:</p>
-{_all_format_buttons()}
+{_reply_cta()}
+{_soft_buy_section()}
 </td></tr>
 <tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
@@ -824,9 +861,8 @@ the underlying problem goes unaddressed.</p>
 — <em>What Is Healthy?</em>, "The Working-Class Trade-Off"</p>
 </td></tr>
 <tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
-<p style="margin:20px 0 12px;font-size:16px;line-height:1.8;color:#374151;">
-The full book:</p>
-{_all_format_buttons()}
+{_reply_cta()}
+{_soft_buy_section()}
 </td></tr>
 <tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
@@ -866,9 +902,8 @@ You were not born with a destiny to be sick. You inherited habits. And habits ca
 — <em>What Is Healthy?</em>, "Medications That Cured — Not Just Treated"</p>
 </td></tr>
 <tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
-<p style="margin:20px 0 12px;font-size:16px;line-height:1.8;color:#374151;">
-The full book:</p>
-{_all_format_buttons()}
+{_reply_cta()}
+{_soft_buy_section()}
 </td></tr>
 <tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
@@ -912,9 +947,8 @@ Eight hours. That gap has consequences that last a lifetime.</p>
 — <em>What Is Healthy?</em>, Nutrition 101</p>
 </td></tr>
 <tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
-<p style="margin:20px 0 12px;font-size:16px;line-height:1.8;color:#374151;">
-The full book:</p>
-{_all_format_buttons()}
+{_reply_cta()}
+{_soft_buy_section()}
 </td></tr>
 <tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
@@ -954,9 +988,8 @@ because there's no immediate pain. Until there is.</p>
 — <em>What Is Healthy?</em>, "Teeth Don't Grow Back"</p>
 </td></tr>
 <tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
-<p style="margin:20px 0 12px;font-size:16px;line-height:1.8;color:#374151;">
-The full book:</p>
-{_all_format_buttons()}
+{_reply_cta()}
+{_soft_buy_section()}
 </td></tr>
 <tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
@@ -995,9 +1028,8 @@ is yours. And the next generation deserves the version of you that chooses diffe
 — <em>What Is Healthy?</em>, "The Role of Community"</p>
 </td></tr>
 <tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
-<p style="margin:20px 0 12px;font-size:16px;line-height:1.8;color:#374151;">
-The full book:</p>
-{_all_format_buttons()}
+{_reply_cta()}
+{_soft_buy_section()}
 </td></tr>
 <tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
@@ -1037,9 +1069,8 @@ it's easier to grab something fast. That's where health is actually made.</p>
 — <em>What Is Healthy?</em>, "The Psychology of Change"</p>
 </td></tr>
 <tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
-<p style="margin:20px 0 12px;font-size:16px;line-height:1.8;color:#374151;">
-The full book:</p>
-{_all_format_buttons()}
+{_reply_cta()}
+{_soft_buy_section()}
 </td></tr>
 <tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
@@ -1079,9 +1110,8 @@ stimulation and starts offering support.</p>
 — <em>What Is Healthy?</em>, "Addiction, Anxiety, and the Hidden Cost of Coping"</p>
 </td></tr>
 <tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
-<p style="margin:20px 0 12px;font-size:16px;line-height:1.8;color:#374151;">
-The full book:</p>
-{_all_format_buttons()}
+{_reply_cta()}
+{_soft_buy_section()}
 </td></tr>
 <tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
@@ -1120,9 +1150,8 @@ and yes to what restores.</p>
 — <em>What Is Healthy?</em>, "How Disconnection Replaces Love"</p>
 </td></tr>
 <tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
-<p style="margin:20px 0 12px;font-size:16px;line-height:1.8;color:#374151;">
-The full book:</p>
-{_all_format_buttons()}
+{_reply_cta()}
+{_soft_buy_section()}
 </td></tr>
 <tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
@@ -1163,9 +1192,8 @@ You don't need to be perfect. You need a direction. One meal at a time.</p>
 — <em>What Is Healthy?</em>, "Rediscovering Real Food"</p>
 </td></tr>
 <tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
-<p style="margin:20px 0 12px;font-size:16px;line-height:1.8;color:#374151;">
-The full book:</p>
-{_all_format_buttons()}
+{_reply_cta()}
+{_soft_buy_section()}
 </td></tr>
 <tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
@@ -1207,9 +1235,8 @@ at a deeper level.</p>
 — <em>What Is Healthy?</em>, "When Did Fasting Lose Its True Meaning?"</p>
 </td></tr>
 <tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
-<p style="margin:20px 0 12px;font-size:16px;line-height:1.8;color:#374151;">
-The full book:</p>
-{_all_format_buttons()}
+{_reply_cta()}
+{_soft_buy_section()}
 </td></tr>
 <tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
@@ -1246,9 +1273,8 @@ so they inherit something different than what you were given.</p>
 — <em>What Is Healthy?</em>, "Breaking the Cycle"</p>
 </td></tr>
 <tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
-<p style="margin:20px 0 12px;font-size:16px;line-height:1.8;color:#374151;">
-The full book:</p>
-{_all_format_buttons()}
+{_reply_cta()}
+{_soft_buy_section()}
 </td></tr>
 <tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
@@ -1290,9 +1316,8 @@ traded away in the name of convenience.</p>
 — <em>What Is Healthy?</em>, "Lessons from the Blue Zones"</p>
 </td></tr>
 <tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
-<p style="margin:20px 0 12px;font-size:16px;line-height:1.8;color:#374151;">
-The full book:</p>
-{_all_format_buttons()}
+{_reply_cta()}
+{_soft_buy_section()}
 </td></tr>
 <tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
@@ -1336,8 +1361,7 @@ what was handed to you.</p>
 </td></tr>
 <tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
 <p style="margin:20px 0 12px;font-size:16px;line-height:1.8;color:#374151;">
-If you haven't grabbed the full book yet — 264 pages, no agenda:</p>
-{_all_format_buttons()}
+{_soft_buy_section()}
 </td></tr>
 <tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
 <p style="margin:20px 0 16px;font-size:15px;line-height:1.8;color:#374151;">
