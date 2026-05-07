@@ -454,6 +454,50 @@ async def preview_all(request: Request):
     return {"status": "ok", "sent_to": to_email, "results": results}
 
 
+# ── B2B Preview (test emails, no DB write) ────────────────────────────────────
+
+_B2B_TYPES_ALL = ["bookstore", "library", "podcast", "blog", "church", "school"]
+
+
+@router.post("/admin/preview-b2b")
+async def preview_b2b(request: Request):
+    """
+    Admin: send Day 0 B2B test emails for all business types (or a subset)
+    to a specified address. No lead is saved to the database.
+
+    Body (JSON):
+      { "to_email": "you@example.com",
+        "first_name": "Kortney",
+        "company_name": "Test Co",
+        "types": ["bookstore","podcast"]   // optional — omit for all 6
+      }
+    """
+    admin_token = os.getenv("INTERNAL_ADMIN_TOKEN", "")
+    req_token = request.headers.get("x-admin-token", "")
+    if admin_token and req_token != admin_token:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    body = await request.json()
+    to_email = body.get("to_email", "").strip()
+    first_name = body.get("first_name", "Kortney").strip()
+    company_name = body.get("company_name", "").strip()
+    types = body.get("types") or _B2B_TYPES_ALL
+
+    if not to_email:
+        raise HTTPException(status_code=400, detail="to_email required")
+
+    from src.services.b2b_nurture_service import _render_b2b_day0, _get, _send
+
+    results = []
+    for bt in types:
+        subject = _get(bt)["d0_subject"]
+        html = _render_b2b_day0(first_name, bt, company_name)
+        sent = await _send(to_email, f"[{bt.upper()} TEST] {subject}", html)
+        results.append({"type": bt, "subject": subject, "sent": sent})
+
+    return {"to": to_email, "sent": len([r for r in results if r["sent"]]), "results": results}
+
+
 # ── Unsubscribe ───────────────────────────────────────────────────────────
 
 class ResendRequest(BaseModel):
