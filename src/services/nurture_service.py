@@ -252,14 +252,28 @@ def _team(variant: str) -> str:
 
 
 # Nurture sequence: (stage, days_after_signup, template_id, subject)
+# 20 emails walking the full book story — runs until unsubscribe
 NURTURE_SEQUENCE = [
-    (0, 0,  "book_delivery",    "Why I wrote this, {first_name}"),
-    (1, 1,  "did_you_get_this", "The first page of the book"),
-    (2, 3,  "big_benefit",      "What's actually in \"natural flavors\""),
-    (3, 5,  "got_questions",    "The 5-second test for any food label"),
-    (4, 7,  "social_proof",     "What changed after Chapter 6"),
-    (5, 10, "im_surprised",     "The chapter everyone dog-ears"),
-    (6, 14, "last_chance",      "My last email to you"),
+    ( 0,   0, "book_delivery",    "Before you start reading this, {first_name}"),
+    ( 1,   1, "did_you_get_this", "I failed spectacularly."),
+    ( 2,   3, "big_benefit",      "What's actually in \"natural flavors\""),
+    ( 3,   5, "got_questions",    "The 5-second test for any food label"),
+    ( 4,   7, "social_proof",     "What changed after Chapter 6"),
+    ( 5,  10, "im_surprised",     "The chapter everyone dog-ears"),
+    ( 6,  14, "sugar_truth",      "What is sugar, really?"),
+    ( 7,  18, "working_class",    "The system isn't built to reward wellness"),
+    ( 8,  23, "reversible",       "The diseases you're afraid of are lifestyle diseases"),
+    ( 9,  29, "what_is_nutrition","What food actually is"),
+    (10,  36, "teeth",            "Teeth don't grow back — and neither do some choices"),
+    (11,  44, "community",        "Does this serve us — or harm us?"),
+    (12,  53, "psychology",       "How many no's before a yes?"),
+    (13,  63, "mental_health",    "1 in 4 adults under 30 now reports this"),
+    (14,  74, "disconnection",    "Overfed. Undernourished. Connected to nothing."),
+    (15,  86, "real_food",        "You don't need perfection. You need direction."),
+    (16, 100, "fasting",          "What fasting teaches us about love"),
+    (17, 115, "breaking_cycle",   "The power of one generation"),
+    (18, 130, "blue_zones",       "What people who live to 100 actually eat"),
+    (19, 150, "where_next",       "Where do we go from here?"),
 ]
 
 
@@ -274,7 +288,7 @@ def _email_wrap(content: str, variant: str = "") -> str:
 <body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;padding:0;">
 <tr><td align="center">
-<table width="620" cellpadding="0" cellspacing="0" style="max-width:620px;width:100%;background:#ffffff;">
+<table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#ffffff;">
 {content}
 <tr><td style="padding:20px 40px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;color:#9ca3af;font-size:12px;line-height:1.6;text-align:center;">
@@ -384,142 +398,138 @@ def _brand_cards() -> str:
 # ── Template builders ─────────────────────────────────────────────────────────
 
 def _render_book_delivery(first_name: str, variant: str = "", **kw) -> str:
-    """Day 0 — origin story with CDC-verified data in the callout block."""
+    """Day 0 — full Preface from the book. Sets the question. Buy CTA."""
     c = _get_copy(variant)
     return _email_wrap(f"""
 <tr><td style="padding:40px 40px 24px;">
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">Hey {first_name},</p>
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
-My grandmother died of cancer. She had been living with type 2 diabetes and high blood pressure for years before that — three chronic conditions, stacked on top of each other.</p>
-<p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
-She was not unusual. Sixty percent of American adults have at least one chronic disease. More than half — 51 percent — have two or more. The three my grandmother carried were not a freak combination. They were the national average, multiplied.</p>
-<p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
-She was not careless. She read labels. She chose the low-fat versions, the heart-healthy cereals, the products marked "natural." By everything she understood, she was eating well.</p>
-<p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
-After she passed, I could not let it go. I needed to understand how someone who genuinely tried could still end up that sick. Two years of research later, here is what I found:</p>
+Before you start reading this book, I want you to take a few minutes to think about this question:</p>
 </td></tr>
-<tr><td style="padding:0 40px 24px;">
-<table width="100%" cellpadding="20" cellspacing="0" bgcolor="#f0f4ff"
-       style="border-left:3px solid #1e40af;font-size:15px;line-height:1.8;color:#374151;">
-<tr><td>
-<p style="margin:0 0 16px;">More than half of all calories Americans eat today come from ultra-processed food — products engineered to override your body's ability to know when it has had enough. <em>(CDC, 2025)</em></p>
-<p style="margin:0 0 16px;">The average American consumes 17 teaspoons of added sugar every day. The recommendation for women is 6. That gap does not come from candy. It comes from salad dressings, pasta sauces, yogurt, and bread — products sold as healthy options. <em>(CDC / American Heart Association)</em></p>
-<p style="margin:0 0 16px;">Two in five American adults have prediabetes right now. Eight in ten have no idea. Their blood sugar is quietly damaging their organs for years while the labels they trust tell them everything is fine. <em>(CDC, 2026)</em></p>
-<p style="margin:0;">The FDA permits approximately 3,000 flavoring substances under the single label "natural flavors." The term was not created to inform you. It was created to satisfy disclosure law while revealing as little as possible. <em>(FDA SAAF database)</em></p>
-</td></tr></table>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 16px;font-size:21px;font-weight:700;line-height:1.3;color:#111827;">
+Preface</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+<strong>What is healthy?</strong></p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Is it the absence of disease? Daily trips to the gym? A fridge full of organic food?
+A number on the scale? A strict diet? Or is it glowing skin and visible abs?</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Ask ten people and you'll likely get ten different answers. Even among those who seem
+healthy, definitions differ. But one truth is clear: health is foundational. It
+influences how we live, how we feel, and how we care for those around us.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+And yet, somewhere along the way, we've lost clarity. We didn't stop believing in real
+food — we just stopped recognizing it. Today, we trust the packaged over the perishable,
+defend what's convenient, and market what's artificial as if it's nourishment. The truth
+is many of us don't even know what real food is anymore.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+But let's be honest: if fruits and vegetables weren't real, they wouldn't rot. And if
+processed foods were harmless, we wouldn't see a rise in diet-related illnesses like
+type 2 diabetes, heart disease, and obesity year after year — especially among children.
+The industry tells one story. The numbers tell another.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Meanwhile, a generation of children is growing up more fatigued, more overweight, and
+more dependent on medication than ever before. In this book, we'll explore what it truly
+means to be healthy, how our environment and habits shape that reality, and what it takes
+to reclaim our well-being — not just for ourselves but for the generations that follow.</p>
+<p style="margin:0 0 4px;font-size:14px;line-height:1.6;color:#6b7280;text-align:right;font-style:italic;">
+— Kortney O. Lee, <em>What Is Healthy?</em>, Preface</p>
 </td></tr>
-<tr><td style="padding:0 40px 24px;">
-<p style="margin:20px 0 20px;font-size:16px;line-height:1.8;color:#374151;">
-None of this is fringe. It is in the regulatory filings, the peer-reviewed literature, and the industry's own documents. I spent two years pulling it together — no supplements to sell, no diet to push.</p>
-<p style="margin:0 0 8px;font-size:16px;line-height:1.8;color:#374151;">
-That became <strong>What Is Healthy?</strong> — 264 pages on what the food system does not want you to understand, and exactly what to do about it.</p>
-</td></tr>
-<tr><td align="center" style="padding:0 40px 16px;">
-<img src="{BOOK_IMAGE_URL}" alt="What Is Healthy? book cover" width="160"
+<tr><td align="center" style="padding:20px 40px 8px;">
+<img src="{BOOK_IMAGE_URL}" alt="What Is Healthy? book cover" width="140"
      style="display:block;margin:0 auto;border:0;" />
 </td></tr>
-<tr><td style="padding:0 40px 24px;">
+<tr><td style="padding:8px 40px 24px;">
+<p style="margin:0 0 12px;font-size:16px;line-height:1.8;color:#374151;">
+The full 264-page book:</p>
 {_all_format_buttons()}
-<p style="margin:12px 0 0;font-size:13px;line-height:1.6;color:#9ca3af;text-align:center;">
+<p style="margin:10px 0 0;font-size:13px;line-height:1.6;color:#9ca3af;text-align:center;">
 Paperback ships free. Kindle and Audible available immediately.</p>
 </td></tr>
 <tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
-I will send you the opening chapter tomorrow.</p>
+Tomorrow I'll send you the opening chapter — the night that changed everything.</p>
 <p style="margin:20px 0 0;font-size:16px;line-height:1.8;color:#374151;">
 Talk soon,<br/>Kortney</p>
 </td></tr>""", variant=variant)
 
 
 def _render_did_you_get_this(first_name: str, variant: str = "", **kw) -> str:
-    """Day 1 — actual book passages: Hello World, Is This You, cliffhanger. Buy CTA."""
+    """Day 1 — the bathroom incident, Hello World. Exact book passages. Buy CTA."""
     c = _get_copy(variant)
     return _email_wrap(f"""
 <tr><td style="padding:40px 40px 16px;">
 <p style="margin:0 0 16px;font-size:16px;line-height:1.8;color:#374151;">Hey {first_name},</p>
 <p style="margin:0 0 0;font-size:16px;line-height:1.8;color:#374151;">
-Here is the opening of <strong>What Is Healthy?</strong> — pulled directly from the book.</p>
+Here is the introduction to <strong>What Is Healthy?</strong> — the night that
+started everything.</p>
 </td></tr>
-
-<tr><td style="padding:0 40px 20px;border-top:1px solid #e5e7eb;">
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
 <p style="margin:20px 0 16px;font-size:20px;font-weight:700;line-height:1.3;color:#111827;">
+Introduction</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+It was the middle of the night, and I woke up with an urgent need to pee. I raced up
+the eight steps toward the bathroom, fueled by sheer panic and determination not to
+have an accident. Spoiler alert: I failed spectacularly.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Despite my best efforts, I lost control — peeing on myself, the walls, the floor —
+everywhere but the toilet. It felt like a scene from a poorly scripted comedy, except
+I wasn't laughing. I was gasping for air, my heart pounding like I'd run a marathon.
+My vision blurred. I felt lightheaded. And to make matters worse, I slipped and fell —
+landing in a position that can only be described as undignified.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+The commotion didn't even wake my wife. No one came rushing to my side. I just sat
+there, a grown man, alone in a puddle of my own mess — out of breath, embarrassed,
+and utterly defeated.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+It was as if my body had finally staged an intervention and said, "Enough is enough,
+buddy. Time to get it together."</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+In that moment, as shame and humiliation washed over me — along with, well, other
+things — I realized something had to change. Just a few weeks earlier, a friend had
+given me a blunt assessment: "You're fat as F—." I played it off with a laugh, but
+the truth is, it got to me. I did what most people do — I denied it. But now, I
+couldn't ignore it. My body was screaming for help, and it was time I started
+listening. This wasn't just an inconvenient wake-up call — it was a blaring siren
+demanding action.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+My thoughts turned to my children. They were too young to understand what was
+happening, too small to remember that night. But one day, they would grow up watching
+me. Learning from me. Being shaped by the habits I passed down — whether I meant to
+or not.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+That moment, as humiliating as it was, became a turning point. This wasn't about
+quick fixes or crash diets anymore. It was about change. Real lasting change. Not
+just for me — but for the legacy I was shaping.</p>
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 16px;font-size:20px;font-weight:700;line-height:1.3;color:#111827;">
+So who am I?</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
 Hello, World. My name is Kortney Lee.</p>
 <p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
 When you're first taught to write code, the introduction often begins with a simple
 program that prints one phrase: Hello, World. That single line represents the start
 of something new — simple on the surface, but full of possibility. That's how this
-began for me. Not with a perfect plan. But with a line. A choice. A moment of clarity.
-And a lot of questions.</p>
+began for me. Not with a perfect plan. But with a line. A choice. A moment of
+clarity. And a lot of questions.</p>
 <p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
-In my life, that line got printed the night I found myself on the floor — confused,
-winded, and unsure of how things had gotten that bad. That was my Hello, World moment.
+In my life, that line got printed the night I found myself lying on the floor —
+confused, winded, and unsure of how it got that bad. That was my Hello, World moment.
 Not the start of another diet or fitness plan, but the first real interruption in the
-script I had been living on autopilot. The moment I knew I had to break the cycle —
-or at least figure out how it started. What caused it. What was keeping it alive.</p>
-<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
-I spent most of my career in software. Long hours in front of a computer. I signed up
-for a gym and never went. I made coffee in the morning, loaded with sugar, several
-more times throughout the day. Lunch was fast and familiar: burgers, pizza, whatever
-was convenient. By the time I got home, I would eat a full dinner and still find
-myself back in the kitchen. Not because I was hungry — because I had been conditioned
-to expect more.</p>
-<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
-Eventually I tried to turn things around. I followed advice that sounded smart. I paid
-thousands for coaching, programs, and services that promised results. I tried vibrating
-belts, meal replacement shakes, fat-burning pills, detox teas, lemon and cayenne
-cleanses. I even drank apple cider vinegar straight — and that was a horrible decision.
-Nothing worked. My waistline kept growing.</p>
-<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
-I was constantly full but rarely satisfied. Tired. Bloated. Discouraged.</p>
+script I had been living on autopilot. It was the moment I knew I had to break the
+cycle — or at least figure out how it started. What caused it. What was keeping it alive.</p>
+<p style="margin:0 0 4px;font-size:14px;line-height:1.6;color:#6b7280;text-align:right;font-style:italic;">
+— <em>What Is Healthy?</em>, Introduction, pp. 1–3</p>
 </td></tr>
-
-<tr><td style="padding:0 40px 20px;">
-<p style="margin:0 0 16px;font-size:20px;font-weight:700;line-height:1.3;color:#111827;">
-Is This You?</p>
+<tr><td style="padding:20px 40px 24px;border-top:2px solid #111827;">
 <p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
-Have you ever squeezed into an airplane seat, wondering if the seats have gotten smaller?
-You're not imagining it — since the 1980s, the average width of economy seats has shrunk
-by over two inches. But maybe the real question isn't whether the seat got smaller.</p>
-<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
-Maybe it's not just airplane seats.</p>
-<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
-Maybe you've slid into a booth and felt your stomach press against the edge. Struggled
-to buckle a seatbelt. Adjusted your clothes in the mirror, trying to convince yourself
-they still fit. Or maybe you've walked up a single flight of stairs and felt your legs
-burn. Hurried across a parking lot and arrived breathless. Bent down to tie your shoes
-and felt your stomach get in the way.</p>
-<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
-It didn't happen overnight. It happened one skipped step at a time. One extra serving.
-One more drive-thru because cooking felt like too much. You told yourself: I'll start
-tomorrow. And then one day, nothing feels the same. Your clothes fit differently.
-Your energy is gone. You feel like a stranger in your own body.</p>
-<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
-I looked around and realized the patterns weren't just mine. My family. My friends.
-My community. Everyone was doing their best with what they had — eating what was
-available, doing what was convenient, believing what was marketed. And we were
-getting sicker. Not because we didn't care. Because we didn't know where to begin.</p>
-</td></tr>
-
-<tr><td style="padding:20px 40px 20px;border-top:2px solid #111827;border-bottom:2px solid #111827;">
-<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
-So the question isn't just "What are we eating?" It's:</p>
+Chapter 1 asks the question Kortney couldn't stop asking after that night:</p>
 <p style="margin:0 0 16px;font-size:17px;font-weight:600;line-height:1.85;color:#111827;">
-"Why are we eating it? How did we get here? What patterns are we repeating?
-And — what story are we handing down?"</p>
-<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
-This is about clarity. Most of us are living out health stories we didn't write —
-shaped by industries we don't control and systems we never paused to question.
-We may not have chosen the conditions we were raised in. But we can choose what
-we carry forward.</p>
-<p style="margin:0 0 4px;font-size:16px;line-height:1.85;color:#374151;font-style:italic;">
-"If this isn't the story you want passed down... then how did we get here?"</p>
-<p style="margin:12px 0 0;font-size:14px;line-height:1.6;color:#6b7280;">
-— <em>What Is Healthy?</em>, Introduction, p. 9</p>
-</td></tr>
-
-<tr><td style="padding:20px 40px 24px;">
+"How did we get here?"</p>
 <p style="margin:0 0 16px;font-size:16px;line-height:1.8;color:#374151;">
-Chapter 1 answers that question. It starts on page 29 of the full book:</p>
+The full book — 264 pages, no agenda, no supplements to sell:</p>
 {_all_format_buttons()}
 </td></tr>
 <tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
@@ -732,16 +742,640 @@ To your health,<br/>{_team(variant)}</p>
 </td></tr>""", variant=variant)
 
 
+def _render_sugar_truth(first_name: str, variant: str = "", **kw) -> str:
+    """Day 14 — Sugar chapter from the book."""
+    c = _get_copy(variant)
+    return _email_wrap(f"""
+<tr><td style="padding:40px 40px 24px;">
+<p style="margin:0 0 16px;font-size:16px;line-height:1.8;color:#374151;">Hey {first_name},</p>
+<p style="margin:0 0 0;font-size:16px;line-height:1.8;color:#374151;">
+From the book — the chapter on sugar.</p>
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 16px;font-size:20px;font-weight:700;line-height:1.3;color:#111827;">
+What Is Sugar, Really?</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Sugar isn't just the white stuff in your kitchen. It's a category — and food companies
+have become experts at hiding it under names most people don't recognize. Dextrose.
+Maltodextrin. High-fructose corn syrup. Agave nectar. Cane juice. Rice syrup. Barley
+malt. More than 61 names for the same molecule — all of them legal, all of them
+designed to keep the ingredient from appearing at the top of the list.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+The average American consumes 17 teaspoons of added sugar every day. The American
+Heart Association recommends no more than 6 teaspoons for women and 9 for men.
+That gap doesn't come from dessert. It comes from products marketed as healthy —
+flavored yogurt, granola bars, pasta sauce, whole-grain bread, and "natural" fruit
+drinks that contain more sugar per serving than a can of soda.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Why is sugar so addictive? Because it triggers dopamine — the same reward pathway
+activated by other addictive substances. Food companies know this. The ratio of
+sugar, fat, and salt in ultra-processed food is not accidental. It is engineered,
+tested, and refined to hit what the industry calls the "bliss point" — the exact
+combination that makes you want more before you've finished what's in front of you.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+The silent strain: two in five American adults have prediabetes right now — and
+eight in ten don't know it. Their insulin is working overtime every single day,
+responding to blood sugar spikes from foods labeled "healthy." The damage accumulates
+quietly, for years, before a diagnosis arrives.</p>
+<p style="margin:0 0 4px;font-size:14px;line-height:1.6;color:#6b7280;text-align:right;font-style:italic;">
+— <em>What Is Healthy?</em>, Sugar chapter</p>
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 12px;font-size:16px;line-height:1.8;color:#374151;">
+The full book:</p>
+{_all_format_buttons()}
+</td></tr>
+<tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
+<p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
+More in a few days.<br/>Kortney</p>
+</td></tr>""", variant=variant)
+
+
+def _render_working_class(first_name: str, variant: str = "", **kw) -> str:
+    """Day 18 — The working-class trade-off from the book."""
+    c = _get_copy(variant)
+    return _email_wrap(f"""
+<tr><td style="padding:40px 40px 24px;">
+<p style="margin:0 0 16px;font-size:16px;line-height:1.8;color:#374151;">Hey {first_name},</p>
+<p style="margin:0 0 0;font-size:16px;line-height:1.8;color:#374151;">
+From the book — the chapter on convenience culture and the working-class trade-off.</p>
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 16px;font-size:20px;font-weight:700;line-height:1.3;color:#111827;">
+The System Isn't Built to Reward Wellness</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+For working-class Americans, the equation is brutal. If you're working two jobs,
+managing a household, or standing on your feet all day in a labor-intensive role,
+healthy living isn't just difficult — it feels out of reach.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+The system isn't set up to reward wellness. It's built to extract labor.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+More than 36% of adults consume fast food on any given day — with the highest rates
+among full-time workers. That statistic isn't a reflection of poor values. It's a
+predictable outcome of a life built around survival, not sustainability. Breakfast
+is skipped or grabbed from a drive-thru. Lunch is eaten in a car between jobs or
+skipped entirely. Dinner is whatever's fast, cheap, and available — because
+exhaustion rarely leaves room for intention.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+These aren't isolated decisions. They're what happens when a food environment is
+designed for profit, not people — when convenience is marketed as a solution while
+the underlying problem goes unaddressed.</p>
+<p style="margin:0 0 4px;font-size:14px;line-height:1.6;color:#6b7280;text-align:right;font-style:italic;">
+— <em>What Is Healthy?</em>, "The Working-Class Trade-Off"</p>
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 12px;font-size:16px;line-height:1.8;color:#374151;">
+The full book:</p>
+{_all_format_buttons()}
+</td></tr>
+<tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
+<p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
+More in a few days.<br/>Kortney</p>
+</td></tr>""", variant=variant)
+
+
+def _render_reversible(first_name: str, variant: str = "", **kw) -> str:
+    """Day 23 — Lifestyle diseases are reversible. From the book."""
+    c = _get_copy(variant)
+    return _email_wrap(f"""
+<tr><td style="padding:40px 40px 24px;">
+<p style="margin:0 0 16px;font-size:16px;line-height:1.8;color:#374151;">Hey {first_name},</p>
+<p style="margin:0 0 0;font-size:16px;line-height:1.8;color:#374151;">
+Something important from the book — something most doctors don't say clearly enough.</p>
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 16px;font-size:20px;font-weight:700;line-height:1.3;color:#111827;">
+The Diseases You're Afraid of Are Lifestyle Diseases</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Conditions like type 2 diabetes, cardiovascular disease, obesity, and hypertension
+are diet-related chronic illnesses. What we eat, how we move, how we manage stress,
+and what we do consistently over time — these don't happen overnight. They build up.
+They are lifestyle-driven.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Which means they are also lifestyle-reversible.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+This is not a guarantee and it is not a replacement for medical care. But it is a
+truth that gets buried under the weight of pharmaceutical marketing, insurance
+incentives, and a healthcare system that profits more from treating illness than
+preventing it. The research is clear: consistent changes to diet and movement can
+reverse prediabetes, reduce blood pressure, and dramatically lower cardiovascular risk
+— in some cases more effectively than medication alone.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+You were not born with a destiny to be sick. You inherited habits. And habits can change.</p>
+<p style="margin:0 0 4px;font-size:14px;line-height:1.6;color:#6b7280;text-align:right;font-style:italic;">
+— <em>What Is Healthy?</em>, "Medications That Cured — Not Just Treated"</p>
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 12px;font-size:16px;line-height:1.8;color:#374151;">
+The full book:</p>
+{_all_format_buttons()}
+</td></tr>
+<tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
+<p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
+More in a few days.<br/>Kortney</p>
+</td></tr>""", variant=variant)
+
+
+def _render_what_is_nutrition(first_name: str, variant: str = "", **kw) -> str:
+    """Day 29 — What food actually is. Nutrition 101 from the book."""
+    c = _get_copy(variant)
+    return _email_wrap(f"""
+<tr><td style="padding:40px 40px 24px;">
+<p style="margin:0 0 16px;font-size:16px;line-height:1.8;color:#374151;">Hey {first_name},</p>
+<p style="margin:0 0 0;font-size:16px;line-height:1.8;color:#374151;">
+From the Nutrition 101 chapter — what food actually is, stripped of the marketing.</p>
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 16px;font-size:20px;font-weight:700;line-height:1.3;color:#111827;">
+Food as Fuel vs. Food as Habit</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+The body doesn't care what a label says. It responds to what you give it. Macronutrients
+— proteins, carbohydrates, and fats — are the three categories of food your body uses
+for energy, repair, and function. Every meal is a combination of them. The question is
+whether the combination you're eating is doing the work your body needs, or working
+against it.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Most Americans have been taught to think about food in terms of calories — but calories
+are a measure of energy, not nutrition. A 200-calorie snack of almonds and a 200-calorie
+serving of crackers hit the body very differently. One sustains. One spikes. The label
+doesn't tell you which is which. The macronutrient breakdown does.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+The NOVA food classification system, developed by researchers at the University of
+Sao Paulo, sorts food not by calories but by how it's processed — and the research
+is clear: the more processed a food is, the more likely it is to drive inflammation,
+disrupt hunger signals, and contribute to chronic disease — regardless of its
+calorie count.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Students in the US receive fewer than eight hours of nutrition education per year.
+Eight hours. That gap has consequences that last a lifetime.</p>
+<p style="margin:0 0 4px;font-size:14px;line-height:1.6;color:#6b7280;text-align:right;font-style:italic;">
+— <em>What Is Healthy?</em>, Nutrition 101</p>
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 12px;font-size:16px;line-height:1.8;color:#374151;">
+The full book:</p>
+{_all_format_buttons()}
+</td></tr>
+<tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
+<p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
+More in a few days.<br/>Kortney</p>
+</td></tr>""", variant=variant)
+
+
+def _render_teeth(first_name: str, variant: str = "", **kw) -> str:
+    """Day 36 — Teeth and systemic health. From the book."""
+    c = _get_copy(variant)
+    return _email_wrap(f"""
+<tr><td style="padding:40px 40px 24px;">
+<p style="margin:0 0 16px;font-size:16px;line-height:1.8;color:#374151;">Hey {first_name},</p>
+<p style="margin:0 0 0;font-size:16px;line-height:1.8;color:#374151;">
+This one surprises people. From the book.</p>
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 16px;font-size:20px;font-weight:700;line-height:1.3;color:#111827;">
+Teeth Don't Grow Back — and Neither Do Some Choices</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Most people don't connect their teeth to their heart. They should.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Oral health is one of the clearest windows into systemic health. The bacteria that
+accumulate in an unhealthy mouth don't stay there — they enter the bloodstream and
+have been linked to cardiovascular disease, diabetes complications, and cognitive
+decline. The mouth is not a separate system. It is part of the whole.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Enamel erosion — caused by acid from sugary and processed foods — cannot be
+reversed. Once decay progresses, restoration becomes the only option. Root canals.
+Extractions. Implants. Thousands of dollars, and years of damage, from a pattern
+of eating that was never questioned.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Flossing may feel small. In the book, I use it as a metaphor for the whole problem:
+we know what to do, we know the consequences of not doing it, and we still delay —
+because there's no immediate pain. Until there is.</p>
+<p style="margin:0 0 4px;font-size:14px;line-height:1.6;color:#6b7280;text-align:right;font-style:italic;">
+— <em>What Is Healthy?</em>, "Teeth Don't Grow Back"</p>
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 12px;font-size:16px;line-height:1.8;color:#374151;">
+The full book:</p>
+{_all_format_buttons()}
+</td></tr>
+<tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
+<p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
+More in a few days.<br/>Kortney</p>
+</td></tr>""", variant=variant)
+
+
+def _render_community(first_name: str, variant: str = "", **kw) -> str:
+    """Day 44 — Community and culture chapter from the book."""
+    c = _get_copy(variant)
+    return _email_wrap(f"""
+<tr><td style="padding:40px 40px 24px;">
+<p style="margin:0 0 16px;font-size:16px;line-height:1.8;color:#374151;">Hey {first_name},</p>
+<p style="margin:0 0 0;font-size:16px;line-height:1.8;color:#374151;">
+From the book — the chapter on community, culture, and the hardest question to ask.</p>
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 16px;font-size:20px;font-weight:700;line-height:1.3;color:#111827;">
+Does This Serve Us — or Harm Us?</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Some of the most damaging norms go unchallenged simply because they're familiar.
+Pizza on Fridays becomes pizza every day. The church potluck becomes the template
+for what celebration looks like. The food at funerals, at holidays, at baby showers —
+it's all comfort, all tradition, and in many cases, all disease.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Change starts by asking one simple question: Does this serve us — or does it harm us?</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+When a community starts asking that together, they don't just reject what's broken.
+They build something better: access, equity, and long-term well-being. The solution
+doesn't start with policy. It starts at the table — with one family deciding to
+ask a different question about what they're eating and why.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+You are a product of your environment — until you decide not to be. That decision
+is yours. And the next generation deserves the version of you that chooses differently.</p>
+<p style="margin:0 0 4px;font-size:14px;line-height:1.6;color:#6b7280;text-align:right;font-style:italic;">
+— <em>What Is Healthy?</em>, "The Role of Community"</p>
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 12px;font-size:16px;line-height:1.8;color:#374151;">
+The full book:</p>
+{_all_format_buttons()}
+</td></tr>
+<tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
+<p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
+More in a few days.<br/>Kortney</p>
+</td></tr>""", variant=variant)
+
+
+def _render_psychology(first_name: str, variant: str = "", **kw) -> str:
+    """Day 53 — Psychology of change. From the book."""
+    c = _get_copy(variant)
+    return _email_wrap(f"""
+<tr><td style="padding:40px 40px 24px;">
+<p style="margin:0 0 16px;font-size:16px;line-height:1.8;color:#374151;">Hey {first_name},</p>
+<p style="margin:0 0 0;font-size:16px;line-height:1.8;color:#374151;">
+From the book — the chapter on why change is hard, and what actually makes it happen.</p>
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 16px;font-size:20px;font-weight:700;line-height:1.3;color:#111827;">
+How Many No's Before a Yes?</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Most people don't change when they learn something new. They change when the pain of
+staying the same becomes greater than the fear of changing. That gap — between knowing
+what to do and actually doing it — is where most health journeys stall.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+I've learned that the number of times someone says no to change before they say yes
+has less to do with willpower and more to do with environment. Who's around them.
+What's available. What's been normalized. What story they were told about who they are.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+The psychology of change isn't about motivation. It's about identity. People don't
+sustain behaviors that conflict with how they see themselves. The first step isn't a
+diet — it's a different answer to the question: who am I, and what do people like me do?</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+What matters is what you do next. Not what you've done. Not what you should have done.
+What happens in the next meal, the next grocery trip, the next moment you're tired and
+it's easier to grab something fast. That's where health is actually made.</p>
+<p style="margin:0 0 4px;font-size:14px;line-height:1.6;color:#6b7280;text-align:right;font-style:italic;">
+— <em>What Is Healthy?</em>, "The Psychology of Change"</p>
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 12px;font-size:16px;line-height:1.8;color:#374151;">
+The full book:</p>
+{_all_format_buttons()}
+</td></tr>
+<tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
+<p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
+More in a few days.<br/>Kortney</p>
+</td></tr>""", variant=variant)
+
+
+def _render_mental_health(first_name: str, variant: str = "", **kw) -> str:
+    """Day 63 — Mental health and food as coping. From the book."""
+    c = _get_copy(variant)
+    return _email_wrap(f"""
+<tr><td style="padding:40px 40px 24px;">
+<p style="margin:0 0 16px;font-size:16px;line-height:1.8;color:#374151;">Hey {first_name},</p>
+<p style="margin:0 0 0;font-size:16px;line-height:1.8;color:#374151;">
+A chapter from the book that doesn't get talked about enough.</p>
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 16px;font-size:20px;font-weight:700;line-height:1.3;color:#111827;">
+1 in 4 Adults Under 30 Now Reports This</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Rates of anxiety and depression have climbed sharply over the past two decades —
+especially among teens and young adults. According to the CDC, nearly one in four
+adults under thirty now reports symptoms of anxiety or depression. That number was
+not always this high. Something changed.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+The research connecting diet and mental health is growing fast. The gut-brain axis —
+the direct communication pathway between your digestive system and your brain — means
+that what you eat affects not just your body but your mood, your focus, your
+resilience under stress. Ultra-processed food disrupts the gut microbiome. A disrupted
+microbiome produces less serotonin. And 90% of the body's serotonin is made in the gut,
+not the brain.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Real health is mental health. And mental health doesn't come from pills alone. It comes
+from nourishment. From movement. From connection. From a system that stops selling
+stimulation and starts offering support.</p>
+<p style="margin:0 0 4px;font-size:14px;line-height:1.6;color:#6b7280;text-align:right;font-style:italic;">
+— <em>What Is Healthy?</em>, "Addiction, Anxiety, and the Hidden Cost of Coping"</p>
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 12px;font-size:16px;line-height:1.8;color:#374151;">
+The full book:</p>
+{_all_format_buttons()}
+</td></tr>
+<tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
+<p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
+More in a few days.<br/>Kortney</p>
+</td></tr>""", variant=variant)
+
+
+def _render_disconnection(first_name: str, variant: str = "", **kw) -> str:
+    """Day 74 — Overfed but undernourished. Disconnection chapter from the book."""
+    c = _get_copy(variant)
+    return _email_wrap(f"""
+<tr><td style="padding:40px 40px 24px;">
+<p style="margin:0 0 16px;font-size:16px;line-height:1.8;color:#374151;">Hey {first_name},</p>
+<p style="margin:0 0 0;font-size:16px;line-height:1.8;color:#374151;">
+From the book — the part that hit me hardest to write.</p>
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 16px;font-size:20px;font-weight:700;line-height:1.3;color:#111827;">
+Overfed. Undernourished. Connected to Nothing.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+We are overstimulated but under-touched. Overfed but undernourished. Exposed to
+everything — connected to nothing.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Food used to be the center of connection. It was how families gathered, how communities
+celebrated, how cultures preserved identity. Something happened between that version of
+food and the one we live with now — and it wasn't just a change in ingredients. It was
+a change in relationship. We stopped eating together and started eating at screens.
+We stopped cooking as a practice and started ordering as a convenience. We lost the
+ritual, and with it, some of the meaning.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+If we want our health — and our relationships — to thrive, the healing has to start
+within. Not with a number on a scale. Not with a quick fix. But with a willingness to
+be present again. To turn off the screen. To make time. To say no to what numbs —
+and yes to what restores.</p>
+<p style="margin:0 0 4px;font-size:14px;line-height:1.6;color:#6b7280;text-align:right;font-style:italic;">
+— <em>What Is Healthy?</em>, "How Disconnection Replaces Love"</p>
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 12px;font-size:16px;line-height:1.8;color:#374151;">
+The full book:</p>
+{_all_format_buttons()}
+</td></tr>
+<tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
+<p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
+More in a few days.<br/>Kortney</p>
+</td></tr>""", variant=variant)
+
+
+def _render_real_food(first_name: str, variant: str = "", **kw) -> str:
+    """Day 86 — Rediscovering real food. From the book."""
+    c = _get_copy(variant)
+    return _email_wrap(f"""
+<tr><td style="padding:40px 40px 24px;">
+<p style="margin:0 0 16px;font-size:16px;line-height:1.8;color:#374151;">Hey {first_name},</p>
+<p style="margin:0 0 0;font-size:16px;line-height:1.8;color:#374151;">
+From the book — the chapter that tells you what to actually do.</p>
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 16px;font-size:20px;font-weight:700;line-height:1.3;color:#111827;">
+You Don't Need Perfection. You Need Direction.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+By now, you've seen the whole picture — how tradition became habit, how comfort
+replaced intention, and how generations inherited the consequences. You've seen how
+misinformation, culture, access, and marketing shape what ends up on our plates and
+in our lives. You've seen how we make peace with illness and call it genetics — when
+in reality, it's often modeled behavior, normalized dysfunction, and quiet surrender.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+But awareness disrupts that pattern. Awareness gives you the power to pause before
+the next bite. To ask why. To choose differently. Because the future isn't written yet.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Real food isn't complicated. It's food that spoils. Food with ingredients you can
+pronounce. Food that looks like what it is. The simplest rule in the book: if it
+wouldn't exist without a factory, be suspicious of it. If it came from the ground, a
+tree, or an animal without a five-step manufacturing process, your body knows what
+to do with it.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+You don't need to be perfect. You need a direction. One meal at a time.</p>
+<p style="margin:0 0 4px;font-size:14px;line-height:1.6;color:#6b7280;text-align:right;font-style:italic;">
+— <em>What Is Healthy?</em>, "Rediscovering Real Food"</p>
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 12px;font-size:16px;line-height:1.8;color:#374151;">
+The full book:</p>
+{_all_format_buttons()}
+</td></tr>
+<tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
+<p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
+More in a few days.<br/>Kortney</p>
+</td></tr>""", variant=variant)
+
+
+def _render_fasting(first_name: str, variant: str = "", **kw) -> str:
+    """Day 100 — Fasting: spiritual and health perspectives. From the book."""
+    c = _get_copy(variant)
+    return _email_wrap(f"""
+<tr><td style="padding:40px 40px 24px;">
+<p style="margin:0 0 16px;font-size:16px;line-height:1.8;color:#374151;">Hey {first_name},</p>
+<p style="margin:0 0 0;font-size:16px;line-height:1.8;color:#374151;">
+One of the chapters I didn't expect to love writing. From the book.</p>
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 16px;font-size:20px;font-weight:700;line-height:1.3;color:#111827;">
+What Fasting Teaches Us About Love</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Fasting has been practiced for thousands of years across every major religion and
+culture. It is one of the oldest tools for clarity, discipline, and spiritual focus.
+It is also, increasingly, one of the most well-researched interventions in metabolic
+health.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Time-restricted eating — eating within a defined window and fasting the rest — has been
+shown to improve insulin sensitivity, reduce inflammation, support cellular repair
+through a process called autophagy, and reduce the risk of metabolic disease. Not
+because it's a trick. Because it's how humans ate for most of history. Three meals a
+day plus snacks is a modern invention, driven more by food industry revenue than by
+biology.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+But the chapter isn't really about the science. It's about what happens when you
+create space — from food, from noise, from constant consumption. Fasting creates
+space. And healing fills it. That's true whether you're approaching it from faith,
+from health, or simply from a desire to understand your relationship with food
+at a deeper level.</p>
+<p style="margin:0 0 4px;font-size:14px;line-height:1.6;color:#6b7280;text-align:right;font-style:italic;">
+— <em>What Is Healthy?</em>, "When Did Fasting Lose Its True Meaning?"</p>
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 12px;font-size:16px;line-height:1.8;color:#374151;">
+The full book:</p>
+{_all_format_buttons()}
+</td></tr>
+<tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
+<p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
+More in a few days.<br/>Kortney</p>
+</td></tr>""", variant=variant)
+
+
+def _render_breaking_cycle(first_name: str, variant: str = "", **kw) -> str:
+    """Day 115 — Breaking the cycle. Power of one generation. From the book."""
+    c = _get_copy(variant)
+    return _email_wrap(f"""
+<tr><td style="padding:40px 40px 24px;">
+<p style="margin:0 0 16px;font-size:16px;line-height:1.8;color:#374151;">Hey {first_name},</p>
+<p style="margin:0 0 0;font-size:16px;line-height:1.8;color:#374151;">
+From the book — the chapter that brings it all together.</p>
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 16px;font-size:20px;font-weight:700;line-height:1.3;color:#111827;">
+The Power of One Generation</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+The habits we pass down are not inevitable. They feel inevitable because they are familiar,
+because they were modeled for us before we could question them, and because the systems
+around us are designed to keep them in place. But they are habits. Not destiny.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+One generation that asks different questions changes the trajectory for every generation
+that follows. Not by being perfect. Not by having all the answers. But by refusing to
+pass the confusion and the silence down unchanged.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+What we accept as normal becomes their starting point. What we don't question becomes
+their burden to explain, solve, and fix. The most powerful thing you can do for the
+people who come after you is to do the work now — imperfectly, openly, visibly —
+so they inherit something different than what you were given.</p>
+<p style="margin:0 0 4px;font-size:14px;line-height:1.6;color:#6b7280;text-align:right;font-style:italic;">
+— <em>What Is Healthy?</em>, "Breaking the Cycle"</p>
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 12px;font-size:16px;line-height:1.8;color:#374151;">
+The full book:</p>
+{_all_format_buttons()}
+</td></tr>
+<tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
+<p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
+Two more emails coming.<br/>Kortney</p>
+</td></tr>""", variant=variant)
+
+
+def _render_blue_zones(first_name: str, variant: str = "", **kw) -> str:
+    """Day 130 — Blue Zones: what people who live to 100 actually eat."""
+    c = _get_copy(variant)
+    return _email_wrap(f"""
+<tr><td style="padding:40px 40px 24px;">
+<p style="margin:0 0 16px;font-size:16px;line-height:1.8;color:#374151;">Hey {first_name},</p>
+<p style="margin:0 0 0;font-size:16px;line-height:1.8;color:#374151;">
+From the book — Lessons from the Blue Zones.</p>
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 16px;font-size:20px;font-weight:700;line-height:1.3;color:#111827;">
+What People Who Live to 100 Actually Eat</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+The Blue Zones are five regions of the world where people live measurably longer,
+healthier lives — Okinawa, Japan; Sardinia, Italy; Nicoya, Costa Rica; Ikaria, Greece;
+and Loma Linda, California. Researchers have studied these populations for decades.
+What they found was not what the supplement industry hoped for.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+They eat mostly plants. They eat until they're 80% full — a practice the Okinawans
+call hara hachi bu. They don't diet. They don't count calories. They eat the foods
+their grandparents ate, prepared the way their grandparents prepared them, at a
+table with people they care about.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+They also move naturally — not through gym memberships but through lives built around
+walking, gardening, and physical work. They belong to communities that provide meaning
+and accountability. They have a reason to get up in the morning.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+The lesson from the Blue Zones isn't a diet. It's a way of life — and most of it has
+nothing to do with supplements or superfoods. It has everything to do with what we've
+traded away in the name of convenience.</p>
+<p style="margin:0 0 4px;font-size:14px;line-height:1.6;color:#6b7280;text-align:right;font-style:italic;">
+— <em>What Is Healthy?</em>, "Lessons from the Blue Zones"</p>
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 12px;font-size:16px;line-height:1.8;color:#374151;">
+The full book:</p>
+{_all_format_buttons()}
+</td></tr>
+<tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
+<p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
+One more email after this.<br/>Kortney</p>
+</td></tr>""", variant=variant)
+
+
+def _render_where_next(first_name: str, variant: str = "", **kw) -> str:
+    """Day 150 — Final email. Where do we go from here? All CTAs. Eden + Cora."""
+    c = _get_copy(variant)
+    return _email_wrap(f"""
+<tr><td style="padding:40px 40px 24px;">
+<p style="margin:0 0 16px;font-size:16px;line-height:1.8;color:#374151;">Hey {first_name},</p>
+<p style="margin:0 0 0;font-size:16px;line-height:1.8;color:#374151;">
+The last chapter of <strong>What Is Healthy?</strong></p>
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 16px;font-size:20px;font-weight:700;line-height:1.3;color:#111827;">
+Where Do We Go from Here?</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Not: "What's healthy?" But: "What's true — for you, your family, and your future?"</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Not: "How do I fix everything overnight?" But: "What do I need to keep, question,
+or let go of — on purpose?"</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Rewriting the narrative doesn't mean rejecting who you are. It means questioning
+everything you were taught — because future generations are learning from your example.
+What we accept as normal becomes their starting point. What we don't question becomes
+their burden.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+I started this book on the floor of a bathroom at two in the morning. I didn't know
+then that the question I was asking about myself — how did I get here? — would become
+the question I'd spend years trying to answer for my family, my community, and anyone
+willing to listen.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+The answer isn't a diet. It isn't a supplement. It isn't a program. It's a decision —
+made again every day, imperfectly, intentionally — to choose something better than
+what was handed to you.</p>
+<p style="margin:0 0 4px;font-size:14px;line-height:1.6;color:#6b7280;text-align:right;font-style:italic;">
+— <em>What Is Healthy?</em>, "Where Do We Go from Here?"</p>
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 12px;font-size:16px;line-height:1.8;color:#374151;">
+If you haven't grabbed the full book yet — 264 pages, no agenda:</p>
+{_all_format_buttons()}
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 16px;font-size:15px;line-height:1.8;color:#374151;">
+Two tools I built that come from the same place this book does:</p>
+{_brand_cards()}
+</td></tr>
+<tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
+<p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
+Whatever you decide — keep reading those labels.</p>
+<p style="margin:20px 0 0;font-size:16px;line-height:1.8;color:#374151;">
+All the best,<br/>Kortney</p>
+</td></tr>""", variant=variant)
+
+
 # Template renderer lookup
 _RENDERERS = {
-    "book_delivery": _render_book_delivery,
+    "book_delivery":    _render_book_delivery,
     "did_you_get_this": _render_did_you_get_this,
-    "big_benefit": _render_big_benefit,
-    "got_questions": _render_got_questions,
-    "social_proof": _render_social_proof,
-    "im_surprised": _render_im_surprised,
-    "last_chance": _render_last_chance,
-    "buy_now_offer": _render_buy_now_offer,
+    "big_benefit":      _render_big_benefit,
+    "got_questions":    _render_got_questions,
+    "social_proof":     _render_social_proof,
+    "im_surprised":     _render_im_surprised,
+    "last_chance":      _render_last_chance,
+    "sugar_truth":      _render_sugar_truth,
+    "working_class":    _render_working_class,
+    "reversible":       _render_reversible,
+    "what_is_nutrition":_render_what_is_nutrition,
+    "teeth":            _render_teeth,
+    "community":        _render_community,
+    "psychology":       _render_psychology,
+    "mental_health":    _render_mental_health,
+    "disconnection":    _render_disconnection,
+    "real_food":        _render_real_food,
+    "fasting":          _render_fasting,
+    "breaking_cycle":   _render_breaking_cycle,
+    "blue_zones":       _render_blue_zones,
+    "where_next":       _render_where_next,
+    "buy_now_offer":    _render_buy_now_offer,
 }
 
 
