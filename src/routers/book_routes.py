@@ -487,11 +487,11 @@ async def preview_b2b(request: Request):
     if not to_email:
         raise HTTPException(status_code=400, detail="to_email required")
 
-    from src.services.b2b_nurture_service import _render_b2b_day0, _get, _send
+    from src.services.b2b_nurture_service import _render_b2b_day0, _subject, _send
 
     results = []
     for bt in types:
-        subject = _get(bt)["d0_subject"]
+        subject = _subject(bt, 0)
         html = _render_b2b_day0(first_name, bt, company_name)
         sent = await _send(to_email, f"[{bt.upper()} TEST] {subject}", html)
         results.append({"type": bt, "subject": subject, "sent": sent})
