@@ -46,9 +46,17 @@ def _wrap(content: str) -> str:
 <tr><td align="center">
 <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#ffffff;">
 {content}
-<tr><td style="padding:16px 40px 24px;border-top:1px solid #e5e7eb;">
+<tr><td style="padding:20px 40px 16px;border-top:1px solid #e5e7eb;">
+<p style="margin:0;font-size:14px;line-height:1.7;color:#4b5563;">
+The research and data behind this book is what drives everything we publish at
+<a href="https://vowels.org" target="_blank" style="color:#1e40af;text-decoration:underline;font-weight:600;">Vowels.org</a>
+&mdash; where we break down nutrition science, food industry practices, and what the
+evidence actually says, in plain language anyone can understand. If you or your audience
+want to go deeper, that&rsquo;s where to start.</p>
+</td></tr>
+<tr><td style="padding:8px 40px 24px;">
 <p style="margin:0 0 6px;font-size:13px;line-height:1.6;color:#6b7280;">
-You received this because of your work in books, health, or community — topics this book speaks to directly.</p>
+You received this because of your work in books, health, or community &mdash; topics this book speaks to directly.</p>
 <p style="margin:0;color:#9ca3af;font-size:12px;line-height:1.6;">
 <a href="{UNSUBSCRIBE_URL}" style="color:#9ca3af;text-decoration:underline;">Unsubscribe</a>
 &middot; Kortney Lee &middot; info@vowels.org
