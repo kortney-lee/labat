@@ -19,7 +19,7 @@ import httpx
 logger = logging.getLogger(__name__)
 
 SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY", "").strip()
-FROM_EMAIL = os.getenv("B2B_FROM_EMAIL", "partnerships@vowels.org")
+FROM_EMAIL = os.getenv("B2B_FROM_EMAIL", "info@vowels.org")
 FROM_NAME  = os.getenv("B2B_FROM_NAME",  "Kortney Lee — What Is Healthy?")
 BCC_EMAIL  = os.getenv("BOOK_EMAIL_BCC", "kortney@wihy.ai")
 UNSUBSCRIBE_URL = "https://whatishealthy.org/unsubscribe"
