@@ -1064,6 +1064,21 @@ class AlexService:
         except Exception as _bl_err:
             logger.warning("Could not fetch book leads report: %s", _bl_err)
 
+        # SendGrid email stats from book service
+        email_stats: Dict[str, Any] = {}
+        try:
+            from src.alex.config import BOOK_SERVICE_URL, INTERNAL_ADMIN_TOKEN
+            async with httpx.AsyncClient(timeout=20.0) as client:
+                r = await client.get(
+                    f"{BOOK_SERVICE_URL}/api/book/email-stats",
+                    params={"days": "7"},
+                    headers={"x-admin-token": INTERNAL_ADMIN_TOKEN},
+                )
+                if r.status_code == 200:
+                    email_stats = r.json()
+        except Exception as _sg_err:
+            logger.warning("Could not fetch SendGrid stats: %s", _sg_err)
+
         return {
             "agent": "ALEX",
             "generated_at": datetime.utcnow().strftime("%B %d, %Y at %H:%M UTC"),
@@ -1088,6 +1103,7 @@ class AlexService:
                 for name, info in health.items()
             },
             "book_leads": book_leads,
+            "email_stats": email_stats,
         }
 
     @staticmethod

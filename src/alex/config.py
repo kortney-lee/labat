@@ -22,8 +22,9 @@ ALEX_LLM_TEMPERATURE = float(os.getenv("ALEX_LLM_TEMPERATURE", "0.5"))
 
 # ── Services integration ─────────────────────────────────────────────────────
 
-SERVICES_URL = os.getenv("SERVICES_URL", "https://services.wihy.ai")
-LABAT_URL = os.getenv("LABAT_URL", "https://wihy-labat-n4l2vldq3q-uc.a.run.app")
+SERVICES_URL    = os.getenv("SERVICES_URL", "https://services.wihy.ai")
+LABAT_URL       = os.getenv("LABAT_URL", "https://wihy-labat-n4l2vldq3q-uc.a.run.app")
+BOOK_SERVICE_URL= os.getenv("BOOK_SERVICE_URL", "https://wihy-ml-book-n4l2vldq3q-uc.a.run.app")
 SHANIA_GRAPHICS_URL = os.getenv("SHANIA_GRAPHICS_URL", "https://wihy-shania-graphics-12913076533.us-central1.run.app")
 ALEX_BASE_URL = os.getenv("ALEX_BASE_URL", "http://localhost:8080")
 ALEX_REPORT_LINK = os.getenv("ALEX_REPORT_LINK", "").strip()

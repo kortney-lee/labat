@@ -414,6 +414,80 @@ async def stats(request: Request):
     return {"leads": count}
 
 
+@router.get("/email-stats")
+async def email_stats(request: Request, days: int = 7):
+    """
+    SendGrid stats for all nurture and B2B campaigns.
+    Returns opens, clicks, deliveries, bounces, unsubscribes per category.
+    Admin only.
+    """
+    admin_token = os.getenv("INTERNAL_ADMIN_TOKEN", "")
+    req_token = request.headers.get("x-admin-token", "")
+    if admin_token and req_token != admin_token:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    sg_key = os.getenv("SENDGRID_API_KEY", "").strip()
+    if not sg_key:
+        raise HTTPException(status_code=503, detail="SendGrid API key not configured")
+
+    from datetime import timedelta
+    start = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%d")
+
+    # Categories to pull
+    categories = ["nurture", "b2b-nurture", "launch-nurture"]
+
+    async with httpx.AsyncClient(timeout=20.0) as client:
+        # Overall account stats (all sends)
+        overall_resp = await client.get(
+            "https://api.sendgrid.com/v3/stats",
+            params={"start_date": start, "aggregated_by": "day"},
+            headers={"Authorization": f"Bearer {sg_key}"},
+        )
+        overall_data = overall_resp.json() if overall_resp.status_code == 200 else []
+
+        # Per-category stats
+        cat_stats = {}
+        for cat in categories:
+            r = await client.get(
+                "https://api.sendgrid.com/v3/categories/stats",
+                params={"start_date": start, "categories": cat, "aggregated_by": "day"},
+                headers={"Authorization": f"Bearer {sg_key}"},
+            )
+            if r.status_code == 200:
+                cat_stats[cat] = _aggregate_sg(r.json())
+
+    # Aggregate totals across all days
+    overall_totals = _aggregate_sg(overall_data)
+
+    return {
+        "period_days": days,
+        "start_date": start,
+        "overall": overall_totals,
+        "by_category": cat_stats,
+    }
+
+
+def _aggregate_sg(daily_rows: list) -> dict:
+    """Sum SendGrid daily stat rows into a single totals dict."""
+    totals = {
+        "requests": 0, "delivered": 0, "opens": 0, "unique_opens": 0,
+        "clicks": 0, "unique_clicks": 0, "bounces": 0, "spam_reports": 0,
+        "unsubscribes": 0, "blocks": 0,
+    }
+    for row in (daily_rows or []):
+        for stat in row.get("stats", []):
+            m = stat.get("metrics", {})
+            for k in totals:
+                totals[k] += m.get(k, 0)
+
+    # Compute rates
+    delivered = totals["delivered"] or 1
+    totals["open_rate"]  = round(totals["unique_opens"]  / delivered * 100, 1)
+    totals["click_rate"] = round(totals["unique_clicks"] / delivered * 100, 1)
+    totals["bounce_rate"]= round(totals["bounces"]       / max(totals["requests"], 1) * 100, 1)
+    return totals
+
+
 @router.post("/nurture-cron")
 async def nurture_cron(request: Request):
     """Process pending nurture emails. Called by Cloud Scheduler."""
