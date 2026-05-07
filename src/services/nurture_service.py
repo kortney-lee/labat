@@ -49,7 +49,7 @@ _DEFAULT_BRAND = "vowels"
 
 BOOK_PDF_URL = "https://whatishealthy.org/WhatisHealthy_FreeIntroduction.pdf"
 CONFIRM_DOWNLOAD_URL = "https://whatishealthy.org/confirm-download.html"
-BOOK_IMAGE_URL = "https://storage.googleapis.com/wihy-web-assets/images/book/BookGreen.jpg"
+BOOK_IMAGE_URL = "https://storage.googleapis.com/wihy-web-assets/images/book-green.jpg"
 WIHY_URL = "https://wihy.ai"
 WIHY_SUB_URL = "https://wihy.ai/subscription"
 WIHY_ICON_URL = "https://storage.googleapis.com/wihy-web-assets/images/eden/eden-icon.png"
@@ -337,91 +337,48 @@ def _all_format_buttons() -> str:
 
 
 def _brand_cards() -> str:
-    """Side-by-side Eden + Cora brand cards with images, positioning, and CTA buttons."""
-    return f"""
-<table width="100%" cellpadding="0" cellspacing="0">
-<tr>
-  <!-- Eden card -->
-  <td width="50%" valign="top" style="padding:0 6px 0 0;">
-    <table width="100%" cellpadding="0" cellspacing="0"
-           style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
-      <tr>
-        <td align="center" bgcolor="#1e1b4b" style="padding:20px 16px 12px;">
-          <img src="{WIHY_ICON_URL}" width="72" height="72" alt="Eden by WIHY"
-               style="display:block;margin:0 auto 10px;border-radius:50%;border:0;" />
-          <p style="margin:0;font-size:15px;font-weight:700;color:#ffffff;
-             font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-            Eden by WIHY</p>
-        </td>
-      </tr>
-      <tr>
-        <td style="padding:14px 14px 6px;">
-          <p style="margin:0 0 8px;font-size:13px;font-weight:700;color:#1e1b4b;
-             font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-            For your overall health goals</p>
-          <p style="margin:0;font-size:12px;line-height:1.7;color:#4b5563;
-             font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-            Ask any food or health question. Scan labels. Track progress. Eden is built for
-            people who want to understand their health from the inside out.</p>
-        </td>
-      </tr>
-      <tr>
-        <td align="center" style="padding:12px 14px 16px;">
-          <table cellpadding="0" cellspacing="0"><tr>
-            <td align="center" bgcolor="#1e1b4b" style="border-radius:5px;">
-              <a href="{WIHY_SUB_URL}" target="_blank"
-                 style="display:block;padding:10px 18px;color:#ffffff;font-size:13px;
-                 font-weight:700;text-decoration:none;
-                 font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-                Get Started Free</a>
-            </td>
-          </tr></table>
-        </td>
-      </tr>
-    </table>
-  </td>
-  <!-- Cora card -->
-  <td width="50%" valign="top" style="padding:0 0 0 6px;">
-    <table width="100%" cellpadding="0" cellspacing="0"
-           style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
-      <tr>
-        <td align="center" bgcolor="#f0fdf4" style="padding:20px 16px 12px;">
-          <img src="{CG_ICON_URL}" width="72" height="72" alt="Cora by Community Groceries"
-               style="display:block;margin:0 auto 10px;border:0;" />
-          <p style="margin:0;font-size:15px;font-weight:700;color:#15803d;
-             font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-            Cora by CG</p>
-        </td>
-      </tr>
-      <tr>
-        <td style="padding:14px 14px 6px;">
-          <p style="margin:0 0 8px;font-size:13px;font-weight:700;color:#15803d;
-             font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-            For singles &amp; empty nesters</p>
-          <p style="margin:0;font-size:12px;line-height:1.7;color:#4b5563;
-             font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-            Real food at fair prices, sized for one or two. No bulk. No waste.
-            Cora is built for people who want to eat well without buying for a family
-            they no longer have.</p>
-        </td>
-      </tr>
-      <tr>
-        <td align="center" style="padding:12px 14px 16px;">
-          <table cellpadding="0" cellspacing="0"><tr>
-            <td align="center" bgcolor="#15803d" style="border-radius:5px;">
-              <a href="{CG_SUB_URL}" target="_blank"
-                 style="display:block;padding:10px 18px;color:#ffffff;font-size:13px;
-                 font-weight:700;text-decoration:none;
-                 font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-                Get Started Free</a>
-            </td>
-          </tr></table>
-        </td>
-      </tr>
-    </table>
-  </td>
-</tr>
-</table>"""
+    """Stacked Eden + Cora rows: logo left, name + description + link right. No backgrounds."""
+    def card(icon_url: str, name: str, tagline: str, description: str, cta: str, link: str) -> str:
+        return (
+            f'<table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 16px;">'
+            f'<tr>'
+            f'<td width="56" valign="top" style="padding:0 14px 0 0;">'
+            f'<img src="{icon_url}" width="48" height="48" alt="{name}"'
+            f' style="display:block;border:0;border-radius:8px;" /></td>'
+            f'<td valign="top">'
+            f'<p style="margin:0 0 2px;font-size:15px;font-weight:700;color:#111827;'
+            f'font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif;">'
+            f'{name} &mdash; <span style="font-weight:400;color:#6b7280;">{tagline}</span></p>'
+            f'<p style="margin:0 0 6px;font-size:14px;line-height:1.7;color:#4b5563;'
+            f'font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif;">'
+            f'{description}</p>'
+            f'<a href="{link}" target="_blank"'
+            f' style="font-size:14px;font-weight:600;color:#1e40af;text-decoration:underline;'
+            f'font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif;">'
+            f'{cta}</a>'
+            f'</td></tr></table>'
+        )
+    return (
+        card(
+            WIHY_ICON_URL,
+            "Eden by WIHY",
+            "for your overall health goals",
+            "Ask any food or health question, scan labels, and get straight answers. "
+            "Eden is for people who want to understand their health from the inside out.",
+            "Try Eden free",
+            WIHY_SUB_URL,
+        ) +
+        card(
+            CG_ICON_URL,
+            "Cora by Community Groceries",
+            "for singles &amp; empty nesters",
+            "Real food at fair prices, sized for one or two. No bulk, no waste. "
+            "Built for people who want to eat well without shopping for a household "
+            "they no longer have.",
+            "Try Cora free",
+            CG_SUB_URL,
+        )
+    )
 
 
 # ── Template builders ─────────────────────────────────────────────────────────
