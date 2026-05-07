@@ -271,12 +271,12 @@ def _email_wrap(content: str, variant: str = "") -> str:
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/></head>
-<body style="margin:0;padding:0;background:#f9fafb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#f9fafb;padding:32px 16px;">
+<body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;padding:0;">
 <tr><td align="center">
-<table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#ffffff;border-radius:8px;overflow:hidden;">
+<table width="620" cellpadding="0" cellspacing="0" style="max-width:620px;width:100%;background:#ffffff;">
 {content}
-<tr><td style="padding:24px 32px;border-top:1px solid #f0f0f0;">
+<tr><td style="padding:20px 40px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;color:#9ca3af;font-size:12px;line-height:1.6;text-align:center;">
 Sent by {b['brand_label']} &middot; <a href="{UNSUBSCRIBE_URL}" style="color:#9ca3af;text-decoration:underline;">Unsubscribe</a>
 </p></td></tr>
@@ -387,7 +387,7 @@ def _render_book_delivery(first_name: str, variant: str = "", **kw) -> str:
     """Day 0 — origin story with CDC-verified data in the callout block."""
     c = _get_copy(variant)
     return _email_wrap(f"""
-<tr><td style="padding:40px 32px 24px;">
+<tr><td style="padding:40px 40px 24px;">
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">Hey {first_name},</p>
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
 My grandmother died of cancer. She had been living with type 2 diabetes and high blood pressure for years before that — three chronic conditions, stacked on top of each other.</p>
@@ -398,7 +398,7 @@ She was not careless. She read labels. She chose the low-fat versions, the heart
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
 After she passed, I could not let it go. I needed to understand how someone who genuinely tried could still end up that sick. Two years of research later, here is what I found:</p>
 </td></tr>
-<tr><td style="padding:0 32px 24px;">
+<tr><td style="padding:0 40px 24px;">
 <table width="100%" cellpadding="20" cellspacing="0" bgcolor="#f0f4ff"
        style="border-left:3px solid #1e40af;font-size:15px;line-height:1.8;color:#374151;">
 <tr><td>
@@ -408,22 +408,22 @@ After she passed, I could not let it go. I needed to understand how someone who 
 <p style="margin:0;">The FDA permits approximately 3,000 flavoring substances under the single label "natural flavors." The term was not created to inform you. It was created to satisfy disclosure law while revealing as little as possible. <em>(FDA SAAF database)</em></p>
 </td></tr></table>
 </td></tr>
-<tr><td style="padding:0 32px 24px;">
+<tr><td style="padding:0 40px 24px;">
 <p style="margin:20px 0 20px;font-size:16px;line-height:1.8;color:#374151;">
 None of this is fringe. It is in the regulatory filings, the peer-reviewed literature, and the industry's own documents. I spent two years pulling it together — no supplements to sell, no diet to push.</p>
 <p style="margin:0 0 8px;font-size:16px;line-height:1.8;color:#374151;">
 That became <strong>What Is Healthy?</strong> — 264 pages on what the food system does not want you to understand, and exactly what to do about it.</p>
 </td></tr>
-<tr><td align="center" style="padding:0 32px 16px;">
+<tr><td align="center" style="padding:0 40px 16px;">
 <img src="{BOOK_IMAGE_URL}" alt="What Is Healthy? book cover" width="160"
      style="display:block;margin:0 auto;border:0;" />
 </td></tr>
-<tr><td style="padding:0 32px 24px;">
+<tr><td style="padding:0 40px 24px;">
 {_all_format_buttons()}
 <p style="margin:12px 0 0;font-size:13px;line-height:1.6;color:#9ca3af;text-align:center;">
 Paperback ships free. Kindle and Audible available immediately.</p>
 </td></tr>
-<tr><td style="padding:16px 32px 32px;border-top:1px solid #e5e7eb;">
+<tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
 I will send you the opening chapter tomorrow.</p>
 <p style="margin:20px 0 0;font-size:16px;line-height:1.8;color:#374151;">
@@ -435,13 +435,13 @@ def _render_did_you_get_this(first_name: str, variant: str = "", **kw) -> str:
     """Day 1 — actual book passages: Hello World, Is This You, cliffhanger. Buy CTA."""
     c = _get_copy(variant)
     return _email_wrap(f"""
-<tr><td style="padding:40px 32px 16px;">
+<tr><td style="padding:40px 40px 16px;">
 <p style="margin:0 0 16px;font-size:16px;line-height:1.8;color:#374151;">Hey {first_name},</p>
 <p style="margin:0 0 0;font-size:16px;line-height:1.8;color:#374151;">
 Here is the opening of <strong>What Is Healthy?</strong> — pulled directly from the book.</p>
 </td></tr>
 
-<tr><td style="padding:0 32px 20px;border-top:1px solid #e5e7eb;">
+<tr><td style="padding:0 40px 20px;border-top:1px solid #e5e7eb;">
 <p style="margin:20px 0 16px;font-size:20px;font-weight:700;line-height:1.3;color:#111827;">
 Hello, World. My name is Kortney Lee.</p>
 <p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
@@ -473,7 +473,7 @@ Nothing worked. My waistline kept growing.</p>
 I was constantly full but rarely satisfied. Tired. Bloated. Discouraged.</p>
 </td></tr>
 
-<tr><td style="padding:0 32px 20px;">
+<tr><td style="padding:0 40px 20px;">
 <p style="margin:0 0 16px;font-size:20px;font-weight:700;line-height:1.3;color:#111827;">
 Is This You?</p>
 <p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
@@ -500,7 +500,7 @@ available, doing what was convenient, believing what was marketed. And we were
 getting sicker. Not because we didn't care. Because we didn't know where to begin.</p>
 </td></tr>
 
-<tr><td style="padding:20px 32px 20px;border-top:2px solid #111827;border-bottom:2px solid #111827;">
+<tr><td style="padding:20px 40px 20px;border-top:2px solid #111827;border-bottom:2px solid #111827;">
 <p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
 So the question isn't just "What are we eating?" It's:</p>
 <p style="margin:0 0 16px;font-size:17px;font-weight:600;line-height:1.85;color:#111827;">
@@ -517,12 +517,12 @@ we carry forward.</p>
 — <em>What Is Healthy?</em>, Introduction, p. 9</p>
 </td></tr>
 
-<tr><td style="padding:20px 32px 24px;">
+<tr><td style="padding:20px 40px 24px;">
 <p style="margin:0 0 16px;font-size:16px;line-height:1.8;color:#374151;">
 Chapter 1 answers that question. It starts on page 29 of the full book:</p>
 {_all_format_buttons()}
 </td></tr>
-<tr><td style="padding:16px 32px 32px;border-top:1px solid #e5e7eb;">
+<tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
 More in a few days.</p>
 <p style="margin:20px 0 0;font-size:16px;line-height:1.8;color:#374151;">
@@ -534,7 +534,7 @@ def _render_big_benefit(first_name: str, variant: str = "", **kw) -> str:
     """Day 3 — natural flavors deep dive + variant-specific callout."""
     c = _get_copy(variant)
     return _email_wrap(f"""
-<tr><td style="padding:40px 32px 24px;">
+<tr><td style="padding:40px 40px 24px;">
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">Hey {first_name},</p>
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
 Here is something from the book I think about every time I walk through a grocery store.</p>
@@ -547,7 +547,7 @@ Here is what the label does not tell you: "natural flavors" is a legal catch-all
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
 This is not an accident. It is a design decision made by an industry that spent decades lobbying for label language that sounds reassuring while saying nothing.</p>
 </td></tr>
-<tr><td style="padding:0 32px 24px;">
+<tr><td style="padding:0 40px 24px;">
 <table width="100%" cellpadding="20" cellspacing="0" bgcolor="#fffbeb"
        style="border-left:3px solid #d97706;font-size:15px;line-height:1.8;color:#374151;">
 <tr><td>
@@ -557,14 +557,14 @@ This is not an accident. It is a design decision made by an industry that spent 
 <p style="margin:0;">{c['bullet3']}</p>
 </td></tr></table>
 </td></tr>
-<tr><td style="padding:0 32px 24px;">
+<tr><td style="padding:0 40px 24px;">
 <p style="margin:20px 0 20px;font-size:16px;line-height:1.8;color:#374151;">
 {c['chapter_hook']}</p>
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
 There are 22 more chapters like this in the book. Each one changes how you read a label and what ends up in your cart.</p>
 {_all_format_buttons()}
 </td></tr>
-<tr><td style="padding:16px 32px 32px;border-top:1px solid #e5e7eb;">
+<tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
 Talk soon,<br/>{_team(variant)}</p>
 </td></tr>""", variant=variant)
@@ -574,12 +574,12 @@ def _render_got_questions(first_name: str, variant: str = "", **kw) -> str:
     """Day 5 — the 5-second label test framework. Eden by WIHY plug."""
     c = _get_copy(variant)
     return _email_wrap(f"""
-<tr><td style="padding:40px 32px 24px;">
+<tr><td style="padding:40px 40px 24px;">
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">Hey {first_name},</p>
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
 One of the most practical things in the book is a framework I call the 5-second label test. Here is the short version:</p>
 </td></tr>
-<tr><td style="padding:0 32px 24px;">
+<tr><td style="padding:0 40px 24px;">
 <table width="100%" cellpadding="20" cellspacing="0" bgcolor="#f0fdf4"
        style="border-left:3px solid #16a34a;font-size:15px;line-height:1.8;color:#374151;">
 <tr><td>
@@ -590,14 +590,14 @@ One of the most practical things in the book is a framework I call the 5-second 
 <p style="margin:0;">That is it. No chemistry degree needed. Five seconds and the back of the package.</p>
 </td></tr></table>
 </td></tr>
-<tr><td style="padding:0 32px 24px;">
+<tr><td style="padding:0 40px 24px;">
 <p style="margin:20px 0 20px;font-size:16px;line-height:1.8;color:#374151;">
 The book has 11 more frameworks like this — for reading labels quickly, spotting hidden sugars across 61 different names, and identifying which products in the health food aisle are not what they claim to be.</p>
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
 The full book with all 12 frameworks:</p>
 {_all_format_buttons()}
 </td></tr>
-<tr><td style="padding:0 32px 24px;border-top:1px solid #e5e7eb;">
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
 <p style="margin:20px 0 12px;font-size:15px;line-height:1.8;color:#6b7280;">
 Two tools I built alongside the book — both free to start:</p>
 {_brand_cards()}
@@ -605,7 +605,7 @@ Two tools I built alongside the book — both free to start:</p>
 Eden is for anyone working on their overall health. Cora is for people cooking for one
 or two who want real food without the bulk-store quantities.</p>
 </td></tr>
-<tr><td style="padding:16px 32px 32px;border-top:1px solid #e5e7eb;">
+<tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
 Best,<br/>Kortney</p>
 </td></tr>""", variant=variant)
@@ -615,7 +615,7 @@ def _render_social_proof(first_name: str, variant: str = "", **kw) -> str:
     """Day 7 — reader story as narrative. Specific outcome. Clean quote block."""
     c = _get_copy(variant)
     return _email_wrap(f"""
-<tr><td style="padding:40px 32px 24px;">
+<tr><td style="padding:40px 40px 24px;">
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">Hey {first_name},</p>
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
 A reader named Sarah sent me a message a few weeks after reading the book.</p>
@@ -626,7 +626,7 @@ She wrote: "I walked out with half the things I normally buy and spent $40 less.
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
 That is what the book is built to do. Not rules. Not a diet. Just the kind of understanding that, once you have it, changes every food decision automatically.</p>
 </td></tr>
-<tr><td style="padding:0 32px 24px;">
+<tr><td style="padding:0 40px 24px;">
 <table width="100%" cellpadding="20" cellspacing="0" bgcolor="#f9fafb"
        style="border-left:3px solid #9ca3af;font-size:15px;line-height:1.9;color:#4b5563;">
 <tr><td>
@@ -634,11 +634,11 @@ That is what the book is built to do. Not rules. Not a diet. Just the kind of un
 <p style="margin:0;font-weight:600;color:#6b7280;">Marcus, reader</p>
 </td></tr></table>
 </td></tr>
-<tr><td style="padding:0 32px 24px;">
+<tr><td style="padding:0 40px 24px;">
 <p style="margin:20px 0 16px;font-size:16px;line-height:1.8;color:#374151;">The full book:</p>
 {_all_format_buttons()}
 </td></tr>
-<tr><td style="padding:16px 32px 32px;border-top:1px solid #e5e7eb;">
+<tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
 Best,<br/>{_team(variant)}</p>
 </td></tr>""", variant=variant)
@@ -648,7 +648,7 @@ def _render_im_surprised(first_name: str, variant: str = "", **kw) -> str:
     """Day 10 — dog-eared chapter tease with specific grocery store insight."""
     c = _get_copy(variant)
     return _email_wrap(f"""
-<tr><td style="padding:40px 32px 24px;">
+<tr><td style="padding:40px 40px 24px;">
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">Hey {first_name},</p>
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
 There is one chapter in <strong>What Is Healthy?</strong> that readers dog-ear more than any other.</p>
@@ -656,7 +656,7 @@ There is one chapter in <strong>What Is Healthy?</strong> that readers dog-ear m
 It is not the natural flavors chapter. It is not the one about the food industry's lobbying history. It is called "What the Grocery Store Doesn't Want You to Know" — and it is the most immediately useful chapter in the book.</p>
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">One insight from it:</p>
 </td></tr>
-<tr><td style="padding:0 32px 24px;">
+<tr><td style="padding:0 40px 24px;">
 <table width="100%" cellpadding="20" cellspacing="0" bgcolor="#eff6ff"
        style="border-left:3px solid #1e40af;font-size:15px;line-height:1.8;color:#374151;">
 <tr><td>
@@ -664,14 +664,14 @@ It is not the natural flavors chapter. It is not the one about the food industry
 <p style="margin:0;">The layout — produce at the entrance, dairy at the back, end-caps and eye-level shelving throughout — is not designed for your convenience. It is designed by category managers whose job is to maximize impulse purchases of high-margin processed products.</p>
 </td></tr></table>
 </td></tr>
-<tr><td style="padding:0 32px 24px;">
+<tr><td style="padding:0 40px 24px;">
 <p style="margin:20px 0 20px;font-size:16px;line-height:1.8;color:#374151;">
 The chapter walks through how this works aisle by aisle and gives you a shopping approach that routes around it. Most readers say they save $30 to $50 per trip just by changing how they walk through the store.</p>
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
 That chapter alone is worth the cost of the book. There are 18 more like it.</p>
 {_all_format_buttons()}
 </td></tr>
-<tr><td style="padding:16px 32px 32px;border-top:1px solid #e5e7eb;">
+<tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
 Best,<br/>{_team(variant)}</p>
 </td></tr>""", variant=variant)
@@ -681,7 +681,7 @@ def _render_last_chance(first_name: str, variant: str = "", **kw) -> str:
     """Day 14 — honest final email. No hard sell. Eden + CG close."""
     c = _get_copy(variant)
     return _email_wrap(f"""
-<tr><td style="padding:40px 32px 24px;">
+<tr><td style="padding:40px 40px 24px;">
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">Hey {first_name},</p>
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">This is my last email.</p>
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
@@ -693,7 +693,7 @@ I am not going to push hard here. If any of this made you think differently abou
 <p style="margin:0 0 16px;font-size:16px;line-height:1.8;color:#374151;">If you want it:</p>
 {_all_format_buttons()}
 </td></tr>
-<tr><td style="padding:0 32px 16px;border-top:1px solid #e5e7eb;">
+<tr><td style="padding:0 40px 16px;border-top:1px solid #e5e7eb;">
 <p style="margin:20px 0 6px;font-size:15px;line-height:1.8;color:#374151;">
 Before I go — two things I built that come directly out of the same research as this book.</p>
 <p style="margin:0 0 16px;font-size:15px;line-height:1.8;color:#6b7280;">
@@ -701,7 +701,7 @@ I started working on both of these the same year I started writing. They are dif
 for different people, but they come from the same place this book does.</p>
 {_brand_cards()}
 </td></tr>
-<tr><td style="padding:16px 32px 32px;border-top:1px solid #e5e7eb;">
+<tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
 Whatever you decide — keep reading those labels.</p>
 <p style="margin:20px 0 0;font-size:16px;line-height:1.8;color:#374151;">
@@ -713,7 +713,7 @@ def _render_buy_now_offer(first_name: str, variant: str = "", **kw) -> str:
     """Immediate buyer-intent push — short, direct, all formats."""
     c = _get_copy(variant)
     return _email_wrap(f"""
-<tr><td style="padding:40px 32px 0;">
+<tr><td style="padding:40px 40px 0;">
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
 Hey {first_name},</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
@@ -723,10 +723,10 @@ that changes how you see every food decision.</p>
 <p style="margin:0 0 20px;font-size:17px;line-height:1.8;color:#374151;">
 Available in every format:</p>
 </td></tr>
-<tr><td style="padding:0 32px 8px;">
+<tr><td style="padding:0 40px 8px;">
 {_all_format_buttons()}
 </td></tr>
-<tr><td style="padding:20px 32px 32px;border-top:1px solid #f3f4f6;">
+<tr><td style="padding:20px 40px 32px;border-top:1px solid #f3f4f6;">
 <p style="margin:0;font-size:17px;line-height:1.8;color:#374151;">
 To your health,<br/>{_team(variant)}</p>
 </td></tr>""", variant=variant)
