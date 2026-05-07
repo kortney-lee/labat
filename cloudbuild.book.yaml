@@ -43,7 +43,7 @@ steps:
       - '--concurrency'
       - '80'
       - '--set-env-vars'
-      - 'APP_MODULE=src.apps.book_app:app,ENV=production,LOG_LEVEL=INFO,GCP_PROJECT=wihy-ai,BOOK_FROM_EMAIL=info@vowels.org,BOOK_FROM_NAME=Vowels'
+      - 'APP_MODULE=src.apps.book_app:app,ENV=production,LOG_LEVEL=INFO,GCP_PROJECT=wihy-ai,BOOK_FROM_EMAIL=info@vowels.org,BOOK_FROM_NAME=Vowels,B2B_FROM_EMAIL=info@vowels.org,B2B_FROM_NAME=Kortney Lee'
       - '--set-secrets'
       - 'SENDGRID_API_KEY=sendgrid-api-key:latest,STRIPE_SECRET_KEY=stripe-secret-key:latest,STRIPE_WEBHOOK_SECRET=wih-webhook-secret:latest,META_PIXEL_ID=wihy-agent-meta-pixel-id:latest,META_SYSTEM_USER_TOKEN=wihy-agent-meta-system-user-token:latest,INTERNAL_ADMIN_TOKEN=internal-admin-token:latest'
       - '--min-instances'
