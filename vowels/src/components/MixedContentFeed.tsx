@@ -28,7 +28,19 @@ function dateLabel(value?: string): string {
 
 function prettyCategory(value?: string): string | undefined {
   if (!value) return undefined;
-  return value.replace(/-/g, " ");
+  const first = value.split(",")[0]?.trim() || value;
+  const clean = first.replace(/-/g, " ");
+  return clean.length > 36 ? `${clean.slice(0, 33)}...` : clean;
+}
+
+function isWithinLastWeek(value?: string): boolean {
+  if (!value) return false;
+  const publishedAt = new Date(value);
+  if (Number.isNaN(publishedAt.getTime())) return false;
+
+  const now = Date.now();
+  const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+  return now - publishedAt.getTime() <= sevenDaysMs;
 }
 
 function diversifyBySource(items: MixedFeedItem[], maxRun = 3): MixedFeedItem[] {
@@ -76,7 +88,8 @@ export async function MixedContentFeed() {
         isInternal: true,
         readingTime: article.readingTime,
       } satisfies MixedFeedItem;
-    });
+    })
+    .filter((item) => isWithinLastWeek(item.publishedAt));
 
   const external = (await getExternalFeedArticles(180)).map((article) => ({
     id: `ext-${article.id}`,
@@ -89,7 +102,8 @@ export async function MixedContentFeed() {
     category: article.category,
     author: article.author,
     isInternal: false,
-  })) satisfies MixedFeedItem[];
+  }))
+    .filter((item) => isWithinLastWeek(item.publishedAt)) satisfies MixedFeedItem[];
 
   const mixed = diversifyBySource(
     [...internal, ...external].sort((a, b) => +new Date(b.publishedAt || 0) - +new Date(a.publishedAt || 0)),
@@ -100,10 +114,10 @@ export async function MixedContentFeed() {
     const nodes = [
       <li
         key={item.id}
-        className="space-y-3"
+        className=""
       >
         <article
-          className="flex h-full flex-col rounded-2xl border border-black/10 bg-white p-4 transition hover:border-brand/30"
+          className="flex flex-col rounded-2xl border border-black/10 bg-white p-4 transition hover:border-brand/30"
         >
           {item.imageUrl ? (
             item.isInternal ? (
@@ -193,8 +207,14 @@ export async function MixedContentFeed() {
   });
 
   return (
-    <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-      {feedNodes}
-    </ul>
+    mixed.length ? (
+      <ul className="grid items-start gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {feedNodes}
+      </ul>
+    ) : (
+      <section className="rounded-2xl bg-white p-6 text-sm text-slate-700">
+        No stories from the last 7 days are available right now.
+      </section>
+    )
   );
 }

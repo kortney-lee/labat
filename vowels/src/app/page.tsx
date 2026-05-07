@@ -16,7 +16,7 @@ export default function HomePage({ searchParams }: HomePageProps) {
   const query = searchParams?.q?.trim() || "";
 
   return (
-    <div className="space-y-6 pb-8">
+    <div className="space-y-6 pb-24 md:pb-8">
       <SearchHero initialQuery={query} />
 
       <AdSlot slotName="Search Top Leaderboard" size="leaderboard" className="w-full" />
