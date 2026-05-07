@@ -387,6 +387,123 @@ async def trigger_b2b_day0(
     return await _send(email, subject, html)
 
 
+# ── outreach_leads collection handler ────────────────────────────────────────
+
+_SLUG_TO_BTYPE = {
+    "libraries":           "library",
+    "bookstores":          "bookstore",
+    "christian_blogs":     "blog",
+    "book_review_blogs":   "blog",
+    "christian_podcasts":  "podcast",
+    "book_review_podcasts":"podcast",
+}
+
+# Maps nurture_stage → (template_id, render_fn, day_index)
+_OUTREACH_STAGES = [
+    (0, "outreach_day0",  _render_b2b_day0,  0),
+    (1, "outreach_day3",  _render_b2b_day3,  1),
+    (2, "outreach_day7",  _render_b2b_day7,  2),
+    (3, "outreach_day14", _render_b2b_day14, 3),
+    (4, "outreach_day21", _render_b2b_day21, 4),
+]
+_OUTREACH_DELAYS = [0, 3, 7, 14, 21]
+
+
+async def process_outreach_leads(batch: int = 100) -> dict:
+    """
+    Cron: send emails to outreach_leads collection.
+    - Stage 0 (new): reads remarketing_status='new', sends Day 0
+    - Stage 1-4: reads nurture_next_at <= now, sends follow-up
+    Returns counts of sent/skipped/errors.
+    """
+    from datetime import datetime, timezone, timedelta
+    from google.cloud import firestore
+
+    db  = firestore.AsyncClient(project=os.getenv("GCP_PROJECT", "wihy-ai"))
+    now = datetime.now(timezone.utc)
+    sent = skipped = errors = 0
+    COLL = "outreach_leads"
+
+    # ── Day 0: new leads not yet contacted ────────────────────────────────────
+    new_query = (
+        db.collection(COLL)
+        .where("remarketing_status", "==", "new")
+        .where("sequence_status", "==", "active")
+        .limit(batch)
+    )
+    async for doc in new_query.stream():
+        d = doc.to_dict()
+        if d.get("do_not_contact") or d.get("sendgrid_suppressed") or d.get("unsubscribed"):
+            skipped += 1
+            continue
+        email      = d.get("email", "")
+        first_name = d.get("first_name", "")
+        slug       = d.get("target_slug", "other")
+        bt         = _SLUG_TO_BTYPE.get(slug, "other")
+        company    = d.get("company_name", "")
+        try:
+            html    = _render_b2b_day0(first_name, bt, company)
+            subject = _subject(bt, 0)
+            ok      = await _send(email, subject, html)
+            update  = {
+                "remarketing_status": "contacted",
+                "nurture_stage": 1,
+                "nurture_next_at": now + timedelta(days=3),
+                "outreach_day0_sent_at": now,
+            }
+            await doc.reference.update(update)
+            sent += 1 if ok else 0
+            errors += 0 if ok else 1
+        except Exception as e:
+            logger.error("Outreach Day0 error %s: %s", email, e)
+            errors += 1
+
+    # ── Day 1-4: follow-up emails due ─────────────────────────────────────────
+    followup_query = (
+        db.collection(COLL)
+        .where("remarketing_status", "==", "contacted")
+        .where("sequence_status",    "==", "active")
+        .where("nurture_next_at",    "<=", now)
+        .limit(batch)
+    )
+    async for doc in followup_query.stream():
+        d = doc.to_dict()
+        if d.get("do_not_contact") or d.get("sendgrid_suppressed") or d.get("unsubscribed"):
+            skipped += 1
+            continue
+        stage      = d.get("nurture_stage", 1)
+        if stage >= len(_OUTREACH_STAGES):
+            await doc.reference.update({"sequence_status": "completed"})
+            continue
+        _, tmpl_id, render_fn, day_idx = _OUTREACH_STAGES[stage]
+        email      = d.get("email", "")
+        first_name = d.get("first_name", "")
+        slug       = d.get("target_slug", "other")
+        bt         = _SLUG_TO_BTYPE.get(slug, "other")
+        company    = d.get("company_name", "")
+        try:
+            html    = render_fn(first_name, bt, company)
+            subject = _subject(bt, day_idx)
+            ok      = await _send(email, subject, html)
+            next_stage = stage + 1
+            update: dict = {
+                "nurture_stage": next_stage,
+                f"{tmpl_id}_sent_at": now,
+            }
+            if next_stage < len(_OUTREACH_STAGES):
+                update["nurture_next_at"] = now + timedelta(days=_OUTREACH_DELAYS[next_stage])
+            else:
+                update["sequence_status"] = "completed"
+            await doc.reference.update(update)
+            sent += 1 if ok else 0
+            errors += 0 if ok else 1
+        except Exception as e:
+            logger.error("Outreach followup error %s: %s", email, e)
+            errors += 1
+
+    return {"sent": sent, "skipped": skipped, "errors": errors, "ran_at": now.isoformat()}
+
+
 async def process_pending_b2b_nurture() -> dict:
     """Cron: send pending B2B nurture emails."""
     from datetime import datetime, timezone, timedelta

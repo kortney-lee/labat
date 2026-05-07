@@ -423,10 +423,11 @@ async def nurture_cron(request: Request):
         raise HTTPException(status_code=401, detail="Unauthorized")
 
     from src.services.nurture_service import process_pending_nurture
-    from src.services.b2b_nurture_service import process_pending_b2b_nurture
-    consumer_result = await process_pending_nurture()
-    b2b_result = await process_pending_b2b_nurture()
-    return {"status": "ok", "consumer": consumer_result, "b2b": b2b_result}
+    from src.services.b2b_nurture_service import process_pending_b2b_nurture, process_outreach_leads
+    consumer_result  = await process_pending_nurture()
+    b2b_result       = await process_pending_b2b_nurture()
+    outreach_result  = await process_outreach_leads(batch=100)
+    return {"status": "ok", "consumer": consumer_result, "b2b": b2b_result, "outreach": outreach_result}
 
 
 @router.post("/preview-all")
