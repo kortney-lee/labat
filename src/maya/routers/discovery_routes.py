@@ -111,10 +111,51 @@ async def list_collaborators(
             .get()
         )
         for doc in docs:
-            candidates.append(doc.to_dict())
+            candidates.append({**doc.to_dict(), "_doc_id": doc.id})
 
     candidates.sort(key=lambda x: x.get("score", 0), reverse=True)
     return {"total": len(candidates), "candidates": candidates[:limit]}
+
+
+@router.get("/collaborators/approve")
+async def approve_collaborator(
+    user_id: str = Query(...),
+    brand: str = Query(...),
+    token: str = Query(...),
+):
+    """One-click approval from email link. Token must match INTERNAL_ADMIN_TOKEN."""
+    if ADMIN_TOKEN and token != ADMIN_TOKEN:
+        from fastapi.responses import HTMLResponse
+        return HTMLResponse("<h2 style='font-family:sans-serif;color:red'>Invalid approval token.</h2>", status_code=401)
+
+    from google.cloud import firestore
+    from fastapi.responses import HTMLResponse
+    db = firestore.AsyncClient(project=os.getenv("GCP_PROJECT", "wihy-ai"))
+    ref = (
+        db.collection("collaborators")
+        .document(brand)
+        .collection("candidates")
+        .document(user_id)
+    )
+    doc = await ref.get()
+    if not doc.exists:
+        return HTMLResponse("<h2 style='font-family:sans-serif;color:red'>Collaborator not found.</h2>", status_code=404)
+
+    data = doc.to_dict()
+    username = data.get("username", user_id)
+    await ref.update({"outreach_approved": True, "status": "approved"})
+    logger.info("Collaborator approved for outreach: @%s brand=%s", username, brand)
+
+    return HTMLResponse(f"""
+    <html><body style='font-family:-apple-system,sans-serif;max-width:500px;margin:80px auto;text-align:center;'>
+        <div style='background:#f0fdf4;border:2px solid #16a34a;border-radius:12px;padding:40px;'>
+            <div style='font-size:48px;margin-bottom:16px;'>✅</div>
+            <h2 style='color:#166534;margin:0 0 8px;'>@{username} Approved</h2>
+            <p style='color:#4b5563;'>This collaborator has been approved for outreach.
+            Maya will send a DM when the outreach pipeline runs.</p>
+        </div>
+    </body></html>
+    """)
 
 
 # ── Auto-Engage ───────────────────────────────────────────────────────────────

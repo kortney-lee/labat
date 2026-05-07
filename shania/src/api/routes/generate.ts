@@ -684,9 +684,10 @@ router.post("/generate-hero-image", async (req: Request, res: Response): Promise
       return;
     }
 
-    // Strip words that make AI generate text/labels in the image
-    const textTriggers = /\b(label|labels|labeling|nutrition facts|ingredient list|food label|packaging|printed|text|reading|literacy|words|writing|sign|signage)\b/gi;
-    let safeTopic = topic.substring(0, 120).replace(textTriggers, "").replace(/\s{2,}/g, " ").trim();
+    // Strip words/phrases that make Imagen generate text, logos, or branded overlays in the image
+    const textTriggers = /\b(label|labels|labeling|nutrition facts|ingredient list|food label|packaging|printed|text|reading|literacy|words|writing|sign|signage|checklist|framework|initiative|launch|program|guide|report|plan|brand|logo|branding|title|caption|headline|subtitle|banner|poster|flyer|infographic|chart|graph|diagram|steps?|tips?|tricks?)\b/gi;
+    // Also strip parenthetical content like "(LAUNCH)" which triggers text overlays
+    let safeTopic = topic.substring(0, 120).replace(/\([^)]*\)/g, "").replace(textTriggers, "").replace(/\s{2,}/g, " ").trim();
     if (!safeTopic) safeTopic = "healthy food photography";
 
     let styleNote: string;

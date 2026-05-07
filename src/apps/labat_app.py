@@ -101,6 +101,8 @@ from src.labat.routers.master_agent_routes import router as master_agent_router
 from src.labat.routers.automation_routes import router as automation_router
 from src.labat.routers.rules_routes import router as rules_router
 from src.labat.routers.vowels_newsroom_routes import router as vowels_newsroom_router
+from src.labat.routers.book_affiliate_routes import router as book_affiliate_router
+from src.labat.routers.amazon_ads_routes import router as amazon_ads_router
 
 app.include_router(auth_router)
 app.include_router(ads_router)
@@ -116,6 +118,8 @@ app.include_router(master_agent_router)
 app.include_router(automation_router)
 app.include_router(rules_router)
 app.include_router(vowels_newsroom_router)
+app.include_router(book_affiliate_router)
+app.include_router(amazon_ads_router)
 
 logger.info("All LABAT routers loaded (including master agent + automation + rules)")
 
@@ -186,6 +190,8 @@ async def root():
             "/api/labat/posts/*",
             "/api/labat/trending/*",
             "/api/labat/automation/*",
+            "/api/labat/book-affiliate/*",
+            "/api/labat/amazon-ads/*",
             "/api/labat/linkedin/*",
             "/api/labat/page/*",
             "/api/labat/comments/*",

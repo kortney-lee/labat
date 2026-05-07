@@ -20,6 +20,7 @@ from typing import Any, Dict, List, Optional
 from src.labat.config import META_AD_ACCOUNT_ID, META_SYSTEM_USER_TOKEN
 from src.labat.meta_client import graph_get, MetaAPIError
 from src.labat.services import ads_service
+from src.labat.services.book_affiliate_service import publish_book_post
 from src.labat.services.insights_service import get_insights, get_insights_by_brand
 from src.labat.services.master_agent_service import get_master_agent
 from src.labat.services.notify import send_notification
@@ -29,6 +30,7 @@ logger = logging.getLogger("labat.automation")
 # ── Thresholds (configurable via env) ──────────────────────────────────────
 
 import os
+from src.labat.config import BOOK_PROMO_AUTOMATION_ENABLED
 
 # Auto-pause: pause ad/adset if spend > threshold with zero conversions
 PAUSE_SPEND_THRESHOLD = float(os.getenv("AUTOMATION_PAUSE_SPEND_THRESHOLD", "10.0"))
@@ -509,7 +511,8 @@ async def run_full_cycle(
     2. Auto-pause underperformers
     3. Auto-scale winners
     4. A/B creative rotation
-    5. Generate and send report
+    5. Publish affiliate book promo (optional)
+    6. Generate and send report
 
     When brand is set, all steps operate only on that brand's campaigns.
     Called by Cloud Scheduler every hour.
@@ -585,7 +588,24 @@ async def run_full_cycle(
         logger.error("A/B rotation failed: %s", e)
         results["steps"]["ab_rotation"] = {"status": "error", "error": str(e)}
 
-    # Step 5: Generate and send report
+    # Step 5: Publish affiliate book promo (optional)
+    try:
+        if BOOK_PROMO_AUTOMATION_ENABLED:
+            promo_result = await publish_book_post(dry_run=dry_run)
+            results["steps"]["book_affiliate"] = {
+                "status": "completed",
+                "details": promo_result,
+            }
+        else:
+            results["steps"]["book_affiliate"] = {
+                "status": "skipped",
+                "reason": "BOOK_PROMO_AUTOMATION_ENABLED is false",
+            }
+    except Exception as e:
+        logger.error("Book affiliate publish failed: %s", e)
+        results["steps"]["book_affiliate"] = {"status": "error", "error": str(e)}
+
+    # Step 6: Generate and send report
     try:
         master = get_master_agent()
         report = await master.generate_report()

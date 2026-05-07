@@ -11,30 +11,19 @@ html {
 }
 
 body {
-  background-color: #f5f1e8;
+  background-color: #ffffff;
   color: #131313;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
-  background-image: radial-gradient(circle at 88% -8%, rgba(255, 106, 0, 0.2), transparent 33%), radial-gradient(circle at -6% 22%, rgba(17, 19, 25, 0.09), transparent 36%), linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(245, 241, 232, 1));
-}
-
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background-image: linear-gradient(rgba(0, 0, 0, 0.022) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 0, 0, 0.022) 1px, transparent 1px);
-  background-size: 24px 24px;
-  opacity: 0.12;
+  background-image: none;
 }
 
 .news-card {
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 1.5rem;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 10px 40px rgba(17, 19, 25, 0.12);
-  backdrop-filter: blur(10px);
+  background: transparent;
+  box-shadow: none;
 }
 
 ::selection {

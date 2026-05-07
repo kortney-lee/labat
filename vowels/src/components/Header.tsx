@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { SearchBar } from "@/components/SearchBar";
@@ -16,6 +17,8 @@ const navLinks = [
 ];
 
 export function Header() {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   useEffect(() => {
@@ -35,7 +38,8 @@ export function Header() {
           <Image src="/vowels-lockup.png" alt="Vowels" width={180} height={48} priority />
         </Link>
 
-        <div className="w-full max-w-[360px]">
+        {/* On the home page the centered SearchHero is the primary search; hide the compact bar at the top. */}
+        <div className={`w-full max-w-[360px] ${isHome && !isCollapsed ? "hidden" : ""}`}>
           <SearchBar compact />
         </div>
       </div>

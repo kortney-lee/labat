@@ -20,6 +20,7 @@ from src.labat.services.automation_service import (
     ab_creative_rotation,
     run_full_cycle,
 )
+from src.labat.services.book_affiliate_service import publish_book_post
 from src.labat.services.blog_writer import write_unwritten
 
 logger = logging.getLogger("labat.automation_routes")
@@ -79,6 +80,33 @@ async def vowels_newsroom_cron(
         "status": "vowels_newsroom_cycle_started",
         "brand": "vowels",
         "generate_images": generate_images,
+    }
+
+
+@router.post("/book-affiliate-cron")
+async def book_affiliate_cron(
+    background_tasks: BackgroundTasks,
+    dry_run: bool = Query(False),
+    asin: Optional[str] = Query(None),
+    _=Depends(require_admin),
+):
+    """
+    Affiliate-only book promo posting.
+    Intended for Cloud Scheduler or manual trigger.
+    """
+
+    async def _run_book_affiliate():
+        try:
+            result = await publish_book_post(dry_run=dry_run, asin=asin)
+            logger.info("Book affiliate cron completed: %s", result.get("status"))
+        except Exception as e:
+            logger.error("Book affiliate cron failed: %s", e)
+
+    background_tasks.add_task(_run_book_affiliate)
+    return {
+        "status": "book_affiliate_cycle_started",
+        "dry_run": dry_run,
+        "asin": asin,
     }
 
 

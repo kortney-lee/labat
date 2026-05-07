@@ -26,6 +26,9 @@ const AD_TEST_MODE = process.env.NEXT_PUBLIC_ADSENSE_ADTEST === "on";
 
 const SLOT_IDS: Record<string, string> = {
   "Homepage Leaderboard": process.env.NEXT_PUBLIC_ADSENSE_SLOT_HOMEPAGE_LEADERBOARD || "",
+  "Search Top Leaderboard": process.env.NEXT_PUBLIC_ADSENSE_SLOT_SEARCH_TOP_LEADERBOARD || "",
+  "Research Results Inline Ad": process.env.NEXT_PUBLIC_ADSENSE_SLOT_RESEARCH_RESULTS_INLINE || "",
+  "Search Mid Rectangle": process.env.NEXT_PUBLIC_ADSENSE_SLOT_SEARCH_MID_RECTANGLE || "",
   "Sidebar Rectangle": process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR_RECTANGLE || "",
   "Sidebar Half Page": process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR_HALF_PAGE || "",
   "In-Feed Content Ad": process.env.NEXT_PUBLIC_ADSENSE_SLOT_INFEED || "",

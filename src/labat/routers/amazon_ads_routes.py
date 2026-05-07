@@ -101,7 +101,7 @@ async def oauth_authorize():
 
     params = urllib.parse.urlencode({
         "client_id": AMAZON_ADS_CLIENT_ID,
-        "scope": "advertising:campaign_management",
+        "scope": "advertising::campaign_management",
         "response_type": "code",
         "redirect_uri": _REDIRECT_URI,
     })

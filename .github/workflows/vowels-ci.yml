@@ -95,6 +95,8 @@ jobs:
         working-directory: .
         run: |
           curl -fsSL "https://vowels-org.web.app" > /dev/null
+          curl -fsSL "https://vowels-org.web.app/sitemap.xml" > /dev/null
+          curl -fsSL "https://vowels-org.web.app/robots.txt" > /dev/null
           curl -fsSL "https://vowels-org.web.app/rss.xml" > /dev/null
           curl -fsSL "https://vowels-org.web.app/feed" > /dev/null
           curl -fsSL "https://vowels-org.web.app/news-sitemap.xml" > /dev/null

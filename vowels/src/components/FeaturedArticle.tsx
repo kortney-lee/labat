@@ -22,7 +22,6 @@ export function FeaturedArticle({ article }: FeaturedArticleProps) {
         loading="lazy"
       />
       <div className="absolute inset-0 bg-gradient-to-r from-black/82 via-black/65 to-black/75" />
-      <div className="absolute -right-24 -top-20 h-64 w-64 rounded-full bg-brand/30 blur-3xl" />
       <div className="absolute -left-12 bottom-0 h-52 w-52 rounded-full bg-white/10 blur-3xl" />
 
       <div className="relative grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">

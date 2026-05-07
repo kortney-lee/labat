@@ -69,6 +69,26 @@ LINKEDIN_BASE_URL = f"https://api.linkedin.com/{LINKEDIN_API_VERSION}"
 
 LINKEDIN_API_TIMEOUT = float(os.getenv("LINKEDIN_API_TIMEOUT", "30"))
 
+# ── Amazon Associates (book affiliate MVP) ───────────────────────────────────
+
+AMAZON_ASSOCIATE_TAG = os.getenv("AMAZON_ASSOCIATE_TAG", "").strip()
+AMAZON_MARKETPLACE = os.getenv("AMAZON_MARKETPLACE", "amazon.com").strip()
+BOOK_PRIMARY_ASIN = os.getenv("BOOK_PRIMARY_ASIN", "B0DL7Z7NFL").strip()
+BOOK_PROMO_BRAND = os.getenv("BOOK_PROMO_BRAND", "wihy").strip().lower()
+BOOK_PROMO_AUTOMATION_ENABLED = (
+    os.getenv("BOOK_PROMO_AUTOMATION_ENABLED", "false").strip().lower()
+    in ("1", "true", "yes", "on")
+)
+
+# ── Amazon Ads API (scaffolding) ─────────────────────────────────────────────
+
+AMAZON_ADS_CLIENT_ID = os.getenv("AMAZON_ADS_CLIENT_ID", "").strip()
+AMAZON_ADS_CLIENT_SECRET = os.getenv("AMAZON_ADS_CLIENT_SECRET", "").strip()
+AMAZON_ADS_REFRESH_TOKEN = os.getenv("AMAZON_ADS_REFRESH_TOKEN", "").strip()
+AMAZON_ADS_SCOPE_PROFILE_ID = os.getenv("AMAZON_ADS_SCOPE_PROFILE_ID", "").strip()
+AMAZON_ADS_REGION = os.getenv("AMAZON_ADS_REGION", "na").strip().lower()
+AMAZON_ADS_API_TIMEOUT = float(os.getenv("AMAZON_ADS_API_TIMEOUT", "30"))
+
 # ── Rate limit defaults ──────────────────────────────────────────────────────
 
 # Meta Marketing API: ~200 calls/hour for standard access
@@ -103,4 +123,10 @@ def validate_config() -> dict:
         "admin_auth": bool(INTERNAL_ADMIN_TOKEN),
         "gemini": bool(GEMINI_API_KEY),
         "linkedin": bool(LINKEDIN_ACCESS_TOKEN and LINKEDIN_ORG_ID),
+        "amazon_affiliate": bool(AMAZON_ASSOCIATE_TAG),
+        "amazon_ads": bool(
+            AMAZON_ADS_CLIENT_ID
+            and AMAZON_ADS_CLIENT_SECRET
+            and AMAZON_ADS_REFRESH_TOKEN
+        ),
     }

@@ -1162,41 +1162,266 @@ class AlexService:
             )
 
     async def send_report(self) -> bool:
-        """Send report via auth notification service."""
+        """Send a rich HTML daily report email via SendGrid."""
+        import httpx as _httpx
+
         report = await self.generate_report()
         if ALEX_REPORT_LINK:
             report["report_link"] = ALEX_REPORT_LINK
-            link_expiry = self._parse_report_link_expiry(ALEX_REPORT_LINK)
-            report["report_link_expires_at_utc"] = link_expiry.isoformat() + "Z" if link_expiry else "unknown"
 
-        bl = report.get("book_leads") or {}
+        sendgrid_key = os.getenv("SENDGRID_API_KEY", "").strip()
+        from_email   = os.getenv("NOTIFICATION_FROM_EMAIL", "noreply@wihy.ai")
+        to_email     = os.getenv("NOTIFICATION_TO_EMAIL", "kortney@wihy.ai")
+
+        if not sendgrid_key:
+            logger.warning("SENDGRID_API_KEY not set — Alex report skipped")
+            return False
+
+        bl         = report.get("book_leads") or {}
         engagement = bl.get("email_engagement") or {}
-        book_summary = (
-            f"Book leads: {bl.get('total_book_leads', '?')} total, "
-            f"{bl.get('new_leads_last_7d', bl.get('new_leads_last_30d', '?'))} new (7d), "
-            f"{bl.get('total_purchased', '?')} purchased | "
-            f"Email open {engagement.get('open_rate_pct', '?')}% "
-            f"click {engagement.get('click_rate_pct', '?')}%"
-        )
-        sent = await send_notification(
-            agent="alex",
-            severity="info",
-            title="ALEX Periodic Report",
-            message=(
-                f"Keywords: {self.cycle_stats['keywords_discovered']}, "
-                f"Pages: {self.cycle_stats['pages_generated']}, "
-                f"Refreshed: {self.cycle_stats['pages_refreshed']}, "
-                f"Opportunities: {self.cycle_stats['opportunities_found']} | "
-                f"{book_summary}"
-            ),
-            service="alex-seo",
-            details=report,
+        health     = report.get("service_health") or {}
+        last_runs  = report.get("last_runs") or {}
+        timestamp  = report.get("generated_at", "")
+
+        # ── Stat cards ──────────────────────────────────────────────────────
+        def _stat_card(label: str, value, color: str = "#2563eb", suffix: str = "") -> str:
+            return f"""
+            <td style="width:20%;padding:0 6px;text-align:center;">
+              <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;
+                          padding:16px 8px;border-top:3px solid {color};">
+                <div style="font-size:28px;font-weight:800;color:{color};
+                            line-height:1;">{value}{suffix}</div>
+                <div style="font-size:11px;color:#64748b;margin-top:6px;
+                            font-weight:600;text-transform:uppercase;
+                            letter-spacing:0.4px;">{label}</div>
+              </div>
+            </td>"""
+
+        stats_row = (
+            _stat_card("Keywords", self.cycle_stats.get("keywords_discovered", 0), "#2563eb") +
+            _stat_card("Pages Made", self.cycle_stats.get("pages_generated", 0), "#7c3aed") +
+            _stat_card("Refreshed", self.cycle_stats.get("pages_refreshed", 0), "#0891b2") +
+            _stat_card("Opportunities", self.cycle_stats.get("opportunities_found", 0), "#d97706") +
+            _stat_card("Analytics", self.cycle_stats.get("analytics_ingested", 0), "#16a34a")
         )
 
+        # ── Last run rows ────────────────────────────────────────────────────
+        run_labels = {
+            "keyword_discovery":  ("🔍", "Keyword Discovery"),
+            "content_queue":      ("📝", "Content Queue"),
+            "page_refresh":       ("🔄", "Page Refresh"),
+            "opportunity_scan":   ("🎯", "Opportunity Scan"),
+            "analytics_ingestion":("📊", "Analytics Ingestion"),
+        }
+        run_rows = ""
+        for key, (icon, label) in run_labels.items():
+            val = last_runs.get(key, "—")
+            run_rows += f"""
+            <tr>
+              <td style="padding:8px 16px;color:#64748b;font-size:13px;
+                         border-bottom:1px solid #f1f5f9;">{icon} {label}</td>
+              <td style="padding:8px 16px;color:#0f172a;font-size:13px;
+                         font-weight:600;border-bottom:1px solid #f1f5f9;
+                         text-align:right;">{val}</td>
+            </tr>"""
+
+        # ── Service health rows ──────────────────────────────────────────────
+        health_rows = ""
+        for svc, status_str in health.items():
+            is_ok = "healthy" in status_str.lower() or "ok" in status_str.lower()
+            dot   = "🟢" if is_ok else "🔴"
+            health_rows += f"""
+            <tr>
+              <td style="padding:8px 16px;color:#64748b;font-size:13px;
+                         border-bottom:1px solid #f1f5f9;">{dot} {svc.title()}</td>
+              <td style="padding:8px 16px;font-size:12px;font-weight:600;
+                         color:{'#16a34a' if is_ok else '#dc2626'};
+                         border-bottom:1px solid #f1f5f9;text-align:right;">
+                {status_str}</td>
+            </tr>"""
+
+        # ── Book leads section ───────────────────────────────────────────────
+        total_leads  = bl.get("total_book_leads", "—")
+        new_7d       = bl.get("new_leads_last_7d", bl.get("new_leads_last_30d", "—"))
+        purchased    = bl.get("total_purchased", "—")
+        open_rate    = engagement.get("open_rate_pct", "—")
+        click_rate   = engagement.get("click_rate_pct", "—")
+
+        book_section = f"""
+        <div style="margin-top:24px;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;">
+          <div style="padding:12px 16px;background:#f8fafc;border-bottom:1px solid #e2e8f0;">
+            <span style="font-size:13px;font-weight:700;color:#0f172a;
+                         text-transform:uppercase;letter-spacing:0.3px;">📚 Book Leads (7d)</span>
+          </div>
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td style="padding:12px 16px;text-align:center;border-right:1px solid #f1f5f9;">
+                <div style="font-size:24px;font-weight:800;color:#2563eb;">{total_leads}</div>
+                <div style="font-size:11px;color:#64748b;font-weight:600;">Total Leads</div>
+              </td>
+              <td style="padding:12px 16px;text-align:center;border-right:1px solid #f1f5f9;">
+                <div style="font-size:24px;font-weight:800;color:#16a34a;">{new_7d}</div>
+                <div style="font-size:11px;color:#64748b;font-weight:600;">New (7d)</div>
+              </td>
+              <td style="padding:12px 16px;text-align:center;border-right:1px solid #f1f5f9;">
+                <div style="font-size:24px;font-weight:800;color:#7c3aed;">{purchased}</div>
+                <div style="font-size:11px;color:#64748b;font-weight:600;">Purchased</div>
+              </td>
+              <td style="padding:12px 16px;text-align:center;border-right:1px solid #f1f5f9;">
+                <div style="font-size:24px;font-weight:800;color:#d97706;">{open_rate}%</div>
+                <div style="font-size:11px;color:#64748b;font-weight:600;">Email Open Rate</div>
+              </td>
+              <td style="padding:12px 16px;text-align:center;">
+                <div style="font-size:24px;font-weight:800;color:#0891b2;">{click_rate}%</div>
+                <div style="font-size:11px;color:#64748b;font-weight:600;">Click Rate</div>
+              </td>
+            </tr>
+          </table>
+        </div>"""
+
+        # ── Twitter trends section ───────────────────────────────────────────
+        trends_section = ""
+        try:
+            from src.maya.services.twitter_trends_service import get_latest_health_trends
+            trends = await get_latest_health_trends(limit=8)
+            if trends:
+                trend_pills = "".join(
+                    f'<span style="display:inline-block;margin:3px;padding:4px 12px;'
+                    f'background:#eff6ff;color:#2563eb;border-radius:20px;'
+                    f'font-size:12px;font-weight:600;">'
+                    f'{t["name"]}'
+                    f'{"&nbsp;·&nbsp;<span style=\\"color:#94a3b8;\\">" + str(t["tweet_volume"]) + "</span>" if t.get("tweet_volume") else ""}'
+                    f'</span>'
+                    for t in trends
+                )
+                trends_section = f"""
+                <div style="margin-top:24px;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;">
+                  <div style="padding:12px 16px;background:#f8fafc;border-bottom:1px solid #e2e8f0;">
+                    <span style="font-size:13px;font-weight:700;color:#0f172a;
+                                 text-transform:uppercase;letter-spacing:0.3px;">🔥 Trending Health Topics (X)</span>
+                  </div>
+                  <div style="padding:14px 16px;">{trend_pills}</div>
+                </div>"""
+        except Exception:
+            pass
+
+        # ── Report link button ───────────────────────────────────────────────
+        report_btn = ""
         if ALEX_REPORT_LINK:
-            await self._notify_report_link_expiry(ALEX_REPORT_LINK)
+            report_btn = f"""
+            <div style="text-align:center;margin-top:24px;">
+              <a href="{ALEX_REPORT_LINK}"
+                 style="display:inline-block;padding:12px 32px;background:#2563eb;
+                        color:#fff;font-size:14px;font-weight:700;border-radius:8px;
+                        text-decoration:none;">View Full Report →</a>
+            </div>"""
 
-        return sent
+        # ── Assemble email ───────────────────────────────────────────────────
+        html = f"""<!DOCTYPE html>
+<html><head><meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/></head>
+<body style="margin:0;padding:0;background:#f1f5f9;
+             font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 16px;background:#f1f5f9;">
+<tr><td align="center">
+<table width="640" cellpadding="0" cellspacing="0"
+       style="max-width:640px;width:100%;background:#fff;border-radius:12px;
+              overflow:hidden;box-shadow:0 4px 6px -1px rgba(0,0,0,.07);">
+
+  <!-- Header -->
+  <tr><td style="padding:20px 32px;background:#0f172a;">
+    <table width="100%" cellpadding="0" cellspacing="0"><tr>
+      <td>
+        <span style="color:#fff;font-size:16px;font-weight:700;">WIHY</span>
+        <span style="color:#64748b;font-size:14px;"> · Alex SEO Daily Report</span>
+      </td>
+      <td align="right">
+        <span style="color:#94a3b8;font-size:12px;">{timestamp}</span>
+      </td>
+    </tr></table>
+  </td></tr>
+
+  <!-- Body -->
+  <tr><td style="padding:28px 32px;">
+
+    <!-- Stat cards -->
+    <table width="100%" cellpadding="0" cellspacing="0"
+           style="margin-bottom:24px;margin-left:-6px;margin-right:-6px;width:calc(100% + 12px);">
+      <tr>{stats_row}</tr>
+    </table>
+
+    <!-- Last runs + Health side by side -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:0;">
+      <tr>
+        <!-- Last runs -->
+        <td style="width:50%;padding-right:10px;vertical-align:top;">
+          <div style="border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;">
+            <div style="padding:12px 16px;background:#f8fafc;border-bottom:1px solid #e2e8f0;">
+              <span style="font-size:13px;font-weight:700;color:#0f172a;
+                           text-transform:uppercase;letter-spacing:0.3px;">⏱ Last Runs</span>
+            </div>
+            <table width="100%" cellpadding="0" cellspacing="0">{run_rows}</table>
+          </div>
+        </td>
+        <!-- Service health -->
+        <td style="width:50%;padding-left:10px;vertical-align:top;">
+          <div style="border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;">
+            <div style="padding:12px 16px;background:#f8fafc;border-bottom:1px solid #e2e8f0;">
+              <span style="font-size:13px;font-weight:700;color:#0f172a;
+                           text-transform:uppercase;letter-spacing:0.3px;">🏥 Service Health</span>
+            </div>
+            <table width="100%" cellpadding="0" cellspacing="0">{health_rows}</table>
+          </div>
+        </td>
+      </tr>
+    </table>
+
+    {book_section}
+    {trends_section}
+    {report_btn}
+
+  </td></tr>
+
+  <!-- Footer -->
+  <tr><td style="padding:16px 32px;background:#f8fafc;
+                 border-top:1px solid #e2e8f0;text-align:center;">
+    <span style="color:#94a3b8;font-size:11px;">
+      Sent by Alex · WIHY Agent System · Daily cadence · Do not reply
+    </span>
+  </td></tr>
+
+</table></td></tr></table></body></html>"""
+
+        subject = f"📊 Alex Daily Report — {self.cycle_stats.get('keywords_discovered', 0)} keywords · {self.cycle_stats.get('pages_generated', 0)} pages · {self.cycle_stats.get('opportunities_found', 0)} opportunities"
+
+        payload = {
+            "personalizations": [{"to": [{"email": to_email}]}],
+            "from": {"email": from_email, "name": "Alex · WIHY Agents"},
+            "subject": subject,
+            "content": [{"type": "text/html", "value": html}],
+            "categories": ["agent-notification", "alex", "alex-seo"],
+        }
+
+        try:
+            async with _httpx.AsyncClient(timeout=15.0) as client:
+                r = await client.post(
+                    "https://api.sendgrid.com/v3/mail/send",
+                    json=payload,
+                    headers={
+                        "Authorization": f"Bearer {sendgrid_key}",
+                        "Content-Type": "application/json",
+                    },
+                )
+            if r.status_code in (200, 201, 202):
+                logger.info("Alex report emailed to %s", to_email)
+                if ALEX_REPORT_LINK:
+                    await self._notify_report_link_expiry(ALEX_REPORT_LINK)
+                return True
+            logger.error("SendGrid error %s: %s", r.status_code, r.text[:200])
+            return False
+        except Exception as exc:
+            logger.error("Alex report email failed: %s", exc)
+            return False
 
 
 # ── Singleton ─────────────────────────────────────────────────────────────────

@@ -4,8 +4,7 @@ import Script from "next/script";
 import type { ReactNode } from "react";
 
 import "@/app/globals.css";
-import { Footer } from "@/components/Footer";
-import { Header } from "@/components/Header";
+import { LayoutChrome } from "@/components/LayoutChrome";
 import { baseMetadata } from "@/lib/seo";
 import { GA_MEASUREMENT_ID } from "@/lib/analytics";
 
@@ -63,15 +62,7 @@ gtag('set','url_passthrough',true);`}
         <Script id="swg-basic-init" strategy="afterInteractive">
           {`if(location.hostname==='vowels.org'){var s=document.createElement('script');s.src='https://news.google.com/swg/js/v1/swg-basic.js';s.onload=function(){(self.SWG_BASIC=self.SWG_BASIC||[]).push(function(b){b.init({type:'NewsArticle',isPartOfType:['Product'],isPartOfProductId:'CAow9bDGDA:openaccess',clientOptions:{theme:'light',lang:'en'}});});};document.head.appendChild(s);}`}
         </Script>
-        <div className="min-h-screen">
-          <div className="sticky top-0 z-20 border-b border-black/10 bg-white/90 backdrop-blur">
-            <div className="mx-auto max-w-[1480px] px-4 py-3 md:px-8 md:py-4">
-              <Header />
-            </div>
-          </div>
-          <main className="mx-auto mt-8 max-w-[1480px] px-4 pb-10 md:px-8">{children}</main>
-          <Footer />
-        </div>
+        <LayoutChrome>{children}</LayoutChrome>
       </body>
     </html>
   );
