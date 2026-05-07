@@ -3,12 +3,15 @@ B2B Nurture Service
 5-email outreach sequence for business leads: bookstores, libraries, podcasts,
 blogs, churches, schools.
 
+Same visual style as the consumer nurture emails. Personal story-first,
+soft book purchase section, reply CTA.
+
 Schedule:
-  Day 0:  Introduction + immediate offer
-  Day 3:  Why this book sells / what audiences respond to
-  Day 7:  Social proof + specific program details
-  Day 14: Direct ask — let's make this happen
-  Day 21: Last note from Kortney
+  Day 0:  Why I wrote the book + B2B intro
+  Day 3:  Who the book reaches + B2B angle
+  Day 7:  Social proof + program details
+  Day 14: Direct ask
+  Day 21: Last note
 """
 
 import logging
@@ -22,13 +25,23 @@ SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY", "").strip()
 FROM_EMAIL = os.getenv("B2B_FROM_EMAIL", "info@vowels.org")
 FROM_NAME  = os.getenv("B2B_FROM_NAME",  "Kortney Lee")
 BCC_EMAIL  = os.getenv("BOOK_EMAIL_BCC", "kortney@wihy.ai")
-UNSUBSCRIBE_URL = "https://whatishealthy.org/unsubscribe"
 
-WHOLESALE_URL  = "https://whatishealthy.org/wholesale"
-MEDIA_KIT_URL  = "https://whatishealthy.org/media-kit"
-LIBRARY_URL    = "https://whatishealthy.org/libraries"
-BOOK_IMAGE_URL = "https://storage.googleapis.com/wihy-web-assets/images/book-green.jpg"
-AMAZON_URL     = "https://www.amazon.com/dp/B0FJ2494LH"
+UNSUBSCRIBE_URL    = "https://whatishealthy.org/unsubscribe"
+WHOLESALE_URL      = "https://whatishealthy.org/wholesale"
+MEDIA_KIT_URL      = "https://whatishealthy.org/media-kit"
+LIBRARY_URL        = "https://whatishealthy.org/libraries"
+
+# IngramSpark direct purchase (shows book cover)
+INGRAM_FEMALE_URL  = "https://shop.ingramspark.com/b/084?params=KdF9tI0DBCGxHsXvFp5EzonT2Vjy0qlWQPnReIEveSF"
+INGRAM_MALE_URL    = "https://shop.ingramspark.com/b/084?params=ortH8rLGOSivIH3DLwamRSP1VHE5GqBpHxkPRViMMmp"
+COVER_FEMALE_IMG   = "https://image-hub-cloud.lightningsource.com/2011-04-01/Images/front_cover/x200/sku/9798822989481.jpg?viewkey=cbe6f8e435b911f25bba9f623f1beeb0b63fe7797d202afd9ae0389ba174c2fd"
+COVER_MALE_IMG     = "https://image-hub-cloud.lightningsource.com/2011-04-01/Images/front_cover/x200/sku/9798822981973.jpg?viewkey=6a6da316aacd73878e33dcdc077f227bfcc0f50c9d3bade6d01aeae2d7eae624"
+
+# Amazon / other formats
+AMAZON_PAPERBACK_URL = "https://www.amazon.com/dp/B0FJ2494LH"
+AMAZON_HARDCOVER_URL = "https://www.amazon.com/dp/B0FJ23J6JQ"
+AMAZON_KINDLE_URL    = "https://www.amazon.com/dp/B0DL7Z7NFL"
+AMAZON_AUDIBLE_URL   = "https://www.amazon.com/dp/B0GVWM74FR"
 
 
 # ── Copy by business type ─────────────────────────────────────────────────────
@@ -39,55 +52,32 @@ _COPY = {
         "d3_subject":  "Why this book has been moving off shelves",
         "d7_subject":  "What independent bookstores are saying",
         "d14_subject": "Can we get 10 copies on your shelf?",
-        "d21_subject": "Last note from me — What Is Healthy?",
-        "d0_intro": "I'm reaching out because I think <em>What Is Healthy?</em> would be a strong fit for your store.",
-        "d0_context": "It's a 264-page book on the food industry, label deception, and what families can do about it — written for a general audience, not a medical one. It resonates especially well with readers who are frustrated with conflicting health advice and want something real.",
-        "d0_offer": "We offer wholesale pricing for orders of 10+ copies with standard returnable terms. I'd love to get a copy in your hands first so you can see if it's the right fit for your customers.",
-        "d0_cta_label": "Request a Wholesale Info Sheet",
+        "d21_subject": "Last note — What Is Healthy?",
+        "d0_b2b": "I'm reaching out because I'd love to get the book on your shelves. We offer wholesale pricing for orders of 10+ copies with standard returnable terms. Happy to send a review copy first so you can see if it's the right fit for your customers.",
+        "d0_cta_label": "View Wholesale Info",
         "d0_cta_url": WHOLESALE_URL,
-        "d3_body": """Most independent bookstores that carry the book put it in the health/wellness section. But what's surprised us is that it also moves in the cooking section, the self-help section, and near registers as an impulse buy. The cover is distinct — a bright green that stands out — and the title does a lot of work for itself.<br/><br/>
-The readers who pick it up tend to already be health-curious. They've read labels, they've wondered about ingredients, they've felt like the system wasn't designed with them in mind. This book validates that feeling and gives them somewhere to go with it.<br/><br/>
-Happy to send a review copy if that would help.""",
+        "d3_b2b": "Most stores put it in the health/wellness section, but it also moves in self-help and near registers as an impulse buy. The cover is a bright green that stands out, and the title does a lot of work on its own. Readers who pick it up tend to already be health-curious — they've read labels, wondered about ingredients, felt like the system wasn't designed with them in mind. This book validates that feeling and gives them somewhere to go with it.",
         "d3_cta_label": "View Wholesale Terms",
         "d3_cta_url": WHOLESALE_URL,
-        "d7_body": """A few things we've heard from stores that carry the book:<br/><br/>
-<em>"It tends to self-merchandise — people pick it up, read the back, and put it back. Then they come back for it."</em><br/><br/>
-<em>"Our wellness section customers are always looking for something that isn't a diet book. This one doesn't feel like a diet book."</em><br/><br/>
-We also support stores with signage, author Q&amp;A sessions (in person or virtual), and reading group materials if you want to build a little program around it.""",
-        "d7_cta_label": "See What Other Stores Are Doing",
-        "d7_cta_url": WHOLESALE_URL,
+        "d7_b2b": 'A few things we\'ve heard from stores: <em>"It tends to self-merchandise — people pick it up, read the back, and put it back. Then they come back for it."</em> We also support stores with signage, author Q&amp;A sessions (in person or virtual), and reading group materials.',
         "d14_ask": "I'd love to get 10 copies on your shelf and see how your customers respond. If they move, we reorder. If they don't, standard returns apply. What would it take to make that happen?",
-        "d21_close": "I don't want to keep following up if it's not the right fit for your store — I just believe in the book and know your customers would too. If timing or interest shifts, we're always here.",
+        "d21_close": "I don't want to keep following up if it's not the right fit — I just believe in the book and know your customers would too. If interest shifts, we're always here.",
     },
     "library": {
         "d0_subject":  "What Is Healthy? — library acquisition info",
         "d3_subject":  "What community libraries are doing with this book",
-        "d7_subject":  "Program support, author Q&A, and reading guides",
+        "d7_subject":  "Discussion guide, author Q&A, and program support",
         "d14_subject": "Happy to support your acquisition request",
         "d21_subject": "Last note — What Is Healthy? for your community",
-        "d0_intro": "I'm reaching out about getting <em>What Is Healthy?</em> into your library collection.",
-        "d0_context": "It's a research-backed, general-audience book on the food industry, nutrition myths, and community health. Libraries have found it works well for community wellness programs, book clubs, and as a general health reference.",
-        "d0_offer": "I'm happy to provide a complimentary review copy for your acquisition review, along with a reading group guide and program support materials.",
-        "d0_cta_label": "Request a Review Copy",
+        "d0_b2b": "I'm reaching out about getting <em>What Is Healthy?</em> into your library collection. Libraries have used it for community wellness programs, book clubs, and as a general health reference. I'm happy to provide a complimentary review copy, along with a reading group guide and program support materials.",
+        "d0_cta_label": "Library Acquisition Info",
         "d0_cta_url": LIBRARY_URL,
-        "d3_body": """Libraries that have added the book to their collections have used it in a few different ways:<br/><br/>
-<strong>Community wellness programs</strong> — using it as the anchor text for 4–6 week community health discussions. We provide a discussion guide.<br/><br/>
-<strong>Book clubs</strong> — it generates strong conversation because it touches on things people deal with daily (grocery shopping, feeding families, reading labels) but usually can't discuss rigorously.<br/><br/>
-<strong>Author events</strong> — I'm available for in-person or virtual author talks for library patrons. These tend to draw well because the topic is relevant to almost everyone.""",
+        "d3_b2b": "Libraries that have added the book have used it in a few ways: 4&ndash;6 week community health discussions (we provide a discussion guide), book clubs where the everyday-life angle generates strong conversation, and author events that tend to draw well because the topic is relevant to almost everyone.",
         "d3_cta_label": "See Library Program Info",
         "d3_cta_url": LIBRARY_URL,
-        "d7_body": """A few resources available to libraries that carry the book:<br/><br/>
-<ul style="margin:0 0 16px;padding-left:20px;font-size:16px;line-height:2;color:#374151;">
-<li>Reading group discussion guide (12 questions, chapter by chapter)</li>
-<li>Community health program curriculum (6 sessions)</li>
-<li>Author Q&amp;A — virtual or in-person</li>
-<li>Promotional materials for library bulletin boards</li>
-</ul>
-All of these are free to libraries that acquire the book. We want the book to actually be read and used, not just sit on a shelf.""",
-        "d7_cta_label": "Request Library Support Materials",
-        "d7_cta_url": LIBRARY_URL,
-        "d14_ask": "I'd love to make sure your library has a copy — and the materials to make it useful to your community. What's the best way to support your acquisition process from here?",
-        "d21_close": "Last note from me. If there's anything I can do to help with the acquisition review — a formal press kit, additional review materials, or a reference call with another librarian who's used the book — just reply and let me know.",
+        "d7_b2b": "Available to libraries that carry the book: reading group discussion guide (12 questions), community health program curriculum (6 sessions), author Q&amp;A (virtual or in-person), and promotional materials. All free. I want the book to actually be read and used, not just sit on a shelf.",
+        "d14_ask": "I'd love to make sure your library has a copy and the materials to make it useful to your community. What's the best way to support your acquisition process from here?",
+        "d21_close": "If there's anything I can do to help with the acquisition review — a press kit, additional review materials, or a reference call with another librarian who's used the book — just reply and let me know.",
     },
     "podcast": {
         "d0_subject":  "Podcast guest — What Is Healthy? with Kortney Lee",
@@ -95,27 +85,15 @@ All of these are free to libraries that acquire the book. We want the book to ac
         "d7_subject":  "What listeners take away from these conversations",
         "d14_subject": "Are we booking a date?",
         "d21_subject": "Last note on the podcast booking",
-        "d0_intro": "I'm Kortney Lee, author of <em>What Is Healthy?</em>, and I think your listeners would find this conversation valuable.",
-        "d0_context": "The book covers the gap between what people are told about health and what the research actually shows — specifically around the food industry, label deception, ultra-processed food, and what families can realistically do about it. It's not another diet book. It's a research-backed look at why the system isn't working for most people and what to do about it.",
-        "d0_offer": "I'm an experienced speaker and can adapt the conversation to what resonates most with your audience — whether that's weight loss, feeding kids, food budgets, or the bigger picture of community health.",
+        "d0_b2b": "I'm an experienced speaker and can adapt the conversation to what resonates most with your audience — whether that's weight loss, feeding kids, food budgets, or the bigger picture of community health. Media kit and talking points are ready whenever you need them.",
         "d0_cta_label": "View Media Kit & Talking Points",
         "d0_cta_url": MEDIA_KIT_URL,
-        "d3_body": """A few angles that have generated the strongest listener response in past interviews:<br/><br/>
-<strong>"The 5-second label test"</strong> — a simple way to know whether a food is worth eating before you even read the ingredients. Listeners share this one.<br/><br/>
-<strong>"Why your grandmother's food was healthier — and it wasn't because she cooked better"</strong> — the structural changes in the food supply since the 1970s. Very shareable.<br/><br/>
-<strong>"The working-class health gap"</strong> — why wellness feels like a luxury and what that costs us as communities. This one tends to resonate emotionally.<br/><br/>
-<strong>"What 100-year-olds actually eat"</strong> — Blue Zones research distilled into practical takeaways. Positive, actionable, surprising.""",
+        "d3_b2b": 'A few angles that generate strong listener response: <strong>The 5-second label test</strong> — a simple way to know if a food is worth eating before you even read the ingredients. <strong>Why your grandmother\'s food was healthier</strong> — the structural changes in the food supply since the 1970s. <strong>The working-class health gap</strong> — why wellness feels like a luxury and what that costs communities. <strong>What 100-year-olds actually eat</strong> — Blue Zones research distilled into practical takeaways.',
         "d3_cta_label": "See All Episode Topics",
         "d3_cta_url": MEDIA_KIT_URL,
-        "d7_body": """What listeners tend to say after these conversations:<br/><br/>
-<em>"I went straight to the store and started reading labels differently."</em><br/><br/>
-<em>"I bought copies for my whole family."</em><br/><br/>
-<em>"This is the episode I keep sending people."</em><br/><br/>
-I bring real research, personal story (my grandmother died of cancer after years of type 2 diabetes and high blood pressure — three chronic illnesses at once — and that's what drove the book), and practical takeaways your listeners can actually use.""",
-        "d7_cta_label": "Book the Interview",
-        "d7_cta_url": MEDIA_KIT_URL,
+        "d7_b2b": 'What listeners say after these conversations: <em>"I went straight to the store and started reading labels differently."</em> <em>"I bought copies for my whole family."</em> <em>"This is the episode I keep sending people."</em> I bring real research, personal story, and practical takeaways your listeners can actually use.',
         "d14_ask": "I'd love to make this happen. What does your booking calendar look like? I'm flexible on format — long-form, short-form, video or audio only.",
-        "d21_close": "Last note from me. If the timing doesn't work right now, no problem at all — just keep me in mind for when it does. The offer stands.",
+        "d21_close": "If the timing doesn't work right now, no problem — just keep me in mind. The offer stands whenever it makes sense.",
     },
     "blog": {
         "d0_subject":  "Review copy + interview — What Is Healthy?",
@@ -123,57 +101,31 @@ I bring real research, personal story (my grandmother died of cancer after years
         "d7_subject":  "What other writers have done with the book",
         "d14_subject": "Would an exclusive excerpt help?",
         "d21_subject": "Last note — covering What Is Healthy?",
-        "d0_intro": "I'm Kortney Lee, author of <em>What Is Healthy?</em>, and I'd love for your readers to know about it.",
-        "d0_context": "The book is a research-backed look at the food industry, nutrition myths, and what families can realistically do to eat better — written for a general audience, not a medical one. It covers label deception, ultra-processed food, community health, and the psychology of why changing eating habits is so hard.",
-        "d0_offer": "I'm happy to provide a complimentary review copy (digital or print), an exclusive excerpt for your readers, or an interview — whatever format works best for your publication.",
+        "d0_b2b": "I'd love for your readers to know about <em>What Is Healthy?</em> I'm happy to provide a complimentary review copy (digital or print), an exclusive excerpt, or an interview — whatever format works best for your publication.",
         "d0_cta_label": "Request a Review Copy",
         "d0_cta_url": MEDIA_KIT_URL,
-        "d3_body": """A few angles that have connected strongly with readers:<br/><br/>
-<strong>The label deception angle</strong> — "natural flavors" appears on 80% of packaged food. Most people don't know what it actually means. This article tends to drive shares.<br/><br/>
-<strong>The budget angle</strong> — eating well isn't just a willpower problem, it's an economic and infrastructure problem. This resonates with readers who feel judged for what's in their grocery cart.<br/><br/>
-<strong>The family angle</strong> — what to feed kids when the food system is working against you. High engagement with parents.<br/><br/>
-<strong>The personal story angle</strong> — my grandmother died of cancer after years of type 2 and high blood pressure. That loss drove the research that became this book.""",
+        "d3_b2b": "Angles that connect strongly with readers: <strong>Label deception</strong> — &ldquo;natural flavors&rdquo; appears on 80% of packaged food and most people don't know what it means. <strong>The budget angle</strong> — eating well isn't just a willpower problem, it's an economic problem. <strong>The family angle</strong> — what to feed kids when the food system is working against you.",
         "d3_cta_label": "See Media Kit",
         "d3_cta_url": MEDIA_KIT_URL,
-        "d7_body": """A few things other writers have done with the book:<br/><br/>
-An exclusive excerpt from Chapter 3 (the one on "natural flavors" and what the FDA actually allows). We can provide this as a standalone piece.<br/><br/>
-A Q&amp;A-style interview — we can do written answers to your questions, or a live conversation you transcribe.<br/><br/>
-A guest post from Kortney on any of the angles above — fully written, original, not published elsewhere.<br/><br/>
-We're flexible on format and happy to work around your editorial calendar.""",
-        "d7_cta_label": "Request an Excerpt or Interview",
-        "d7_cta_url": MEDIA_KIT_URL,
+        "d7_b2b": "What other writers have done: an exclusive excerpt from Chapter 3 (on &ldquo;natural flavors&rdquo; — we can provide this as a standalone piece), Q&amp;A-style interviews (written or live), and guest posts from me on any of the angles above — fully written, original, not published elsewhere.",
         "d14_ask": "Would an exclusive excerpt from Chapter 3 help get this on your editorial calendar? I can have it to you within a few days.",
-        "d21_close": "Last note from me. If the timing or angle doesn't fit right now, no problem. Keep us in mind — the offer for a review copy or excerpt stands whenever you're ready.",
+        "d21_close": "If the timing or angle doesn't fit right now, no problem. The offer for a review copy or excerpt stands whenever you're ready.",
     },
     "church": {
         "d0_subject":  "What Is Healthy? — church & community wellness programs",
         "d3_subject":  "How faith communities are using this book",
-        "d7_subject":  "Bulk pricing, speaking, and small group resources",
+        "d7_subject":  "Small group guide, bulk pricing, and speaking",
         "d14_subject": "Ready to support your community health program",
         "d21_subject": "Last note — What Is Healthy? for your congregation",
-        "d0_intro": "I'm reaching out because <em>What Is Healthy?</em> has found a real home in faith community wellness programs, and I thought it might be a fit for yours.",
-        "d0_context": "The book is about what we put into our bodies, why the system makes it so hard to make good choices, and what individuals and communities can do about it. It's written from a place of care for people — not judgment — and that message resonates with communities that already think about stewardship, wholeness, and looking out for each other.",
-        "d0_offer": "We offer bulk pricing for group studies (10+ copies), and I'm available to speak at health-focused church events, wellness weekends, or community health fairs.",
+        "d0_b2b": "The book has been used in church wellness programs, small group studies, and community health events. I love supporting faith communities doing this work. Bulk pricing is available for group studies (10+ copies), and I'm available to speak at health-focused church events.",
         "d0_cta_label": "View Bulk Order & Speaking Info",
         "d0_cta_url": WHOLESALE_URL,
-        "d3_body": """Faith communities have used the book in a few ways that have worked really well:<br/><br/>
-<strong>6-week small group study</strong> — we provide a discussion guide that maps to chapters and works well in small groups of 8–15. Topics include food and stewardship, caring for your community's health, and what the research says about chronic illness in working families.<br/><br/>
-<strong>Health ministry resource</strong> — many health ministries have added it to their lending library or recommended reading list.<br/><br/>
-<strong>Community health events</strong> — I've spoken at church health fairs, "body and soul" weekends, and community wellness events. The conversation about chronic illness and community care tends to land particularly well.""",
+        "d3_b2b": "Faith communities have used the book for 6-week small group studies (we provide a discussion guide that works well for groups of 8&ndash;15), health ministry resources, and community health events. The conversation about chronic illness and community care tends to land particularly well.",
         "d3_cta_label": "Learn About Community Programs",
         "d3_cta_url": WHOLESALE_URL,
-        "d7_body": """A few things we provide to faith communities that use the book:<br/><br/>
-<ul style="margin:0 0 16px;padding-left:20px;font-size:16px;line-height:2;color:#374151;">
-<li>Small group discussion guide (6 sessions)</li>
-<li>Bulk pricing — 10+ copies at wholesale rates</li>
-<li>Author talk — in person or virtual, 45–60 minutes</li>
-<li>Health ministry support materials</li>
-</ul>
-My grandmother passed from cancer after years of type 2 diabetes and high blood pressure — three chronic illnesses that didn't have to end her life the way they did. That's the personal reason behind the book, and it's why I care about getting it into communities that are paying attention to their health.""",
-        "d7_cta_label": "Request Program Info",
-        "d7_cta_url": WHOLESALE_URL,
+        "d7_b2b": "Available to faith communities: small group discussion guide (6 sessions), bulk pricing (10+ copies at wholesale), author talk (in person or virtual, 45&ndash;60 minutes), and health ministry support materials. My grandmother passed from cancer after years of type 2 diabetes and high blood pressure — that's the personal reason I care about getting this into communities that are paying attention.",
         "d14_ask": "I'd love to support your community with this. What does your health ministry or wellness program look like, and how can we best fit into it?",
-        "d21_close": "Last note. Whether it's a few books for a small group or a full community event, we're here whenever the timing is right. Just reply and we'll make it work.",
+        "d21_close": "Whether it's a few books for a small group or a full community event, we're here whenever the timing is right. Just reply and we'll make it work.",
     },
     "school": {
         "d0_subject":  "What Is Healthy? — school nutrition & health programs",
@@ -181,56 +133,31 @@ My grandmother passed from cancer after years of type 2 diabetes and high blood 
         "d7_subject":  "Curriculum resources, assemblies, and parent workshops",
         "d14_subject": "Ready to support your nutrition program",
         "d21_subject": "Last note — What Is Healthy? for your school",
-        "d0_intro": "I'm reaching out about bringing <em>What Is Healthy?</em> into your school's health or nutrition program.",
-        "d0_context": "The book covers the food industry, what's actually in processed food, how to read labels, and what families can do to make better choices — written for a general adult audience, which makes it ideal for parent education, health teachers, and school wellness staff.",
-        "d0_offer": "We offer classroom and program pricing for schools (10+ copies), and I'm available for student assemblies, parent workshops, and teacher professional development sessions.",
+        "d0_b2b": "I'm reaching out about bringing <em>What Is Healthy?</em> into your school's health or nutrition program. We offer classroom and program pricing (10+ copies), and I'm available for student assemblies, parent workshops, and teacher professional development sessions.",
         "d0_cta_label": "View School Program Info",
         "d0_cta_url": LIBRARY_URL,
-        "d3_body": """Schools have found a few entry points that work well:<br/><br/>
-<strong>Parent education workshops</strong> — "What's really in your kid's lunch?" is a perennial draw. Parents want this information but don't know where to get it from a trusted source. This book gives them something to go home with.<br/><br/>
-<strong>Health class supplemental reading</strong> — Chapters 1–3 work well as a standalone unit on the food industry and label reading for high school health classes.<br/><br/>
-<strong>Student assemblies</strong> — I've spoken to student groups on the connection between food, focus, energy, and long-term health. The personal story elements (chronic illness, family impact) tend to land with students.""",
+        "d3_b2b": "Schools have found a few entry points that work well: parent education workshops (&ldquo;What's really in your kid's lunch?&rdquo; draws well), health class supplemental reading (Chapters 1&ndash;3 work as a standalone unit on label reading for high school), and student assemblies on the connection between food, focus, and long-term health.",
         "d3_cta_label": "See Program Options",
         "d3_cta_url": LIBRARY_URL,
-        "d7_body": """Resources available to schools:<br/><br/>
-<ul style="margin:0 0 16px;padding-left:20px;font-size:16px;line-height:2;color:#374151;">
-<li>Program pricing — 10+ copies at educational rates</li>
-<li>Discussion guide aligned to health curriculum standards</li>
-<li>Student assembly — 45 minutes, Q&amp;A included</li>
-<li>Parent workshop — 60–90 minutes, includes book</li>
-<li>Teacher PD session on food literacy</li>
-</ul>
-The goal is for students to leave with one or two things they can actually apply — reading a label, making a better choice at the grocery store, understanding why certain foods are marketed to them the way they are.""",
-        "d7_cta_label": "Request School Program Info",
-        "d7_cta_url": LIBRARY_URL,
+        "d7_b2b": "Resources available to schools: program pricing (10+ copies at educational rates), discussion guide aligned to health curriculum standards, student assembly (45 minutes, Q&amp;A included), parent workshop (60&ndash;90 minutes), and teacher PD session on food literacy. The goal is for students to leave with one or two things they can actually apply — reading a label, making a better choice at the store.",
         "d14_ask": "What would be most useful for your school right now — books for a class, a parent event, or a student assembly? I'd love to figure out the right fit.",
-        "d21_close": "Last note from me. School programs take time to put together and I understand calendars get full — whenever the timing is right, we're here to support your nutrition program.",
+        "d21_close": "School programs take time to put together and I understand calendars get full. Whenever the timing is right, we're here to support your nutrition program.",
     },
     "other": {
         "d0_subject":  "What Is Healthy? — partnership inquiry",
         "d3_subject":  "A few ways we work with partners",
-        "d7_subject":  "What we've built together with other organizations",
+        "d7_subject":  "What we've built with other organizations",
         "d14_subject": "Ready to make something happen",
         "d21_subject": "Last note from Kortney",
-        "d0_intro": "I'm Kortney Lee, author of <em>What Is Healthy?</em>, and I'd love to explore how we might work together.",
-        "d0_context": "The book is a research-backed look at the food industry, nutrition myths, and what families can do to eat better. It's finding readers everywhere — from bookstores to church wellness programs to school nutrition initiatives.",
-        "d0_offer": "Whether you're thinking about bulk orders, a content partnership, an author event, or something else entirely — I'm open to the conversation.",
+        "d0_b2b": "Whether you're thinking about bulk orders, a content partnership, an author event, or something else entirely — I'm open to the conversation. Hit reply and tell me what you're imagining.",
         "d0_cta_label": "Start the Conversation",
         "d0_cta_url": WHOLESALE_URL,
-        "d3_body": """A few ways we've worked with organizations so far:<br/><br/>
-<strong>Bulk orders</strong> — wholesale pricing for 10+ copies, returnable terms available.<br/><br/>
-<strong>Author events</strong> — in-person or virtual talks, panels, and Q&amp;A sessions.<br/><br/>
-<strong>Content partnerships</strong> — exclusive excerpts, guest posts, interviews for newsletters or publications.<br/><br/>
-<strong>Community programs</strong> — reading group guides, curriculum materials, health program support.<br/><br/>
-Hit reply and tell me more about what you're imagining — we'll figure out if there's a fit.""",
+        "d3_b2b": "A few ways we work with organizations: bulk orders (wholesale pricing for 10+ copies), author events (in-person or virtual), content partnerships (exclusive excerpts, guest posts, interviews), and community programs (reading guides, curriculum materials, health program support).",
         "d3_cta_label": "See Partnership Options",
         "d3_cta_url": WHOLESALE_URL,
-        "d7_body": """The book is on Amazon in paperback, hardcover, Kindle, and Audible — but the best partnerships we've built have been with organizations that put the book in front of the right people at the right time.<br/><br/>
-My grandmother passed from cancer after years of type 2 diabetes and high blood pressure. Three chronic illnesses. That's what drove me to write this book — and it's why I care about getting it to communities that are paying attention to their health, not just individuals who already are.""",
-        "d7_cta_label": "Learn More",
-        "d7_cta_url": WHOLESALE_URL,
+        "d7_b2b": "The best partnerships we've built have been with organizations that put the book in front of the right people at the right time. My grandmother passed from cancer after years of type 2 diabetes and high blood pressure — three chronic illnesses. That's what drove the research behind this book, and why I care about getting it into communities that are paying attention to their health.",
         "d14_ask": "What would a partnership look like for you? I'd love to find a way to make this work.",
-        "d21_close": "Last note. If the timing wasn't right or something shifted, no problem at all — just reply whenever it does make sense. Happy to pick the conversation back up.",
+        "d21_close": "If the timing wasn't right or something shifted, no problem — just reply whenever it does make sense.",
     },
 }
 
@@ -239,63 +166,143 @@ def _get(bt: str) -> dict:
     return _COPY.get(bt, _COPY["other"])
 
 
-# ── Email templates ───────────────────────────────────────────────────────────
+# ── Shared components (match consumer email style) ────────────────────────────
 
 def _wrap(content: str) -> str:
+    """560px white wrapper matching the consumer nurture email style."""
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/></head>
-<body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;">
+<body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;padding:0;">
 <tr><td align="center">
 <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#ffffff;">
 {content}
 <tr><td style="padding:16px 40px 24px;border-top:1px solid #e5e7eb;">
-<p style="margin:0;font-size:12px;color:#9ca3af;line-height:1.6;">
+<p style="margin:0 0 6px;font-size:13px;line-height:1.6;color:#6b7280;">
+You're receiving this because you reached out about <em>What Is Healthy?</em> or a partnership with Vowels.</p>
+<p style="margin:0;color:#9ca3af;font-size:12px;line-height:1.6;">
 <a href="{UNSUBSCRIBE_URL}" style="color:#9ca3af;text-decoration:underline;">Unsubscribe</a>
-&middot; Partnerships &middot; What Is Healthy?
+&middot; Kortney Lee &middot; partnerships@vowels.org
 </p></td></tr>
 </table></td></tr></table></body></html>"""
 
 
-def _cta(label: str, url: str) -> str:
+def _cta_btn(label: str, url: str) -> str:
     return (
-        f'<table cellpadding="0" cellspacing="0" style="margin:0 0 24px;"><tr>'
-        f'<td bgcolor="#1e40af" style="border-radius:5px;">'
-        f'<a href="{url}" style="display:block;padding:12px 24px;color:#ffffff;'
-        f'font-size:15px;font-weight:600;text-decoration:none;">{label}</a>'
+        f'<a href="{url}" target="_blank" style="display:inline-block;background:#1e40af;'
+        f'color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;'
+        f'padding:12px 24px;border-radius:6px;">{label}</a>'
+    )
+
+
+def _book_covers() -> str:
+    """Two IngramSpark book cover cards, email-safe table layout."""
+    def cover_card(img: str, link: str, label: str) -> str:
+        return (
+            f'<td width="50%" style="padding:0 8px 0 0;vertical-align:top;">'
+            f'<table width="100%" cellpadding="0" cellspacing="0" '
+            f'style="border:1px solid #e5e7eb;border-radius:8px;">'
+            f'<tr><td align="center" style="padding:12px 12px 8px;">'
+            f'<a href="{link}" target="_blank">'
+            f'<img src="{img}" width="80" alt="What Is Healthy?" '
+            f'style="display:block;border:0;" /></a></td></tr>'
+            f'<tr><td style="padding:0 12px 6px;">'
+            f'<p style="margin:0;font-size:13px;font-weight:700;color:#111827;'
+            f'font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif;">'
+            f'What Is Healthy?</p>'
+            f'<p style="margin:2px 0 0;font-size:12px;color:#6b7280;font-style:italic;">'
+            f'Kortney O. Lee &mdash; {label}</p></td></tr>'
+            f'<tr><td align="center" style="padding:8px 12px 12px;">'
+            f'<a href="{link}" target="_blank" '
+            f'style="display:inline-block;background:#FEBE10;color:#000000;'
+            f'font-size:14px;font-weight:700;text-decoration:none;'
+            f'padding:8px 20px;border-radius:8px;">Buy Now</a>'
+            f'</td></tr></table></td>'
+        )
+    return (
+        f'<table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 8px;">'
+        f'<tr>'
+        + cover_card(COVER_FEMALE_IMG, INGRAM_FEMALE_URL, "Female cover")
+        + cover_card(COVER_MALE_IMG,   INGRAM_MALE_URL,   "Male cover")
+        + f'</tr></table>'
+        f'<p style="margin:8px 0 0;font-size:13px;line-height:1.7;color:#6b7280;">'
+        f'Also on '
+        f'<a href="{AMAZON_PAPERBACK_URL}" style="color:#1e40af;text-decoration:underline;">Amazon Paperback</a>'
+        f' &middot; '
+        f'<a href="{AMAZON_HARDCOVER_URL}" style="color:#1e40af;text-decoration:underline;">Hardcover</a>'
+        f' &middot; '
+        f'<a href="{AMAZON_KINDLE_URL}" style="color:#1e40af;text-decoration:underline;">Kindle</a>'
+        f' &middot; '
+        f'<a href="{AMAZON_AUDIBLE_URL}" style="color:#1e40af;text-decoration:underline;">Audible</a>'
+        f'</p>'
+    )
+
+
+def _sig() -> str:
+    return (
+        '<p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">'
+        'Talk soon,<br/><strong>Kortney Lee</strong><br/>'
+        '<span style="font-size:14px;color:#6b7280;">Author, <em>What Is Healthy?</em>'
+        ' &middot; partnerships@vowels.org</span></p>'
+    )
+
+
+def _reply_cta(question: str) -> str:
+    return (
+        f'<table width="100%" cellpadding="0" cellspacing="0">'
+        f'<tr><td style="padding:20px 0 0;border-top:1px solid #f3f4f6;">'
+        f'<p style="margin:0;font-size:15px;line-height:1.7;color:#374151;">'
+        f'<strong>{question}</strong> Hit reply &mdash; I read every response.</p>'
         f'</td></tr></table>'
     )
 
 
-def _sig(short: bool = False) -> str:
-    if short:
-        return """<p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
-Kortney</p>"""
-    return """<p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
-Talk soon,<br/>Kortney Lee<br/>
-<span style="font-size:14px;color:#6b7280;">Author, <em>What Is Healthy?</em> &middot; partnerships@vowels.org</span></p>"""
+# ── Why I wrote the book — the personal story (used in Day 0) ─────────────────
 
+_WHY_I_WROTE_IT = """<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+My grandmother was one of the most vibrant people I knew. She was also someone who, for years,
+lived with type 2 diabetes, high blood pressure, and cancer. Three chronic illnesses at once.
+She died from the cancer. I've spent a long time thinking about whether that was inevitable.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+The research I found while writing this book suggests it wasn't. 60% of Americans have at least
+one chronic illness. 51% have two or more. These aren't just individual health failures &mdash;
+they're a system that was never designed to help most people be well.</p>
+<p style="margin:0 0 0;font-size:16px;line-height:1.85;color:#374151;">
+That's what <em>What Is Healthy?</em> is about. Not a diet. Not a fitness plan. A clear-eyed
+look at what the food industry has done, what the research actually shows, and what people can
+realistically do about it &mdash; especially people who don't have the time or money to make
+wellness a full-time job.</p>"""
+
+
+# ── Email templates ───────────────────────────────────────────────────────────
 
 def _render_b2b_day0(first_name: str, business_type: str, company_name: str) -> str:
     c = _get(business_type)
     name = first_name or "there"
     company = f" at {company_name}" if company_name else ""
     return _wrap(f"""
-<tr><td style="padding:40px 40px 8px;">
-<img src="{BOOK_IMAGE_URL}" width="80" alt="What Is Healthy?" style="display:block;margin:0 0 28px;border:0;" />
+<tr><td style="padding:40px 40px 24px;">
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">Hey {name},</p>
-<p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
-{c['d0_intro']}{company}.</p>
-<p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
-{c['d0_context']}</p>
-<p style="margin:0 0 24px;font-size:16px;line-height:1.8;color:#374151;">
-{c['d0_offer']}</p>
-{_cta(c['d0_cta_label'], c['d0_cta_url'])}
-<p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
-Or just hit reply — happy to answer questions directly.</p>
+{_WHY_I_WROTE_IT}
 </td></tr>
-<tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 16px;font-size:16px;line-height:1.8;color:#374151;">
+I'm reaching out because I think the book could be a real fit for {f"<strong>{company_name}</strong>" if company_name else "what you do"}{company and ""}.</p>
+<p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
+{c['d0_b2b']}</p>
+<p style="margin:0 0 24px;font-size:16px;line-height:1.8;color:#374151;">
+{_cta_btn(c['d0_cta_label'], c['d0_cta_url'])}</p>
+<p style="margin:0 0 4px;font-size:15px;font-weight:600;color:#374151;">
+Or pick up a copy yourself &mdash; there are two cover options:</p>
+</td></tr>
+<tr><td style="padding:0 40px 24px;">
+{_book_covers()}
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+{_reply_cta("Does this sound like something that could work for you?")}
+</td></tr>
+<tr><td style="padding:20px 40px 32px;">
 {_sig()}
 </td></tr>""")
 
@@ -304,15 +311,28 @@ def _render_b2b_day3(first_name: str, business_type: str, company_name: str) -> 
     c = _get(business_type)
     name = first_name or "there"
     return _wrap(f"""
-<tr><td style="padding:40px 40px 8px;">
+<tr><td style="padding:40px 40px 24px;">
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">Hey {name},</p>
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
-Following up on my note from a few days ago — wanted to share a little more about what we're seeing with the book.</p>
+Following up on my note from a few days ago &mdash; wanted to share a bit more about who the book reaches and why it tends to resonate.</p>
+<p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
+The readers who connect with it most are adults 30&ndash;65 who are frustrated with conflicting
+health advice and want a research-backed, agenda-free perspective. Strong resonance with families,
+faith communities, and health-conscious individuals who feel like the system isn't working for them.</p>
+<p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
+{c['d3_b2b']}</p>
 <p style="margin:0 0 24px;font-size:16px;line-height:1.8;color:#374151;">
-{c['d3_body']}</p>
-{_cta(c['d3_cta_label'], c['d3_cta_url'])}
+{_cta_btn(c['d3_cta_label'], c['d3_cta_url'])}</p>
 </td></tr>
-<tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 8px;font-size:15px;font-weight:600;color:#374151;">
+The book &mdash; two cover options:</p>
+{_book_covers()}
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+{_reply_cta("Any questions I can answer?")}
+</td></tr>
+<tr><td style="padding:20px 40px 32px;">
 {_sig()}
 </td></tr>""")
 
@@ -321,13 +341,23 @@ def _render_b2b_day7(first_name: str, business_type: str, company_name: str) -> 
     c = _get(business_type)
     name = first_name or "there"
     return _wrap(f"""
-<tr><td style="padding:40px 40px 8px;">
+<tr><td style="padding:40px 40px 24px;">
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">Hey {name},</p>
-<p style="margin:0 0 24px;font-size:16px;line-height:1.8;color:#374151;">
-{c['d7_body']}</p>
-{_cta(c['d7_cta_label'], c['d7_cta_url'])}
+<p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
+{c['d7_b2b']}</p>
+<p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
+264 pages. Paperback, hardcover, Kindle, and Audible. Written for a general audience &mdash;
+not a textbook, not a diet book. Something people will actually read and share.</p>
 </td></tr>
-<tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 8px;font-size:15px;font-weight:600;color:#374151;">
+Order a copy to review:</p>
+{_book_covers()}
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+{_reply_cta("What would make this easy to move forward?")}
+</td></tr>
+<tr><td style="padding:20px 40px 32px;">
 {_sig()}
 </td></tr>""")
 
@@ -336,14 +366,19 @@ def _render_b2b_day14(first_name: str, business_type: str, company_name: str) ->
     c = _get(business_type)
     name = first_name or "there"
     return _wrap(f"""
-<tr><td style="padding:40px 40px 8px;">
+<tr><td style="padding:40px 40px 24px;">
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">Hey {name},</p>
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
 {c['d14_ask']}</p>
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
-Just hit reply — that's the fastest way to make this happen.</p>
+Just hit reply &mdash; that's the fastest way to make this happen.</p>
 </td></tr>
-<tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 8px;font-size:15px;font-weight:600;color:#374151;">
+The book &mdash; in case you want to read it first:</p>
+{_book_covers()}
+</td></tr>
+<tr><td style="padding:20px 40px 32px;border-top:1px solid #e5e7eb;">
 {_sig()}
 </td></tr>""")
 
@@ -352,17 +387,21 @@ def _render_b2b_day21(first_name: str, business_type: str, company_name: str) ->
     c = _get(business_type)
     name = first_name or "there"
     return _wrap(f"""
-<tr><td style="padding:40px 40px 8px;">
+<tr><td style="padding:40px 40px 24px;">
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">Hey {name},</p>
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
-Last note from me — I don't want to fill your inbox.</p>
+Last note from me &mdash; I don't want to fill your inbox.</p>
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
 {c['d21_close']}</p>
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
-partnerships@vowels.org — reach out any time.</p>
+partnerships@vowels.org &mdash; reach out any time.</p>
 </td></tr>
-<tr><td style="padding:16px 40px 32px;border-top:1px solid #e5e7eb;">
-{_sig(short=True)}
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+{_book_covers()}
+</td></tr>
+<tr><td style="padding:20px 40px 32px;border-top:1px solid #e5e7eb;">
+<p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
+All the best,<br/><strong>Kortney</strong></p>
 </td></tr>""")
 
 
