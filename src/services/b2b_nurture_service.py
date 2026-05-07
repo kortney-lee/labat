@@ -404,13 +404,98 @@ below and let me know what you think.</p>
 <tr><td style="padding:20px 40px 32px;">{_sig()}</td></tr>""")
 
 
+def _day0_christian_blog(name: str, company: str) -> str:
+    blog = f"<em>{company}</em>" if company else "your blog"
+    return _wrap(f"""
+<tr><td style="padding:40px 40px 24px;">
+<p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">Hey {name},</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+My name is Kortney Lee. I wrote a book called <em>What Is Healthy? And Why Is It So Hard
+to Achieve</em>, and I&rsquo;m reaching out to {blog} because your readers are already
+thinking about health &mdash; they&rsquo;re just not finding content that speaks to it with
+the honesty and depth they&rsquo;re looking for.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Here&rsquo;s why I came to you specifically: Christian bloggers reach readers who think
+about health in the context of the whole person &mdash; body, mind, community, and legacy.
+That&rsquo;s exactly the frame this book lives in. It&rsquo;s not a diet book. It&rsquo;s a
+research-backed conversation about why chronic illness has become a near-universal
+experience, what the food system has done to create it, and what people can realistically
+do &mdash; especially families and communities already paying attention.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+<strong>What I&rsquo;m asking:</strong> A review, a feature, or a mention if the book
+resonates with you. I can send a digital or physical review copy. I can also provide an
+exclusive excerpt, a guest post on any of the topics the book covers, or a written Q&amp;A
+&mdash; whatever format fits your audience. No requirement to be positive; I just want the
+conversation to reach people who are ready for it.</p>
+<p style="margin:0 0 0;font-size:16px;line-height:1.85;color:#374151;">
+My grandmother lived with type 2 diabetes, high blood pressure, and cancer for years
+before she died. Three chronic illnesses at once. That&rsquo;s the personal reason behind
+this book &mdash; and why I care about getting it into communities that are paying attention
+to more than just the physical side of health.</p>
+</td></tr>
+{_PREFACE}
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 10px;font-size:15px;font-weight:600;color:#374151;">
+Order or request a review copy:</p>
+{_book_covers()}
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+{_reply_cta("Would this resonate with your readers?")}
+</td></tr>
+<tr><td style="padding:20px 40px 32px;">{_sig()}</td></tr>""")
+
+
+def _day0_christian_podcast(name: str, company: str) -> str:
+    show = f"<em>{company}</em>" if company else "your show"
+    return _wrap(f"""
+<tr><td style="padding:40px 40px 24px;">
+<p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">Hey {name},</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+My name is Kortney Lee. I wrote a book called <em>What Is Healthy? And Why Is It So Hard
+to Achieve</em>, and I&rsquo;m reaching out to {show} because I think your listeners are
+carrying a question this book answers directly: why is it so hard to take care of
+ourselves and the people we love, even when we know we should?</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Here&rsquo;s why I came to you specifically: Christian podcast audiences think about health
+as more than fitness &mdash; they think about stewardship, community, and what we pass
+down to the next generation. The chronic illness epidemic is a community and family
+issue, not just an individual one. 60% of American adults have at least one chronic
+illness. 51% have two or more. My grandmother was one of them &mdash; she lived with
+type 2 diabetes, high blood pressure, and cancer for years before she died. That didn&rsquo;t
+have to be her story. The book is about why it became her story, and what we can do
+differently.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+<strong>What I&rsquo;m asking:</strong> An interview on your show. I bring real research,
+personal story, and practical takeaways &mdash; and I adapt the conversation to what lands
+best with your audience. I don&rsquo;t lecture. I talk with people. Topics I cover well
+include the generational patterns of chronic illness, what the food industry has done
+to working families, the stewardship of our bodies as a spiritual and community practice,
+and what it looks like to actually change &mdash; not with a 30-day challenge, but for real.</p>
+<p style="margin:0 0 0;font-size:16px;line-height:1.85;color:#374151;">
+Read the preface below &mdash; it&rsquo;ll give you a feel for the conversation we could have
+with your listeners.</p>
+</td></tr>
+{_PREFACE}
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 10px;font-size:15px;font-weight:600;color:#374151;">
+The book &mdash; read it before we talk:</p>
+{_book_covers()}
+</td></tr>
+<tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
+{_reply_cta("Would this be a good fit for your listeners?")}
+</td></tr>
+<tr><td style="padding:20px 40px 32px;">{_sig()}</td></tr>""")
+
+
 _DAY0_RENDERERS = {
-    "bookstore": _day0_bookstore,
-    "library":   _day0_library,
-    "podcast":   _day0_podcast,
-    "blog":      _day0_blog,
-    "church":    _day0_church,
-    "school":    _day0_school,
+    "bookstore":        _day0_bookstore,
+    "library":          _day0_library,
+    "podcast":          _day0_podcast,
+    "blog":             _day0_blog,
+    "church":           _day0_church,
+    "school":           _day0_school,
+    "christian_blog":   _day0_christian_blog,
+    "christian_podcast":_day0_christian_podcast,
 }
 
 
@@ -564,6 +649,20 @@ _SUBJECTS = {
         "Still here if you'd like to know more",
         "Last note from me",
     ],
+    "christian_blog": [
+        "What Is Healthy? — a book for your faith community readers",
+        "More on What Is Healthy? and whole-person health",
+        "What readers are saying",
+        "Still here if you're interested",
+        "Last note from me",
+    ],
+    "christian_podcast": [
+        "Podcast guest — What Is Healthy? with Kortney Lee",
+        "More on what I cover for faith audiences",
+        "What listeners say after these conversations",
+        "Still interested in booking?",
+        "Last note from me",
+    ],
     "other": [
         "What Is Healthy? — wanted to put this on your radar",
         "More about What Is Healthy?",
@@ -670,9 +769,9 @@ async def process_pending_b2b_nurture() -> dict:
 _SLUG_TO_BTYPE = {
     "libraries":            "library",
     "bookstores":           "bookstore",
-    "christian_blogs":      "blog",
+    "christian_blogs":      "christian_blog",
     "book_review_blogs":    "blog",
-    "christian_podcasts":   "podcast",
+    "christian_podcasts":   "christian_podcast",
     "book_review_podcasts": "podcast",
 }
 

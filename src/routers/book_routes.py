@@ -457,7 +457,8 @@ async def preview_all(request: Request):
 
 # ── B2B Preview (test emails, no DB write) ────────────────────────────────────
 
-_B2B_TYPES_ALL = ["bookstore", "library", "podcast", "blog", "church", "school"]
+_B2B_TYPES_ALL = ["bookstore", "library", "podcast", "blog", "church", "school",
+                   "christian_blog", "christian_podcast"]
 
 
 @router.post("/admin/preview-b2b")
