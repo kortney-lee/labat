@@ -37,20 +37,92 @@ def _get_firestore():
 
 COLLECTION = "book_leads"
 
+# Valid topic/variant values (maps to VARIANT_COPY keys in nurture_service)
+VALID_TOPICS = {
+    "weight", "kids", "energy", "groceries", "family", "confused",
+    "warning", "realfood", "eliminate", "biglie", "mistakes", "finally",
+    "general",
+}
+
+# B2B business types
+B2B_TYPES = {"bookstore", "library", "podcast", "blog", "church", "school", "other"}
+
+
+def classify_lead(
+    source: str,
+    utm_source: str = "",
+    utm_medium: str = "",
+    utm_content: str = "",
+    business_type: str = "",
+) -> tuple[str, str]:
+    """
+    Return (lead_type, lead_topic).
+
+    lead_type:
+      "facebook_book"  — paid Facebook ad, book-focused
+      "organic_book"   — organic visit to whatishealthy.org
+      "newsletter"     — Vowels.org subscriber
+      "b2b"            — business (bookstore, library, podcast, etc.)
+
+    lead_topic:
+      variant name from VALID_TOPICS, or "general" if unknown
+    """
+    src = (source or "").lower()
+    medium = (utm_medium or "").lower()
+    us = (utm_source or "").lower()
+
+    if business_type:
+        return "b2b", "general"
+
+    if src == "facebook_lead_form" or (us == "facebook" and medium == "paid"):
+        # Try to get topic from utm_content — only if it's a real variant name
+        topic = utm_content.strip().lower() if utm_content else ""
+        if topic not in VALID_TOPICS:
+            topic = "general"
+        return "facebook_book", topic
+
+    if "vowels" in src or "newsletter" in src:
+        topic = utm_content.strip().lower() if utm_content else "general"
+        if topic not in VALID_TOPICS:
+            topic = "general"
+        return "newsletter", topic
+
+    # Organic — whatishealthy.org, wihy, communitygroceries, direct
+    topic = utm_content.strip().lower() if utm_content else "general"
+    if topic not in VALID_TOPICS:
+        topic = "general"
+    return "organic_book", topic
+
 
 async def save_lead(
     email: str, source: str = "whatishealthy", first_name: str = "", last_name: str = "",
     utm_source: str = "", utm_campaign: str = "", utm_content: str = "",
     utm_medium: str = "", fbclid: str = "",
+    # Extended fields for segmentation
+    lead_topic: str = "",
+    business_type: str = "",
+    company_name: str = "",
+    referral_url: str = "",
+    message: str = "",
 ) -> dict:
-    """Store an email lead. Returns the created document data."""
+    """Store an email lead with lead_type + lead_topic segmentation."""
     db = _get_firestore()
     now = datetime.now(timezone.utc)
-    doc_data = {
+
+    # Resolve topic: explicit param wins, then utm_content, then "general"
+    resolved_topic = (lead_topic or utm_content or "").strip().lower()
+    if resolved_topic not in VALID_TOPICS:
+        resolved_topic = "general"
+
+    lead_type, _ = classify_lead(source, utm_source, utm_medium, resolved_topic, business_type)
+
+    doc_data: dict = {
         "email": email.lower().strip(),
         "first_name": first_name,
         "last_name": last_name,
         "source": source,
+        "lead_type": lead_type,
+        "lead_topic": resolved_topic,
         "lead_tag": "book_free",
         "funnel_stage": "captured",
         "sequence_status": "active",
@@ -60,19 +132,19 @@ async def save_lead(
         "delivered": False,
         "paperback_purchased": False,
     }
-    if utm_source:
-        doc_data["utm_source"] = utm_source
-    if utm_campaign:
-        doc_data["utm_campaign"] = utm_campaign
-    if utm_content:
-        doc_data["utm_content"] = utm_content
-    if utm_medium:
-        doc_data["utm_medium"] = utm_medium
-    if fbclid:
-        doc_data["fbclid"] = fbclid
+    if utm_source:   doc_data["utm_source"]   = utm_source
+    if utm_campaign: doc_data["utm_campaign"] = utm_campaign
+    if utm_content:  doc_data["utm_content"]  = utm_content
+    if utm_medium:   doc_data["utm_medium"]   = utm_medium
+    if fbclid:       doc_data["fbclid"]       = fbclid
+    if business_type: doc_data["business_type"] = business_type
+    if company_name:  doc_data["company_name"]  = company_name
+    if referral_url:  doc_data["referral_url"]  = referral_url
+    if message:       doc_data["message"]        = message
+
     doc_ref = db.collection(COLLECTION).document()
     await doc_ref.set(doc_data)
-    logger.info(f"Lead saved: {email} (source={source})")
+    logger.info(f"Lead saved: {email} (source={source}, lead_type={lead_type}, topic={resolved_topic})")
     return {**doc_data, "id": doc_ref.id, "created_at": now.isoformat()}
 
 

@@ -1557,11 +1557,18 @@ async def process_pending_nurture() -> dict:
 
     async for doc in query.stream():
         data = doc.to_dict()
+
+        # B2B leads are handled by b2b_nurture_service — skip here
+        if data.get("lead_type") == "b2b":
+            continue
+
         stats["processed"] += 1
         email = data.get("email", "")
         first_name = data.get("first_name", "")
         current_stage = data.get("nurture_stage", 0)
-        variant = data.get("utm_content", "")
+
+        # lead_topic is the canonical variant — fall back to utm_content for old leads
+        variant = data.get("lead_topic") or data.get("utm_content", "") or ""
 
         # Find the next stage to send
         next_entry = None

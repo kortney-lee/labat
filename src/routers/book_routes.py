@@ -42,9 +42,34 @@ class LeadRequest(BaseModel):
     source: str = ""
     utm_source: str = ""
     utm_campaign: str = ""
-    utm_content: str = ""
+    utm_content: str = ""    # should be variant name: weight|kids|energy|groceries|etc.
     utm_medium: str = ""
     fbclid: str = ""
+    referral_url: str = ""   # article/page they came from
+
+
+class NewsletterSignupRequest(BaseModel):
+    """Vowels.org newsletter subscriber."""
+    email: EmailStr
+    first_name: str = ""
+    last_name: str = ""
+    topic: str = "general"      # health topic: weight|kids|energy|groceries|general|etc.
+    referral_url: str = ""      # article URL that drove the signup
+    utm_source: str = ""
+    utm_campaign: str = ""
+    utm_medium: str = ""
+
+
+class B2BLeadRequest(BaseModel):
+    """Business lead — bookstore, library, podcast, blog, etc."""
+    email: EmailStr
+    first_name: str = ""
+    last_name: str = ""
+    company_name: str = ""
+    business_type: str = "other"   # bookstore|library|podcast|blog|church|school|other
+    message: str = ""              # what they asked about / why they're reaching out
+    utm_source: str = ""
+    utm_medium: str = ""
 
 
 class LeadResponse(BaseModel):
@@ -92,18 +117,24 @@ async def capture_lead(req: LeadRequest):
         lead_source = "whatishealthy"
     else:
         lead_source = raw_source or "whatishealthy"
+    # Resolve topic: utm_content should be variant name (weight/kids/energy/etc.)
+    # If it's a generic ad group name, classify_lead will fall back to "general"
+    from src.services.book_leads_service import VALID_TOPICS
+    raw_topic = req.utm_content.strip().lower()
+    lead_topic = raw_topic if raw_topic in VALID_TOPICS else "general"
+
     await save_lead(
         email, source=lead_source, first_name=first_name, last_name=last_name,
         utm_source=req.utm_source, utm_campaign=req.utm_campaign,
         utm_content=req.utm_content, utm_medium=req.utm_medium,
-        fbclid=req.fbclid,
+        fbclid=req.fbclid, lead_topic=lead_topic,
+        referral_url=req.referral_url,
     )
 
-    # Trigger Day 0 nurture email (branded drip — includes download link) — best-effort
-    variant = req.utm_content.strip()
+    # Trigger Day 0 nurture email — best-effort
     try:
         from src.services.nurture_service import trigger_day0
-        await trigger_day0(email, first_name, variant=variant)
+        await trigger_day0(email, first_name, variant=lead_topic)
     except Exception as e:
         logger.error(f"Nurture Day 0 trigger failed (non-blocking): {e}")
 
@@ -121,6 +152,86 @@ async def capture_lead(req: LeadRequest):
         logger.warning(f"CAPI Lead event failed (non-blocking): {e}")
 
     return LeadResponse(success=True, message="Your free copy is ready!")
+
+
+# ── Vowels Newsletter Signup ──────────────────────────────────────────────────
+
+@router.post("/newsletter-signup", response_model=LeadResponse)
+async def vowels_newsletter_signup(req: NewsletterSignupRequest):
+    """
+    Vowels.org newsletter subscriber signup.
+    topic field drives which sequence they receive (weight|kids|energy|general|etc.)
+    referral_url captures which article brought them here.
+    """
+    email = req.email.lower().strip()
+    already = await email_exists(email)
+    if already:
+        return LeadResponse(success=True, message="You're already subscribed!")
+
+    topic = req.topic.strip().lower()
+    from src.services.book_leads_service import VALID_TOPICS
+    if topic not in VALID_TOPICS:
+        topic = "general"
+
+    await save_lead(
+        email,
+        source="vowels-newsletter",
+        first_name=req.first_name.strip(),
+        last_name=req.last_name.strip(),
+        utm_source=req.utm_source,
+        utm_campaign=req.utm_campaign,
+        utm_medium=req.utm_medium,
+        lead_topic=topic,
+        referral_url=req.referral_url,
+    )
+
+    try:
+        from src.services.nurture_service import trigger_day0
+        await trigger_day0(email, req.first_name.strip(), variant=topic)
+    except Exception as e:
+        logger.error(f"Newsletter nurture Day 0 failed (non-blocking): {e}")
+
+    return LeadResponse(success=True, message="Welcome to Vowels!")
+
+
+# ── B2B Lead Intake ───────────────────────────────────────────────────────────
+
+@router.post("/b2b-lead", response_model=LeadResponse)
+async def b2b_lead(req: B2BLeadRequest):
+    """
+    B2B lead intake — bookstore, library, podcast, blog, church, school.
+    Triggers a separate B2B nurture sequence, not the consumer book sequence.
+    """
+    email = req.email.lower().strip()
+    already = await email_exists(email)
+    if already:
+        return LeadResponse(success=True, message="We already have your info — we'll be in touch!")
+
+    btype = req.business_type.strip().lower()
+    from src.services.book_leads_service import B2B_TYPES
+    if btype not in B2B_TYPES:
+        btype = "other"
+
+    await save_lead(
+        email,
+        source="b2b-intake",
+        first_name=req.first_name.strip(),
+        last_name=req.last_name.strip(),
+        utm_source=req.utm_source,
+        utm_medium=req.utm_medium,
+        business_type=btype,
+        company_name=req.company_name.strip(),
+        message=req.message.strip()[:1000],
+    )
+
+    # Trigger B2B Day 0 email
+    try:
+        from src.services.b2b_nurture_service import trigger_b2b_day0
+        await trigger_b2b_day0(email, req.first_name.strip(), btype, req.company_name.strip())
+    except Exception as e:
+        logger.error(f"B2B nurture Day 0 failed (non-blocking): {e}")
+
+    return LeadResponse(success=True, message="Thanks — we'll be in touch within 24 hours!")
 
 
 class VerifyEmailRequest(BaseModel):
@@ -312,8 +423,10 @@ async def nurture_cron(request: Request):
         raise HTTPException(status_code=401, detail="Unauthorized")
 
     from src.services.nurture_service import process_pending_nurture
-    result = await process_pending_nurture()
-    return {"status": "ok", **result}
+    from src.services.b2b_nurture_service import process_pending_b2b_nurture
+    consumer_result = await process_pending_nurture()
+    b2b_result = await process_pending_b2b_nurture()
+    return {"status": "ok", "consumer": consumer_result, "b2b": b2b_result}
 
 
 @router.post("/preview-all")
