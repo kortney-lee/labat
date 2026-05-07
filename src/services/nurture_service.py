@@ -745,7 +745,7 @@ async def send_nurture_email(to_email: str, first_name: str, template_id: str, s
     payload = {
         "personalizations": [{
             "to": [{"email": to_email}],
-            **({"bcc": [{"email": BOOK_EMAIL_BCC}]} if BOOK_EMAIL_BCC else {}),
+            **({"bcc": [{"email": BOOK_EMAIL_BCC}]} if BOOK_EMAIL_BCC and BOOK_EMAIL_BCC.lower() != to_email.lower() else {}),
         }],
         "from": {"email": brand["from_email"], "name": brand["from_name"]},
         "subject": rendered_subject,
