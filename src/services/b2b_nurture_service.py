@@ -411,27 +411,30 @@ def _day0_christian_blog(name: str, company: str) -> str:
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">Hey {name},</p>
 <p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
 My name is Kortney Lee. I wrote a book called <em>What Is Healthy? And Why Is It So Hard
-to Achieve</em>, and I&rsquo;m reaching out to {blog} because your readers are already
-thinking about health &mdash; they&rsquo;re just not finding content that speaks to it with
-the honesty and depth they&rsquo;re looking for.</p>
+to Achieve</em>. I&rsquo;m reaching out to {blog} because I believe your readers are
+wrestling with something the church hasn&rsquo;t always named directly: health was given
+to us by God, but something has been quietly taking it.</p>
 <p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
-Here&rsquo;s why I came to you specifically: Christian bloggers reach readers who think
-about health in the context of the whole person &mdash; body, mind, community, and legacy.
-That&rsquo;s exactly the frame this book lives in. It&rsquo;s not a diet book. It&rsquo;s a
-research-backed conversation about why chronic illness has become a near-universal
-experience, what the food system has done to create it, and what people can realistically
-do &mdash; especially families and communities already paying attention.</p>
+We were designed for wholeness &mdash; in body, not just in spirit. And yet 60% of
+American adults now live with at least one chronic illness. 51% with two or more.
+This isn&rsquo;t weakness. It&rsquo;s not a lack of faith or discipline. The food we eat
+has been quietly re-engineered over decades by an industry that profits from illness
+more than from health. The people it has hurt most are the families in our communities
+who couldn&rsquo;t afford to know better or do differently.</p>
 <p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
-<strong>What I&rsquo;m asking:</strong> A review, a feature, or a mention if the book
-resonates with you. I can send a digital or physical review copy. I can also provide an
-exclusive excerpt, a guest post on any of the topics the book covers, or a written Q&amp;A
-&mdash; whatever format fits your audience. No requirement to be positive; I just want the
-conversation to reach people who are ready for it.</p>
-<p style="margin:0 0 0;font-size:16px;line-height:1.85;color:#374151;">
-My grandmother lived with type 2 diabetes, high blood pressure, and cancer for years
-before she died. Three chronic illnesses at once. That&rsquo;s the personal reason behind
-this book &mdash; and why I care about getting it into communities that are paying attention
-to more than just the physical side of health.</p>
+My grandmother was one of them. She walked with God her whole life and still died
+from cancer after years of type 2 diabetes and high blood pressure. Three chronic
+illnesses. She didn&rsquo;t have the information she needed. That loss is what drove
+me to write this book &mdash; because what happened to her is happening to millions of
+people right now, in families who love the Lord and are still watching their health
+disappear one diagnosis at a time.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+<strong>What I&rsquo;m asking:</strong> If this resonates with you, I&rsquo;d love for
+your readers to know about it. A review, a feature, a mention &mdash; whatever fits
+your voice. I can provide a digital or physical review copy, an exclusive excerpt for
+your audience, a guest post, or a written Q&amp;A. The conversation this book opens is
+one your readers are already having privately. I&rsquo;d love to help you bring it into
+the light.</p>
 </td></tr>
 {_PREFACE}
 <tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
@@ -440,7 +443,7 @@ Order or request a review copy:</p>
 {_book_covers()}
 </td></tr>
 <tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
-{_reply_cta("Would this resonate with your readers?")}
+{_reply_cta("Does this feel like something your readers are ready for?")}
 </td></tr>
 <tr><td style="padding:20px 40px 32px;">{_sig()}</td></tr>""")
 
@@ -452,28 +455,29 @@ def _day0_christian_podcast(name: str, company: str) -> str:
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">Hey {name},</p>
 <p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
 My name is Kortney Lee. I wrote a book called <em>What Is Healthy? And Why Is It So Hard
-to Achieve</em>, and I&rsquo;m reaching out to {show} because I think your listeners are
-carrying a question this book answers directly: why is it so hard to take care of
-ourselves and the people we love, even when we know we should?</p>
+to Achieve</em>. I&rsquo;m reaching out to {show} because I believe your listeners are
+ready for a conversation the church hasn&rsquo;t had plainly enough: health comes from God
+&mdash; but something has been taking it from us, quietly and deliberately, for decades.</p>
 <p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
-Here&rsquo;s why I came to you specifically: Christian podcast audiences think about health
-as more than fitness &mdash; they think about stewardship, community, and what we pass
-down to the next generation. The chronic illness epidemic is a community and family
-issue, not just an individual one. 60% of American adults have at least one chronic
-illness. 51% have two or more. My grandmother was one of them &mdash; she lived with
-type 2 diabetes, high blood pressure, and cancer for years before she died. That didn&rsquo;t
-have to be her story. The book is about why it became her story, and what we can do
-differently.</p>
+We were created for wholeness. The body is a gift. And yet the people in our pews,
+in our families, in our communities &mdash; they are sick. 60% of American adults now
+live with at least one chronic illness. 51% have two or more. These aren&rsquo;t numbers
+from an ungodly culture. These are our people. Grandmothers. Fathers. Children. The
+food industry has re-engineered what we eat and separated us from what God provided
+&mdash; and most people don&rsquo;t know it happened or how to get back.</p>
 <p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
-<strong>What I&rsquo;m asking:</strong> An interview on your show. I bring real research,
-personal story, and practical takeaways &mdash; and I adapt the conversation to what lands
-best with your audience. I don&rsquo;t lecture. I talk with people. Topics I cover well
-include the generational patterns of chronic illness, what the food industry has done
-to working families, the stewardship of our bodies as a spiritual and community practice,
-and what it looks like to actually change &mdash; not with a 30-day challenge, but for real.</p>
+My grandmother walked with God her whole life. She also spent years living with
+type 2 diabetes, high blood pressure, and cancer &mdash; three chronic illnesses &mdash;
+before she died from the cancer. She wasn&rsquo;t weak in faith. She was without information.
+That difference is the whole reason I wrote this book.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+<strong>What I&rsquo;m asking:</strong> An interview on {show}. I&rsquo;m a natural
+conversationalist and I come with real research, real story, and a perspective that honors
+what faith communities already know &mdash; that stewardship of the body is a spiritual
+act, and that what we put into our bodies matters. I don&rsquo;t lecture. I talk with
+people. I&rsquo;d love to bring this conversation to your listeners.</p>
 <p style="margin:0 0 0;font-size:16px;line-height:1.85;color:#374151;">
-Read the preface below &mdash; it&rsquo;ll give you a feel for the conversation we could have
-with your listeners.</p>
+Read the preface below &mdash; it&rsquo;ll show you the conversation we could have.</p>
 </td></tr>
 {_PREFACE}
 <tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
@@ -482,7 +486,7 @@ The book &mdash; read it before we talk:</p>
 {_book_covers()}
 </td></tr>
 <tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
-{_reply_cta("Would this be a good fit for your listeners?")}
+{_reply_cta("Would this conversation serve your listeners?")}
 </td></tr>
 <tr><td style="padding:20px 40px 32px;">{_sig()}</td></tr>""")
 
@@ -505,12 +509,37 @@ def _render_b2b_day0(first_name: str, business_type: str, company_name: str) -> 
     return fn(name, company_name or "")
 
 
-# ── Follow-up templates (Days 3, 7, 14, 21) — same for all types ─────────────
+# ── Follow-up templates (Days 3, 7, 14, 21) ──────────────────────────────────
+
+_CHRISTIAN_TYPES = {"christian_blog", "christian_podcast"}
+
 
 def _render_b2b_day3(first_name: str, business_type: str, company_name: str) -> str:
     name = first_name or "there"
-    return _wrap(f"""
-<tr><td style="padding:40px 40px 24px;">
+
+    if business_type in _CHRISTIAN_TYPES:
+        body = f"""
+<p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">Hey {name},</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Following up on my note from a few days ago &mdash; wanted to share a little more about
+how this book speaks specifically to faith communities.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Most health books start with the individual: eat better, move more, make different
+choices. This one starts somewhere else. It starts with the question of what was taken
+from us &mdash; and how. The food industry has spent decades engineering products that
+override the signals God built into our bodies: hunger, fullness, satisfaction. It
+hasn&rsquo;t been an accident. And the communities that have suffered most from it are
+the ones with the least margin to fight back.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+That&rsquo;s a conversation about stewardship, justice, and generational legacy &mdash; all
+things your audience already cares about. The book gives them the research and the
+language to connect what they believe about the body with what they see happening to
+their families.</p>
+<p style="margin:0 0 0;font-size:16px;line-height:1.85;color:#374151;">
+264 pages. Written for a general audience. No jargon, no condemnation &mdash; just
+honesty about a system that wasn&rsquo;t built to serve us, and what we can do about it.</p>"""
+    else:
+        body = f"""
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">Hey {name},</p>
 <p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
 Following up on my note from a few days ago &mdash; I wanted to add a little more context
@@ -526,7 +555,10 @@ label, the psychology of why changing eating habits is hard, and what people can
 realistically do about it at different income levels. 264 pages. Written for a general
 audience &mdash; not a textbook.</p>
 <p style="margin:0 0 0;font-size:16px;line-height:1.85;color:#374151;">
-Just wanted to give you a fuller picture in case my first note was light on detail.</p>
+Just wanted to give you a fuller picture in case my first note was light on detail.</p>"""
+
+    return _wrap(f"""
+<tr><td style="padding:40px 40px 24px;">{body}
 </td></tr>
 <tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
 {_book_covers()}
@@ -539,11 +571,25 @@ Just wanted to give you a fuller picture in case my first note was light on deta
 
 def _render_b2b_day7(first_name: str, business_type: str, company_name: str) -> str:
     name = first_name or "there"
-    return _wrap(f"""
-<tr><td style="padding:40px 40px 24px;">
-<p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">Hey {name},</p>
-<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
-A few things readers have shared after finishing the book:</p>
+
+    if business_type in _CHRISTIAN_TYPES:
+        testimonials = """
+<table width="100%" cellpadding="16" cellspacing="0" style="margin:0 0 20px;background:#f9fafb;border-left:3px solid #e5e7eb;">
+<tr><td>
+<p style="margin:0 0 12px;font-size:15px;line-height:1.8;color:#374151;font-style:italic;">
+&ldquo;This is the conversation my small group needed. We read it together and it changed how
+we think about feeding our families.&rdquo;</p>
+<p style="margin:0 0 12px;font-size:15px;line-height:1.8;color:#374151;font-style:italic;">
+&ldquo;I shared it with my pastor and we&rsquo;re building a whole wellness series around it.&rdquo;</p>
+<p style="margin:0;font-size:15px;line-height:1.8;color:#374151;font-style:italic;">
+&ldquo;I bought copies for my whole family. My mother started crying when she read the preface
+because she finally felt like someone named what she&rsquo;s been living.&rdquo;</p>
+</td></tr></table>"""
+        closing = """<p style="margin:0 0 0;font-size:16px;line-height:1.85;color:#374151;">
+I wrote it because I believe the body is a gift and we deserve to know what&rsquo;s been done
+to it &mdash; and what we can do to reclaim it. Still here if you want to connect.</p>"""
+    else:
+        testimonials = """
 <table width="100%" cellpadding="16" cellspacing="0" style="margin:0 0 20px;background:#f9fafb;border-left:3px solid #e5e7eb;">
 <tr><td>
 <p style="margin:0 0 12px;font-size:15px;line-height:1.8;color:#374151;font-style:italic;">
@@ -552,12 +598,18 @@ A few things readers have shared after finishing the book:</p>
 &ldquo;I bought copies for my whole family.&rdquo;</p>
 <p style="margin:0;font-size:15px;line-height:1.8;color:#374151;font-style:italic;">
 &ldquo;This is the book I keep sending people.&rdquo;</p>
-</td></tr></table>
-<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+</td></tr></table>"""
+        closing = """<p style="margin:0 0 0;font-size:16px;line-height:1.85;color:#374151;">
 I wrote it for people who are paying attention but don&rsquo;t have the time or money to make
-wellness a full-time job. That&rsquo;s most people. I suspect that&rsquo;s who you work with too.</p>
-<p style="margin:0 0 0;font-size:16px;line-height:1.85;color:#374151;">
-Still here if you want to connect.</p>
+wellness a full-time job. That&rsquo;s most people. Still here if you want to connect.</p>"""
+
+    return _wrap(f"""
+<tr><td style="padding:40px 40px 24px;">
+<p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">Hey {name},</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+A few things readers have shared after finishing the book:</p>
+{testimonials}
+{closing}
 </td></tr>
 <tr><td style="padding:0 40px 24px;border-top:1px solid #e5e7eb;">
 {_book_covers()}
