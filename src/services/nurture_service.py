@@ -51,10 +51,14 @@ BOOK_PDF_URL = "https://whatishealthy.org/WhatisHealthy_FreeIntroduction.pdf"
 CONFIRM_DOWNLOAD_URL = "https://whatishealthy.org/confirm-download.html"
 BOOK_IMAGE_URL = "https://storage.googleapis.com/wihy-web-assets/images/book/BookGreen.jpg"
 WIHY_URL = "https://wihy.ai"
+WIHY_SUB_URL = "https://wihy.ai/subscription"
+WIHY_ICON_URL = "https://storage.googleapis.com/wihy-web-assets/images/eden/eden-icon.png"
 BOOK_URL = "https://whatishealthy.org"
 UNSUBSCRIBE_URL = "https://whatishealthy.org/unsubscribe"
 
 CG_URL = "https://communitygroceries.com"
+CG_SUB_URL = "https://communitygroceries.com/subscription"
+CG_ICON_URL = "https://storage.googleapis.com/wihy-web-assets/images/cora/cora-icon.png"
 
 PAPERBACK_URL_FEMALE = "https://buy.stripe.com/dRmbJ13cu4dYcdz5t0ejK0i"
 PAPERBACK_URL_MALE = "https://buy.stripe.com/aFafZheVc7qacdzg7EejK0j"
@@ -305,27 +309,119 @@ def _paperback_buttons() -> str:
 
 
 def _all_format_buttons() -> str:
-    """Buy options as a clean table — no emojis, works in Outlook."""
-    def row(label: str, url: str, color: str) -> str:
+    """2-column pill-button grid for all 6 purchase formats. Email-safe tables."""
+    def cell(label: str, url: str, color: str) -> str:
         return (
-            f'<tr><td style="padding:0 0 8px 0;">'
+            f'<td width="50%" style="padding:0 4px 8px;">'
             f'<table width="100%" cellpadding="0" cellspacing="0"><tr>'
-            f'<td align="center" bgcolor="{color}" style="border-radius:4px;">'
-            f'<a href="{url}" target="_blank" style="display:block;padding:12px 20px;'
-            f'color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;'
+            f'<td align="center" bgcolor="{color}" style="border-radius:6px;">'
+            f'<a href="{url}" target="_blank"'
+            f' style="display:block;padding:13px 10px;color:#ffffff;font-size:14px;'
+            f'font-weight:700;text-decoration:none;line-height:1.3;'
             f'font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif;">'
-            f'{label}</a></td></tr></table></td></tr>'
+            f'{label}</a></td></tr></table></td>'
         )
     return (
-        '<table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 8px;">' +
-        row("Ship Paperback &mdash; Female Cover", PAPERBACK_URL_FEMALE, "#16a34a") +
-        row("Ship Paperback &mdash; Male Cover",   PAPERBACK_URL_MALE,   "#16a34a") +
-        row("Amazon Paperback",                    AMAZON_PAPERBACK_URL, "#E47911") +
-        row("Amazon Hardcover",                    AMAZON_HARDCOVER_URL, "#232f3e") +
-        row("Kindle Edition",                      AMAZON_KINDLE_URL,    "#1A6B9A") +
-        row("Audible Audiobook",                   AMAZON_AUDIBLE_URL,   "#E8871E") +
-        '</table>'
+        '<table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 4px;">'
+        '<tr>'
+        + cell("Ship Paperback<br/>Female Cover", PAPERBACK_URL_FEMALE, "#15803d")
+        + cell("Ship Paperback<br/>Male Cover",   PAPERBACK_URL_MALE,   "#15803d")
+        + '</tr><tr>'
+        + cell("Amazon Paperback",                AMAZON_PAPERBACK_URL, "#c45000")
+        + cell("Amazon Hardcover",                AMAZON_HARDCOVER_URL, "#1f2937")
+        + '</tr><tr>'
+        + cell("Kindle Edition",                  AMAZON_KINDLE_URL,    "#1a5c8a")
+        + cell("Audible Audiobook",               AMAZON_AUDIBLE_URL,   "#b45309")
+        + '</tr></table>'
     )
+
+
+def _brand_cards() -> str:
+    """Side-by-side Eden + Cora brand cards with images, positioning, and CTA buttons."""
+    return f"""
+<table width="100%" cellpadding="0" cellspacing="0">
+<tr>
+  <!-- Eden card -->
+  <td width="50%" valign="top" style="padding:0 6px 0 0;">
+    <table width="100%" cellpadding="0" cellspacing="0"
+           style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
+      <tr>
+        <td align="center" bgcolor="#1e1b4b" style="padding:20px 16px 12px;">
+          <img src="{WIHY_ICON_URL}" width="72" height="72" alt="Eden by WIHY"
+               style="display:block;margin:0 auto 10px;border-radius:50%;border:0;" />
+          <p style="margin:0;font-size:15px;font-weight:700;color:#ffffff;
+             font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+            Eden by WIHY</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:14px 14px 6px;">
+          <p style="margin:0 0 8px;font-size:13px;font-weight:700;color:#1e1b4b;
+             font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+            For your overall health goals</p>
+          <p style="margin:0;font-size:12px;line-height:1.7;color:#4b5563;
+             font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+            Ask any food or health question. Scan labels. Track progress. Eden is built for
+            people who want to understand their health from the inside out.</p>
+        </td>
+      </tr>
+      <tr>
+        <td align="center" style="padding:12px 14px 16px;">
+          <table cellpadding="0" cellspacing="0"><tr>
+            <td align="center" bgcolor="#1e1b4b" style="border-radius:5px;">
+              <a href="{WIHY_SUB_URL}" target="_blank"
+                 style="display:block;padding:10px 18px;color:#ffffff;font-size:13px;
+                 font-weight:700;text-decoration:none;
+                 font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+                Get Started Free</a>
+            </td>
+          </tr></table>
+        </td>
+      </tr>
+    </table>
+  </td>
+  <!-- Cora card -->
+  <td width="50%" valign="top" style="padding:0 0 0 6px;">
+    <table width="100%" cellpadding="0" cellspacing="0"
+           style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
+      <tr>
+        <td align="center" bgcolor="#f0fdf4" style="padding:20px 16px 12px;">
+          <img src="{CG_ICON_URL}" width="72" height="72" alt="Cora by Community Groceries"
+               style="display:block;margin:0 auto 10px;border:0;" />
+          <p style="margin:0;font-size:15px;font-weight:700;color:#15803d;
+             font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+            Cora by CG</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:14px 14px 6px;">
+          <p style="margin:0 0 8px;font-size:13px;font-weight:700;color:#15803d;
+             font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+            For singles &amp; empty nesters</p>
+          <p style="margin:0;font-size:12px;line-height:1.7;color:#4b5563;
+             font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+            Real food at fair prices, sized for one or two. No bulk. No waste.
+            Cora is built for people who want to eat well without buying for a family
+            they no longer have.</p>
+        </td>
+      </tr>
+      <tr>
+        <td align="center" style="padding:12px 14px 16px;">
+          <table cellpadding="0" cellspacing="0"><tr>
+            <td align="center" bgcolor="#15803d" style="border-radius:5px;">
+              <a href="{CG_SUB_URL}" target="_blank"
+                 style="display:block;padding:10px 18px;color:#ffffff;font-size:13px;
+                 font-weight:700;text-decoration:none;
+                 font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+                Get Started Free</a>
+            </td>
+          </tr></table>
+        </td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>"""
 
 
 # ── Template builders ─────────────────────────────────────────────────────────
@@ -372,9 +468,9 @@ Paperback ships free. Kindle and Audible available immediately.</p>
 </td></tr>
 <tr><td style="padding:16px 32px 32px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
-I'll send you the opening chapter tomorrow.</p>
+I will send you the opening chapter tomorrow.</p>
 <p style="margin:20px 0 0;font-size:16px;line-height:1.8;color:#374151;">
-Talk soon,<br/>{_team(variant)}</p>
+Talk soon,<br/>Kortney</p>
 </td></tr>""", variant=variant)
 
 
@@ -475,20 +571,20 @@ One of the most practical things in the book is a framework I call the 5-second 
 <p style="margin:20px 0 20px;font-size:16px;line-height:1.8;color:#374151;">
 The book has 11 more frameworks like this — for reading labels quickly, spotting hidden sugars across 61 different names, and identifying which products in the health food aisle are not what they claim to be.</p>
 <p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
-We also built <strong>Eden by WIHY</strong> — a free tool where you can ask any food or health question and get a straight answer. Think of it as the research from the book, available in your pocket at the store.</p>
-<table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 20px;">
-<tr><td align="center">
-<a href="{WIHY_URL}" style="display:inline-block;background:#1e40af;color:#ffffff;
-   font-size:15px;font-weight:600;text-decoration:none;padding:12px 28px;border-radius:4px;">
-Try Eden Free</a>
-</td></tr></table>
-<p style="margin:0 0 16px;font-size:16px;line-height:1.8;color:#374151;">
 The full book with all 12 frameworks:</p>
 {_all_format_buttons()}
 </td></tr>
+<tr><td style="padding:0 32px 24px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 12px;font-size:15px;line-height:1.8;color:#6b7280;">
+Two tools I built alongside the book — both free to start:</p>
+{_brand_cards()}
+<p style="margin:14px 0 0;font-size:13px;line-height:1.7;color:#9ca3af;">
+Eden is for anyone working on their overall health. Cora is for people cooking for one
+or two who want real food without the bulk-store quantities.</p>
+</td></tr>
 <tr><td style="padding:16px 32px 32px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
-Best,<br/>{_team(variant)}</p>
+Best,<br/>Kortney</p>
 </td></tr>""", variant=variant)
 
 
@@ -574,21 +670,19 @@ I am not going to push hard here. If any of this made you think differently abou
 <p style="margin:0 0 16px;font-size:16px;line-height:1.8;color:#374151;">If you want it:</p>
 {_all_format_buttons()}
 </td></tr>
-<tr><td style="padding:0 32px 24px;border-top:1px solid #e5e7eb;">
-<p style="margin:20px 0 16px;font-size:15px;line-height:1.8;color:#6b7280;">
-Two other things worth knowing, both connected to what the book is about:</p>
-<p style="margin:0 0 14px;font-size:15px;line-height:1.8;color:#374151;">
-<strong>Eden by WIHY</strong> — a free tool where you can ask any food or health question and get a straight answer. Useful in the store when you are looking at an ingredient you do not recognize.
-<a href="{WIHY_URL}" style="color:#1e40af;">wihy.ai</a></p>
-<p style="margin:0;font-size:15px;line-height:1.8;color:#374151;">
-<strong>Community Groceries</strong> — a grocery service built around the same principles as the book.
-<a href="{CG_URL}" style="color:#1e40af;">communitygroceries.com</a></p>
+<tr><td style="padding:0 32px 16px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 6px;font-size:15px;line-height:1.8;color:#374151;">
+Before I go — two things I built that come directly out of the same research as this book.</p>
+<p style="margin:0 0 16px;font-size:15px;line-height:1.8;color:#6b7280;">
+I started working on both of these the same year I started writing. They are different tools
+for different people, but they come from the same place this book does.</p>
+{_brand_cards()}
 </td></tr>
 <tr><td style="padding:16px 32px 32px;border-top:1px solid #e5e7eb;">
 <p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
 Whatever you decide — keep reading those labels.</p>
 <p style="margin:20px 0 0;font-size:16px;line-height:1.8;color:#374151;">
-All the best,<br/>{_team(variant)}</p>
+All the best,<br/>Kortney</p>
 </td></tr>""", variant=variant)
 
 
