@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY", "").strip()
 FROM_EMAIL = os.getenv("B2B_FROM_EMAIL", "info@vowels.org")
-FROM_NAME  = os.getenv("B2B_FROM_NAME",  "Kortney Lee — What Is Healthy?")
+FROM_NAME  = os.getenv("B2B_FROM_NAME",  "Kortney Lee")
 BCC_EMAIL  = os.getenv("BOOK_EMAIL_BCC", "kortney@wihy.ai")
 UNSUBSCRIBE_URL = "https://whatishealthy.org/unsubscribe"
 
@@ -98,7 +98,7 @@ All of these are free to libraries that acquire the book. We want the book to ac
         "d0_intro": "I'm Kortney Lee, author of <em>What Is Healthy?</em>, and I think your listeners would find this conversation valuable.",
         "d0_context": "The book covers the gap between what people are told about health and what the research actually shows — specifically around the food industry, label deception, ultra-processed food, and what families can realistically do about it. It's not another diet book. It's a research-backed look at why the system isn't working for most people and what to do about it.",
         "d0_offer": "I'm an experienced speaker and can adapt the conversation to what resonates most with your audience — whether that's weight loss, feeding kids, food budgets, or the bigger picture of community health.",
-        "d0_cta_label": "View Media Kit &amp; Talking Points",
+        "d0_cta_label": "View Media Kit & Talking Points",
         "d0_cta_url": MEDIA_KIT_URL,
         "d3_body": """A few angles that have generated the strongest listener response in past interviews:<br/><br/>
 <strong>"The 5-second label test"</strong> — a simple way to know whether a food is worth eating before you even read the ingredients. Listeners share this one.<br/><br/>
@@ -146,7 +146,7 @@ We're flexible on format and happy to work around your editorial calendar.""",
         "d21_close": "Last note from me. If the timing or angle doesn't fit right now, no problem. Keep us in mind — the offer for a review copy or excerpt stands whenever you're ready.",
     },
     "church": {
-        "d0_subject":  "What Is Healthy? — church &amp; community wellness programs",
+        "d0_subject":  "What Is Healthy? — church & community wellness programs",
         "d3_subject":  "How faith communities are using this book",
         "d7_subject":  "Bulk pricing, speaking, and small group resources",
         "d14_subject": "Ready to support your community health program",
@@ -154,7 +154,7 @@ We're flexible on format and happy to work around your editorial calendar.""",
         "d0_intro": "I'm reaching out because <em>What Is Healthy?</em> has found a real home in faith community wellness programs, and I thought it might be a fit for yours.",
         "d0_context": "The book is about what we put into our bodies, why the system makes it so hard to make good choices, and what individuals and communities can do about it. It's written from a place of care for people — not judgment — and that message resonates with communities that already think about stewardship, wholeness, and looking out for each other.",
         "d0_offer": "We offer bulk pricing for group studies (10+ copies), and I'm available to speak at health-focused church events, wellness weekends, or community health fairs.",
-        "d0_cta_label": "View Bulk Order &amp; Speaking Info",
+        "d0_cta_label": "View Bulk Order & Speaking Info",
         "d0_cta_url": WHOLESALE_URL,
         "d3_body": """Faith communities have used the book in a few ways that have worked really well:<br/><br/>
 <strong>6-week small group study</strong> — we provide a discussion guide that maps to chapters and works well in small groups of 8–15. Topics include food and stewardship, caring for your community's health, and what the research says about chronic illness in working families.<br/><br/>
@@ -176,7 +176,7 @@ My grandmother passed from cancer after years of type 2 diabetes and high blood 
         "d21_close": "Last note. Whether it's a few books for a small group or a full community event, we're here whenever the timing is right. Just reply and we'll make it work.",
     },
     "school": {
-        "d0_subject":  "What Is Healthy? — school nutrition &amp; health programs",
+        "d0_subject":  "What Is Healthy? — school nutrition & health programs",
         "d3_subject":  "How schools are using the book in health classes",
         "d7_subject":  "Curriculum resources, assemblies, and parent workshops",
         "d14_subject": "Ready to support your nutrition program",
