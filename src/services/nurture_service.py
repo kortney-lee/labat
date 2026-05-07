@@ -432,35 +432,101 @@ Talk soon,<br/>Kortney</p>
 
 
 def _render_did_you_get_this(first_name: str, variant: str = "", **kw) -> str:
-    """Day 1 — opening prose from the book, cut at cliffhanger. Buy CTA."""
+    """Day 1 — actual book passages: Hello World, Is This You, cliffhanger. Buy CTA."""
     c = _get_copy(variant)
     return _email_wrap(f"""
-<tr><td style="padding:40px 32px 24px;">
-<p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">Hey {first_name},</p>
-<p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
-Here's how <strong>What Is Healthy?</strong> opens:</p>
+<tr><td style="padding:40px 32px 16px;">
+<p style="margin:0 0 16px;font-size:16px;line-height:1.8;color:#374151;">Hey {first_name},</p>
+<p style="margin:0 0 0;font-size:16px;line-height:1.8;color:#374151;">
+Here is the opening of <strong>What Is Healthy?</strong> — pulled directly from the book.</p>
 </td></tr>
-<tr><td style="padding:0 32px 24px;">
-<table width="100%" cellpadding="24" cellspacing="0" bgcolor="#f9fafb"
-       style="border-left:3px solid #d1d5db;font-size:15px;line-height:1.9;color:#4b5563;">
-<tr><td>
-<p style="margin:0 0 16px;font-style:italic;">We are the sickest generation of Americans in recorded history.</p>
-<p style="margin:0 0 16px;font-style:italic;">Not sicker because we are older. Not sicker because we have stopped trying. We are sicker in spite of knowing more about nutrition than any generation before us. We have more diet books, more health apps, more organic labels, and more wellness products than ever before — and the rates of obesity, type 2 diabetes, heart disease, and metabolic dysfunction keep climbing.</p>
-<p style="margin:0 0 16px;font-style:italic;">Something is very wrong with the story we have been told about food.</p>
-<p style="margin:0 0 16px;font-style:italic;">Most people feel it. They follow the advice and don't get better. They read the labels and still feel confused. They try harder and the needle doesn't move. And after a while, they start to wonder if the problem is them — if they're just not disciplined enough, not consistent enough, not smart enough about food.</p>
-<p style="margin:0;font-style:italic;">They're not. The system is broken — and it was designed to be.</p>
-</td></tr></table>
+
+<tr><td style="padding:0 32px 20px;border-top:1px solid #e5e7eb;">
+<p style="margin:20px 0 16px;font-size:20px;font-weight:700;line-height:1.3;color:#111827;">
+Hello, World. My name is Kortney Lee.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+When you're first taught to write code, the introduction often begins with a simple
+program that prints one phrase: Hello, World. That single line represents the start
+of something new — simple on the surface, but full of possibility. That's how this
+began for me. Not with a perfect plan. But with a line. A choice. A moment of clarity.
+And a lot of questions.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+In my life, that line got printed the night I found myself on the floor — confused,
+winded, and unsure of how things had gotten that bad. That was my Hello, World moment.
+Not the start of another diet or fitness plan, but the first real interruption in the
+script I had been living on autopilot. The moment I knew I had to break the cycle —
+or at least figure out how it started. What caused it. What was keeping it alive.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+I spent most of my career in software. Long hours in front of a computer. I signed up
+for a gym and never went. I made coffee in the morning, loaded with sugar, several
+more times throughout the day. Lunch was fast and familiar: burgers, pizza, whatever
+was convenient. By the time I got home, I would eat a full dinner and still find
+myself back in the kitchen. Not because I was hungry — because I had been conditioned
+to expect more.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Eventually I tried to turn things around. I followed advice that sounded smart. I paid
+thousands for coaching, programs, and services that promised results. I tried vibrating
+belts, meal replacement shakes, fat-burning pills, detox teas, lemon and cayenne
+cleanses. I even drank apple cider vinegar straight — and that was a horrible decision.
+Nothing worked. My waistline kept growing.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+I was constantly full but rarely satisfied. Tired. Bloated. Discouraged.</p>
 </td></tr>
-<tr><td style="padding:0 32px 24px;">
-<p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">
-The next chapter is called "How Did We Get Here?" It answers the question most people have been afraid to ask — because the answer means the problem was never you.</p>
-<p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">The full 264-page book:</p>
+
+<tr><td style="padding:0 32px 20px;">
+<p style="margin:0 0 16px;font-size:20px;font-weight:700;line-height:1.3;color:#111827;">
+Is This You?</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Have you ever squeezed into an airplane seat, wondering if the seats have gotten smaller?
+You're not imagining it — since the 1980s, the average width of economy seats has shrunk
+by over two inches. But maybe the real question isn't whether the seat got smaller.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Maybe it's not just airplane seats.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+Maybe you've slid into a booth and felt your stomach press against the edge. Struggled
+to buckle a seatbelt. Adjusted your clothes in the mirror, trying to convince yourself
+they still fit. Or maybe you've walked up a single flight of stairs and felt your legs
+burn. Hurried across a parking lot and arrived breathless. Bent down to tie your shoes
+and felt your stomach get in the way.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+It didn't happen overnight. It happened one skipped step at a time. One extra serving.
+One more drive-thru because cooking felt like too much. You told yourself: I'll start
+tomorrow. And then one day, nothing feels the same. Your clothes fit differently.
+Your energy is gone. You feel like a stranger in your own body.</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+I looked around and realized the patterns weren't just mine. My family. My friends.
+My community. Everyone was doing their best with what they had — eating what was
+available, doing what was convenient, believing what was marketed. And we were
+getting sicker. Not because we didn't care. Because we didn't know where to begin.</p>
+</td></tr>
+
+<tr><td style="padding:20px 32px 20px;border-top:2px solid #111827;border-bottom:2px solid #111827;">
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+So the question isn't just "What are we eating?" It's:</p>
+<p style="margin:0 0 16px;font-size:17px;font-weight:600;line-height:1.85;color:#111827;">
+"Why are we eating it? How did we get here? What patterns are we repeating?
+And — what story are we handing down?"</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#374151;">
+This is about clarity. Most of us are living out health stories we didn't write —
+shaped by industries we don't control and systems we never paused to question.
+We may not have chosen the conditions we were raised in. But we can choose what
+we carry forward.</p>
+<p style="margin:0 0 4px;font-size:16px;line-height:1.85;color:#374151;font-style:italic;">
+"If this isn't the story you want passed down... then how did we get here?"</p>
+<p style="margin:12px 0 0;font-size:14px;line-height:1.6;color:#6b7280;">
+— <em>What Is Healthy?</em>, Introduction, p. 9</p>
+</td></tr>
+
+<tr><td style="padding:20px 32px 24px;">
+<p style="margin:0 0 16px;font-size:16px;line-height:1.8;color:#374151;">
+Chapter 1 answers that question. It starts on page 29 of the full book:</p>
 {_all_format_buttons()}
 </td></tr>
 <tr><td style="padding:16px 32px 32px;border-top:1px solid #e5e7eb;">
-<p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">More coming in a few days.</p>
+<p style="margin:0;font-size:16px;line-height:1.8;color:#374151;">
+More in a few days.</p>
 <p style="margin:20px 0 0;font-size:16px;line-height:1.8;color:#374151;">
-Talk soon,<br/>{_team(variant)}</p>
+Talk soon,<br/>Kortney</p>
 </td></tr>""", variant=variant)
 
 
